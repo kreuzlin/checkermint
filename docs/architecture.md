@@ -8,7 +8,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | Path | Purpose |
 |---|---|
 | `config/` | Settings (one module, configured via environment), URLs, WSGI |
-| `core/` | Base layout, home page, SEO (`core/seo.py`), navigation, `/version`, error pages |
+| `core/` | Base layout, home page, SEO (`core/seo.py`), noindex middleware, Markdown rendering (`core/markdown.py`, `markdown` template filter), navigation, `/version`, `/robots.txt`, error pages |
 | `<app>/` | One small Django app per topic (added per project) |
 
 - Every public view sets title and meta description via `core.seo.SeoMixin`;
