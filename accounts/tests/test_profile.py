@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import Profile
-from accounts.roles import COACH_GROUP_NAME, is_coach
+from accounts.roles import COACH_GROUP_NAME, COACH_PERMISSIONS, is_coach
 
 User = get_user_model()
 
@@ -62,8 +62,17 @@ class ProfileTests(TestCase):
 class CoachRoleTests(TestCase):
     def test_coach_group_exists_with_profile_permissions(self):
         group = Group.objects.get(name=COACH_GROUP_NAME)
-        codenames = set(group.permissions.values_list("codename", flat=True))
-        self.assertEqual(codenames, {"view_profile", "change_profile"})
+        permissions = set(
+            group.permissions.values_list("content_type__app_label", "codename")
+        )
+        expected = {
+            (app_label, f"{action}_{model}")
+            for app_label, models in COACH_PERMISSIONS.items()
+            for model, actions in models.items()
+            for action in actions
+        }
+        self.assertEqual(permissions, expected)
+        self.assertIn(("accounts", "change_profile"), permissions)
 
     def test_coach_group_cannot_manage_users_yet(self):
         group = Group.objects.get(name=COACH_GROUP_NAME)

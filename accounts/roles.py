@@ -16,6 +16,11 @@ COACH_GROUP_NAME = "Coach"
 # rights.
 COACH_PERMISSIONS = {
     "accounts": {"profile": ["view", "change"]},
+    "tasks": {
+        "topic": ["view", "add", "change", "delete"],
+        "levelthreshold": ["view", "add", "change", "delete"],
+    },
+    "badges": {"badge": ["view", "add", "change", "delete"]},
 }
 
 

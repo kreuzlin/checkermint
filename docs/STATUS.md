@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-18 (PR "Generate robot avatars with Robohash")_
+_Last updated: 2026-11-18 (PR "Add topics, level thresholds and badges")_
 
 ## Live
 
@@ -71,6 +71,10 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   requests), "Neuen Roboter würfeln" on `/profil/`, shown in the header,
   directory and profiles; CC-BY credits in the footer (to be repeated on
   the imprint page, #47).
+- #15: apps `tasks` (topics, shared level table with level 1 at 0 points,
+  validated: no gaps, strictly increasing) and `badges` (static artwork or
+  placeholder until #4); admin for coaches (migrations `tasks/0001–0002`,
+  `badges/0001`).
 
 ## Open issues
 
@@ -88,9 +92,9 @@ Overview: `gh issue list`. At the time of writing:
 
 1. Maintainer merges PR #57 (#11 coach-created accounts, contains a
    migration).
-2. M2 is complete once PR #57 is merged. Next: M3 (topics and tasks),
-   starting with #15 topics, level thresholds and badges (migrations, so
-   the maintainer merges those PRs).
+2. Maintainer merges the PR for #15 (migrations; after #57, since both
+   change `COACH_PERMISSIONS`). Next in M3: #16 tasks with immutable
+   versions, requirements and hints.
 3. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars).
 
