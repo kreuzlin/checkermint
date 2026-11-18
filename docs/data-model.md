@@ -14,9 +14,22 @@ for version 1: brief, section 7; decisions in ADRs 0010–0013.
 
 `is_coach(user)` checks this (superusers count as coaches). The group
 "Coach" and its permissions are defined in `COACH_PERMISSIONS` and applied
-by data migrations calling `sync_coach_group` (first: `accounts/0002`).
-Current coach permissions: view and change profiles. Managing user accounts
-follows with a hardened user admin (#11).
+by data migrations calling `sync_coach_group` (`accounts/0002`, `0003`).
+
+Current coach permissions: users view/add/change, profiles view/add/change.
+No delete: accounts are deactivated (`is_active`). The user admin
+(`accounts.admin.UserAdmin`) restricts coaches to participant accounts:
+
+- list, change and password pages only for users with `is_staff = False`
+  and `is_superuser = False`;
+- the add form creates the account (username, password, optional email)
+  and its profile in one step; the profile is required;
+- staff, superuser, group and permission fields are never shown, and
+  `save_model` forces `is_staff = False`, `is_superuser = False`;
+- the profile admin is a list of participant profiles without "add".
+
+Superusers keep Django's full user admin (plus the profile inline, optional
+for them).
 
 ## accounts
 
