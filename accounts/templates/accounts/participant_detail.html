@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load avatars markdown %}
+
+{% block content %}
+  <h1 class="with-avatar">{% avatar profile 64 %} {{ profile.nickname }}</h1>
+
+  <p class="help">
+    Internes Profil: nur für Angemeldete sichtbar.
+    {% if is_own %}<a href="{% url 'accounts:profile_edit' %}">Profil bearbeiten</a>{% endif %}
+  </p>
+
+  <dl class="facts">
+    <dt>Echter Name</dt>
+    <dd>{{ profile.real_name }}</dd>
+    {% if show_email %}
+      <dt>E-Mail-Adresse</dt>
+      <dd>{{ profile.user.email|default:"keine" }} <span class="help">(nur für {% if is_own %}dich{% else %}die Person selbst{% endif %} und Coaches sichtbar)</span></dd>
+    {% endif %}
+  </dl>
+
+  <h2>Über mich</h2>
+  {% if profile.about %}
+    <div class="prose">{{ profile.about|markdown }}</div>
+  {% else %}
+    <p class="help">Noch nichts geschrieben.</p>
+  {% endif %}
+{% endblock %}

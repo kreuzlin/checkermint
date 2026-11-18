@@ -178,3 +178,87 @@ main {
   font: inherit;
   cursor: pointer;
 }
+
+fieldset {
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem 0;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+legend {
+  padding: 0 0.25rem;
+  font-weight: 700;
+}
+
+.form-field textarea {
+  width: 100%;
+  max-width: 40rem;
+  padding: 0.5rem;
+  border: 1px solid var(--text-muted);
+  border-radius: 4px;
+  font: inherit;
+}
+
+/* Status messages after saving (text, not colour alone). */
+.message {
+  margin: 0 0 1rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 4px solid var(--accent);
+}
+
+.message-error {
+  border-left-color: var(--error);
+}
+
+/* Definition lists for profile facts */
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1rem;
+}
+
+.facts dt {
+  font-weight: 600;
+}
+
+.facts dd {
+  margin: 0;
+}
+
+.profile-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Robot avatars (transparent PNG on a light tile) */
+.avatar {
+  flex: none;
+  border-radius: 6px;
+  background: #eef1f4;
+}
+
+.with-avatar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.avatar-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.avatar-box h2 {
+  margin: 0;
+}
+
+.site-footer p {
+  margin: 0 0 0.25rem;
+}

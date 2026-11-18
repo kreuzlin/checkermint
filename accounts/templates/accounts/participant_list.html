@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load avatars %}
+
+{% block content %}
+  <h1>Teilnehmende</h1>
+
+  {% if profiles %}
+    <ul class="profile-list">
+      {% for profile in profiles %}
+        <li><a href="{% url 'accounts:participant_detail' nickname=profile.nickname %}" class="with-avatar">{% avatar profile 32 %} {{ profile.nickname }}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Noch keine Teilnehmenden.</p>
+  {% endif %}
+{% endblock %}

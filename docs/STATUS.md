@@ -66,6 +66,14 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #12: password reset by email (`/passwort-vergessen/`, German pages and
   email, link valid 3 days) for accounts with an email address; otherwise a
   coach sets a new password. Emails go to the console until SMTP (#3, M9).
+- #13: own profile `/profil/` (about text, optional email, visibility
+  switches, notifications; nickname and real name only via coaches),
+  internal directory and profiles `/teilnehmende/` for logged-in users
+  (email only for the person and coaches).
+- #14: robot avatars with Robohash set1, generated locally (no external
+  requests), "Neuen Roboter würfeln" on `/profil/`, shown in the header,
+  directory and profiles; CC-BY credits in the footer (to be repeated on
+  the imprint page, #47).
 
 ## Open issues
 
@@ -81,7 +89,9 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. M2 (accounts and profiles): #13 own profile and visibility, #14 avatars.
+1. M2 (accounts and profiles) is complete. Next: M3 (topics and tasks),
+   starting with #15 topics, level thresholds and badges (PR #61,
+   migrations, so the maintainer merges it).
 2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars).
 
