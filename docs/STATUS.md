@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-18 (PR "Add admin workflow for task versions")_
+_Last updated: 2026-11-18 (PR "Serve private media through an authenticated view")_
 
 ## Live
 
@@ -87,6 +87,9 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   requirement and hint inlines, preview as participants see it, publish
   with confirmation; published versions read-only. Pinned count per
   version follows with #19.
+- #21 (ahead of #18, which needs it): private files only through
+  `/dateien/<kind>/<pk>/` with per-object access checks, random storage
+  names and safe headers; no model uses it yet.
 
 ## Open issues
 
