@@ -9,7 +9,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 |---|---|
 | `config/` | Settings (one module, configured via environment), URLs, WSGI |
 | `core/` | Base layout, home page, SEO (`core/seo.py`), noindex middleware, Markdown rendering (`core/markdown.py`, `markdown` template filter), navigation, `/version`, `/robots.txt`, error pages |
-| `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), password rules |
+| `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
 | `<app>/` | One small Django app per topic (added per project) |
 
 - Every public view sets title and meta description via `core.seo.SeoMixin`;
@@ -31,6 +31,12 @@ Overview of how the project is built and run. Decisions and their rationale:
   about text, regardless of the switches, which only control the public
   page `/p/<nickname>/`, #46). The email address is shown only to the
   participant and to coaches. Inactive and staff accounts are not listed.
+- Avatars (ADR 0012): Robohash set1 rendered locally as PNG in 64, 128 or
+  256 px, only for seeds of existing profiles, kept in an in-process LRU
+  cache and sent with `Cache-Control: public, max-age=1 year, immutable`
+  (a new seed is a new URL). "Neuen Roboter würfeln" (POST
+  `/profil/roboter-wuerfeln/`) sets a new seed. The footer credits the
+  CC-BY artwork; a snapshot test of a few seeds guards package upgrades.
 - Navigation entries can be `members_only` (`core.navigation.NavItem`).
 - Password reset: Django's flow with German templates
   (`accounts/templates/accounts/`). Only active users with a stored email

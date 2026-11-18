@@ -1,4 +1,4 @@
-{% load static seo %}<!doctype html>
+{% load static seo avatars %}<!doctype html>
 <html lang="de-ch">
 <head>
   <meta charset="utf-8">
@@ -28,7 +28,7 @@
       <div class="user-menu">
         {% if user.is_authenticated %}
           {% if user.profile %}
-            <a href="{% url 'accounts:profile_edit' %}" class="user-name"{% if request.resolver_match.view_name == "accounts:profile_edit" %} aria-current="page"{% endif %}>{{ user.profile.nickname }}</a>
+            <a href="{% url 'accounts:profile_edit' %}" class="user-name with-avatar"{% if request.resolver_match.view_name == "accounts:profile_edit" %} aria-current="page"{% endif %}>{% avatar user.profile 32 %} {{ user.profile.nickname }}</a>
           {% else %}
             <span class="user-name">{{ user.username }}</span>
           {% endif %}
@@ -56,7 +56,8 @@
 
   <footer class="site-footer">
     <div class="container">
-      © {% now "Y" %} {{ site_name }}
+      <p>© {% now "Y" %} {{ site_name }}</p>
+      <p>{% avatar_credits %}</p>
     </div>
   </footer>
 </body>
