@@ -170,7 +170,9 @@ Rationale lives in `docs/decisions/`. To deviate, write a new ADR first.
 - Logo and image originals live in `design/` (not served, not in the image);
   web assets are generated from them by a script, not edited by hand. Only
   use images whose usage rights are clear.
-- Never render user content with `|safe`.
+- Rich text (task instructions, feedback, "about me") is Markdown, rendered
+  only with the `|markdown` filter (`core.markdown`: allow-list sanitising
+  with nh3, no images or raw HTML). Never render user content with `|safe`.
 - Images always have an alt text field; it is required when an image is set.
 - Coaches are staff users in the group "Coach" (never superusers);
   participants are plain users without staff status. A new content model
