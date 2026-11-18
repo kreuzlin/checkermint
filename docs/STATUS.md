@@ -63,6 +63,9 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #11: coaches create participant accounts with profile in one admin form,
   edit them, set new passwords and deactivate them; staff accounts and
   rights fields are out of their reach (migration `accounts/0003`).
+- #12: password reset by email (`/passwort-vergessen/`, German pages and
+  email, link valid 3 days) for accounts with an email address; otherwise a
+  coach sets a new password. Emails go to the console until SMTP (#3, M9).
 
 ## Open issues
 
@@ -78,10 +81,8 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. Maintainer merges this PR (changes `compose.prod.yaml`).
-2. M2 (accounts and profiles): #12 password reset by email, #13 own
-   profile and visibility, #14 avatars.
-3. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
+1. M2 (accounts and profiles): #13 own profile and visibility, #14 avatars.
+2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars).
 
 ## Working agreements (summary)
