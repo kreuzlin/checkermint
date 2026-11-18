@@ -81,6 +81,68 @@ is the highest level whose `min_points` their points in that topic reach
 Level 1 at 0 points is created by migration `tasks/0002` and cannot be
 deleted; only the highest level can be deleted (no bulk delete).
 
+### Task
+
+The stable part of a task (brief 5.3, ADR 0010); everything participants
+read or fulfil lives in its versions.
+
+| Field | Type | Rules |
+|---|---|---|
+| `topic` | FK → Topic, protect | exactly one topic |
+| `slug` | slug 60, unique | stays when the title changes |
+| `order` | small int, default 0 | order within the topic |
+| `min_level` | small int ≥ 1, default 1 | locked until this level in the topic is reached |
+| `badge` | FK → Badge, optional, protect | awarded on the first approval |
+| `is_published` | bool, default `False` | visible to participants; needs a published version |
+| `is_archived` | bool, default `False` | hidden from the catalogue, points and history stay |
+| `created_at` | datetime | automatic |
+
+`str(task)` is the title of the latest published version (else the slug).
+Deleting a task is refused while it has a published version
+(`on_delete=protect_published_versions`); drafts are deleted with it.
+
+### TaskVersion
+
+| Field | Type | Rules |
+|---|---|---|
+| `task` | FK → Task | see above |
+| `number` | small int | 1, 2, 3, … per task, set automatically; unique per task |
+| `status` | `draft` / `published` | at most one draft per task (partial unique constraint) |
+| `title` | char 120 | |
+| `instructions` | text | Markdown |
+| `base_points` | small int ≥ 1, default 10 | points = base points × stars (ADR 0013) |
+| `change_note` | char 200, optional | shown to participants when switching |
+| `created_by` | FK → User, optional, set null | |
+| `created_at` | datetime | automatic |
+| `published_at` | datetime, optional | set if and only if published (check constraint) |
+
+**Immutability (ADR 0010), enforced in the model layer:** once the stored row
+is published, `save()` and `delete()` raise `PublishedVersionError`; the
+only allowed transition is `publish()` (draft → published, needs at least
+one requirement). The `QuerySet` refuses `update()` and `delete()` when
+published versions are included.
+
+### TaskRequirement (ADR 0011) and Hint
+
+Both belong to a version (`task_version`, cascade with drafts) and have a
+`key` (slug 50, unique per version, kept across versions) and an `order`.
+Their `save()`, `delete()` and the `QuerySet`'s `update()`, `delete()` and
+`bulk_create()` raise `PublishedVersionError` for published versions (also
+when moving a row out of one).
+
+| TaskRequirement field | Type | Rules |
+|---|---|---|
+| `type` | `text` / `code` / `photo` / `file` | behaviour comes from a handler per type (later) |
+| `label` | char 100 | |
+| `help_text` | char 300, optional | |
+| `required` | bool, default `True` | required → `min_count` ≥ 1 |
+| `min_count`, `max_count` | small int, default 1 | `min_count` ≤ `max_count`, `max_count` ≥ 1 |
+| `options` | JSON object, default `{}` | type-specific settings, validated by the handler |
+
+| Hint field | Type | Rules |
+|---|---|---|
+| `text` | text | Markdown |
+
 ## badges
 
 ### Badge

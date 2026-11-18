@@ -1,6 +1,9 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
-from django.db import models
+from django.db import models, transaction
+from django.db.models import Q
+from django.utils import timezone
 
 
 class Topic(models.Model):
@@ -97,3 +100,382 @@ class LevelThreshold(models.Model):
         if self.level == 1:
             return False
         return not LevelThreshold.objects.filter(level__gt=self.level).exists()
+
+
+# --- Tasks and immutable versions (ADR 0010, 0011) ------------------------
+
+
+class PublishedVersionError(Exception):
+    """A published task version, its requirements or hints were to change.
+
+    Published versions are immutable (brief 5.4, ADR 0010): any change means
+    a new version.
+    """
+
+    def __init__(self, message="Veröffentlichte Versionen lassen sich nicht ändern."):
+        super().__init__(message)
+
+
+def protect_published_versions(collector, field, sub_objs, using):
+    """`on_delete` for TaskVersion.task: drafts go, published versions stay.
+
+    Cascading deletes bypass `Model.delete()` and `QuerySet.delete()`, so
+    deleting a task must be stopped here.
+    """
+    published = [v for v in sub_objs if v.status == TaskVersion.Status.PUBLISHED]
+    if published:
+        raise models.ProtectedError(
+            "Aufgaben mit veröffentlichten Versionen lassen sich nicht löschen; "
+            "archiviere sie stattdessen.",
+            set(published),
+        )
+    models.CASCADE(collector, field, sub_objs, using)
+
+
+class Task(models.Model):
+    """The stable part of a task (brief 5.3); content lives in versions."""
+
+    topic = models.ForeignKey(
+        Topic, on_delete=models.PROTECT, related_name="tasks", verbose_name="Thema"
+    )
+    slug = models.SlugField(
+        "Kurzname für Adressen",
+        max_length=60,
+        unique=True,
+        help_text="Bleibt fest, auch wenn sich der Titel in einer neuen Version ändert.",
+    )
+    order = models.PositiveSmallIntegerField(
+        "Reihenfolge", default=0, help_text="Innerhalb des Themas, kleinere zuerst."
+    )
+    min_level = models.PositiveSmallIntegerField(
+        "Ab Level",
+        default=1,
+        validators=[MinValueValidator(1)],
+        help_text="Gesperrt, bis das Level in diesem Thema erreicht ist.",
+    )
+    badge = models.ForeignKey(
+        "badges.Badge",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="tasks",
+        verbose_name="Badge",
+        help_text="Wird bei der ersten Annahme einer Lösung vergeben.",
+    )
+    is_published = models.BooleanField(
+        "Für Teilnehmende sichtbar",
+        default=False,
+        help_text="Braucht eine veröffentlichte Version.",
+    )
+    is_archived = models.BooleanField(
+        "Archiviert",
+        default=False,
+        help_text="Nicht mehr im Katalog; Punkte und Verlauf bleiben.",
+    )
+    created_at = models.DateTimeField("Erstellt", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Aufgabe"
+        verbose_name_plural = "Aufgaben"
+        ordering = ["topic__order", "topic__name", "order", "slug"]
+
+    def __str__(self):
+        version = self.latest_published_version()
+        return version.title if version else self.slug
+
+    def latest_published_version(self):
+        return self.versions.published().order_by("-number").first()
+
+    def clean(self):
+        if self.is_published and (
+            not self.pk or not self.versions.published().exists()
+        ):
+            raise ValidationError(
+                {"is_published": ("Zuerst muss es eine veröffentlichte Version geben.")}
+            )
+
+
+class TaskVersionQuerySet(models.QuerySet):
+    """Bulk operations must not bypass the immutability guard."""
+
+    def published(self):
+        return self.filter(status=TaskVersion.Status.PUBLISHED)
+
+    def drafts(self):
+        return self.filter(status=TaskVersion.Status.DRAFT)
+
+    def update(self, **kwargs):
+        if self.published().exists():
+            raise PublishedVersionError()
+        return super().update(**kwargs)
+
+    def delete(self):
+        if self.published().exists():
+            raise PublishedVersionError()
+        return super().delete()
+
+
+class TaskVersion(models.Model):
+    """What participants read and fulfil; immutable once published."""
+
+    class Status(models.TextChoices):
+        DRAFT = "draft", "Entwurf"
+        PUBLISHED = "published", "Veröffentlicht"
+
+    task = models.ForeignKey(
+        Task,
+        on_delete=protect_published_versions,
+        related_name="versions",
+        verbose_name="Aufgabe",
+    )
+    number = models.PositiveSmallIntegerField("Version", editable=False)
+    status = models.CharField(
+        "Status", max_length=10, choices=Status.choices, default=Status.DRAFT
+    )
+    title = models.CharField("Titel", max_length=120)
+    instructions = models.TextField(
+        "Anleitung", help_text="Markdown. Bilder folgen mit einer späteren Version."
+    )
+    base_points = models.PositiveSmallIntegerField(
+        "Grundpunkte",
+        default=10,
+        validators=[MinValueValidator(1)],
+        help_text="Punkte = Grundpunkte × Sterne (1 bis 3).",
+    )
+    change_note = models.CharField(
+        "Änderungsnotiz",
+        max_length=200,
+        blank=True,
+        help_text="Was ist neu? Teilnehmende sehen das beim Wechsel.",
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name="Erstellt von",
+    )
+    created_at = models.DateTimeField("Erstellt", auto_now_add=True)
+    published_at = models.DateTimeField("Veröffentlicht am", null=True, blank=True)
+
+    objects = TaskVersionQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = "Aufgaben-Version"
+        verbose_name_plural = "Aufgaben-Versionen"
+        ordering = ["task", "number"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["task", "number"], name="tasks_version_unique_number"
+            ),
+            models.UniqueConstraint(
+                fields=["task"],
+                condition=Q(status="draft"),
+                name="tasks_version_one_draft_per_task",
+                violation_error_message="Diese Aufgabe hat schon einen Entwurf.",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    Q(status="draft", published_at__isnull=True)
+                    | Q(status="published", published_at__isnull=False)
+                ),
+                name="tasks_version_published_at_matches_status",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.title} (Version {self.number})"
+
+    def save(self, *args, **kwargs):
+        # Allowed: creating a draft, changing a draft, and draft → published.
+        if self.stored_is_published():
+            raise PublishedVersionError()
+        if self.number is None:
+            last = TaskVersion.objects.filter(task=self.task_id).aggregate(
+                models.Max("number")
+            )["number__max"]
+            self.number = (last or 0) + 1
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.stored_is_published():
+            raise PublishedVersionError()
+        return super().delete(*args, **kwargs)
+
+    @property
+    def is_published(self) -> bool:
+        return self.status == self.Status.PUBLISHED
+
+    def stored_is_published(self) -> bool:
+        """Whether the row in the database is published (ignores changes in memory)."""
+        if self.pk is None:
+            return False
+        return TaskVersion.objects.published().filter(pk=self.pk).exists()
+
+    def publish(self):
+        """Draft → published, the only allowed change of a version's state."""
+        if self.stored_is_published():
+            raise PublishedVersionError("Diese Version ist schon veröffentlicht.")
+        if not self.requirements.exists():
+            raise ValidationError(
+                "Eine Version braucht mindestens eine Anforderung (was eingereicht wird)."
+            )
+        with transaction.atomic():
+            self.status = self.Status.PUBLISHED
+            self.published_at = timezone.now()
+            self.save()
+
+
+class VersionChildQuerySet(models.QuerySet):
+    """Requirements and hints of published versions are immutable too."""
+
+    def touches_published(self) -> bool:
+        return self.filter(task_version__status=TaskVersion.Status.PUBLISHED).exists()
+
+    def update(self, **kwargs):
+        if self.touches_published():
+            raise PublishedVersionError()
+        return super().update(**kwargs)
+
+    def delete(self):
+        if self.touches_published():
+            raise PublishedVersionError()
+        return super().delete()
+
+    def bulk_create(self, objs, *args, **kwargs):
+        version_ids = {obj.task_version_id for obj in objs}
+        if TaskVersion.objects.published().filter(pk__in=version_ids).exists():
+            raise PublishedVersionError()
+        return super().bulk_create(objs, *args, **kwargs)
+
+
+class VersionChild(models.Model):
+    """Base for rows that belong to a task version (requirements, hints)."""
+
+    key = models.SlugField(
+        "Schlüssel",
+        max_length=50,
+        help_text=(
+            "Fester Kurzname, bleibt in neuen Versionen gleich (verbindet "
+            "Entwürfe und Hinweise über Versionen hinweg)."
+        ),
+    )
+    order = models.PositiveSmallIntegerField("Reihenfolge", default=0)
+
+    objects = VersionChildQuerySet.as_manager()
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        if self._version_is_published() or self._stored_version_is_published():
+            raise PublishedVersionError()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self._stored_version_is_published():
+            raise PublishedVersionError()
+        return super().delete(*args, **kwargs)
+
+    def _version_is_published(self) -> bool:
+        return TaskVersion.objects.published().filter(pk=self.task_version_id).exists()
+
+    def _stored_version_is_published(self) -> bool:
+        """The version this row is stored under (it could be moved in memory)."""
+        if self.pk is None:
+            return False
+        stored = (
+            type(self)
+            .objects.filter(pk=self.pk)
+            .values_list("task_version__status", flat=True)
+        )
+        return TaskVersion.Status.PUBLISHED in stored
+
+
+class TaskRequirement(VersionChild):
+    """What a submission must contain (ADR 0011)."""
+
+    class Type(models.TextChoices):
+        TEXT = "text", "Text"
+        CODE = "code", "Code"
+        PHOTO = "photo", "Foto"
+        FILE = "file", "Datei"
+
+    task_version = models.ForeignKey(
+        TaskVersion,
+        on_delete=models.CASCADE,
+        related_name="requirements",
+        verbose_name="Version",
+    )
+    type = models.CharField("Art", max_length=20, choices=Type.choices)
+    label = models.CharField("Bezeichnung", max_length=100)
+    help_text = models.CharField("Hilfetext", max_length=300, blank=True)
+    required = models.BooleanField("Pflicht", default=True)
+    min_count = models.PositiveSmallIntegerField(
+        "Mindestens", default=1, help_text="z. B. 2 Fotos"
+    )
+    max_count = models.PositiveSmallIntegerField(
+        "Höchstens", default=1, validators=[MinValueValidator(1)]
+    )
+    options = models.JSONField(
+        "Optionen",
+        default=dict,
+        blank=True,
+        help_text="Für Fachleute: Einstellungen je Art, z. B. erlaubte Dateiendungen.",
+    )
+
+    class Meta:
+        verbose_name = "Anforderung"
+        verbose_name_plural = "Anforderungen"
+        ordering = ["task_version", "order", "pk"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["task_version", "key"],
+                name="tasks_requirement_unique_key",
+                violation_error_message="Dieser Schlüssel kommt in der Version schon vor.",
+            ),
+            models.CheckConstraint(
+                condition=Q(min_count__lte=models.F("max_count")),
+                name="tasks_requirement_min_lte_max",
+                violation_error_message="«Mindestens» darf nicht grösser sein als «Höchstens».",
+            ),
+        ]
+
+    def __str__(self):
+        return self.label
+
+    def clean(self):
+        if self.required and self.min_count < 1:
+            raise ValidationError(
+                {"min_count": "Bei einer Pflicht-Anforderung mindestens 1."}
+            )
+        if not isinstance(self.options, dict):
+            raise ValidationError({"options": "Optionen müssen ein Objekt sein: {…}."})
+
+
+class Hint(VersionChild):
+    """A hint that a coach can grant on request (brief 5.5)."""
+
+    task_version = models.ForeignKey(
+        TaskVersion,
+        on_delete=models.CASCADE,
+        related_name="hints",
+        verbose_name="Version",
+    )
+    text = models.TextField("Hinweis", help_text="Markdown.")
+
+    class Meta:
+        verbose_name = "Hinweis"
+        verbose_name_plural = "Hinweise"
+        ordering = ["task_version", "order", "pk"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["task_version", "key"],
+                name="tasks_hint_unique_key",
+                violation_error_message="Dieser Schlüssel kommt in der Version schon vor.",
+            ),
+        ]
+
+    def __str__(self):
+        return f"Hinweis {self.key}"

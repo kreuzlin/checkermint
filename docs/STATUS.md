@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-18 (PR "Add topics, level thresholds and badges")_
+_Last updated: 2026-11-18 (PR "Add tasks with immutable versions")_
 
 ## Live
 
@@ -78,6 +78,10 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   validated: no gaps, strictly increasing) and `badges` (static artwork or
   placeholder until #4); admin for coaches (migrations `tasks/0001–0002`,
   `badges/0001`).
+- #16: `Task`, `TaskVersion`, `TaskRequirement`, `Hint`; published versions
+  and their requirements and hints are immutable in the model layer
+  (`save`/`delete`/QuerySet guards, protected cascade), at most one draft
+  per task (migrations `tasks/0003–0004`). Admin workflow follows in #17.
 
 ## Open issues
 
@@ -93,8 +97,8 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. Maintainer merges PR #61 (#15, migrations). Next in M3: #16 tasks with
-   immutable versions, requirements and hints.
+1. Maintainer merges the PR for #16 (migrations). Next in M3: #17 admin
+   workflow for task versions (new version, publish, preview).
 2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars).
 
