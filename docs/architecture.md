@@ -9,7 +9,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 |---|---|
 | `config/` | Settings (one module, configured via environment), URLs, WSGI |
 | `core/` | Base layout, home page, SEO (`core/seo.py`), noindex middleware, Markdown rendering (`core/markdown.py`, `markdown` template filter), navigation, `/version`, `/robots.txt`, error pages |
-| `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), password rules |
+| `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), password rules |
 | `<app>/` | One small Django app per topic (added per project) |
 
 - Every public view sets title and meta description via `core.seo.SeoMixin`;
@@ -24,6 +24,14 @@ Overview of how the project is built and run. Decisions and their rationale:
 - Passwords: `accounts.password_validation.RoleMinimumLengthValidator`
   (participants 6, staff 8 characters) plus Django's similarity, common and
   numeric validators.
+- Profiles: participants edit their about text, optional email address,
+  visibility switches and notifications on `/profil/`; nickname and real
+  name are changed by coaches in the admin. Logged-in users see the
+  internal directory `/teilnehmende/` and internal profiles (real name and
+  about text, regardless of the switches, which only control the public
+  page `/p/<nickname>/`, #46). The email address is shown only to the
+  participant and to coaches. Inactive and staff accounts are not listed.
+- Navigation entries can be `members_only` (`core.navigation.NavItem`).
 - Password reset: Django's flow with German templates
   (`accounts/templates/accounts/`). Only active users with a stored email
   address get a link (valid `PASSWORD_RESET_TIMEOUT`, 3 days, single use);

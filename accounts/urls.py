@@ -27,4 +27,15 @@ urlpatterns = [
         views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
+    path("profil/", views.ProfileEditView.as_view(), name="profile_edit"),
+    path(
+        "teilnehmende/",
+        views.ParticipantListView.as_view(),
+        name="participant_list",
+    ),
+    path(
+        "teilnehmende/<str:nickname>/",
+        views.ParticipantDetailView.as_view(),
+        name="participant_detail",
+    ),
 ]
