@@ -25,6 +25,17 @@
           </ul>
         </nav>
       {% endif %}
+      <div class="user-menu">
+        {% if user.is_authenticated %}
+          <span class="user-name">{% firstof user.profile.nickname user.username %}</span>
+          <form method="post" action="{% url 'accounts:logout' %}" class="inline-form">
+            {% csrf_token %}
+            <button type="submit" class="link-button">Abmelden</button>
+          </form>
+        {% else %}
+          <a href="{% url 'accounts:login' %}"{% if request.resolver_match.view_name == "accounts:login" %} aria-current="page"{% endif %}>Anmelden</a>
+        {% endif %}
+      </div>
     </div>
   </header>
 

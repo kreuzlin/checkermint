@@ -9,6 +9,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 |---|---|
 | `config/` | Settings (one module, configured via environment), URLs, WSGI |
 | `core/` | Base layout, home page, SEO (`core/seo.py`), noindex middleware, Markdown rendering (`core/markdown.py`, `markdown` template filter), navigation, `/version`, `/robots.txt`, error pages |
+| `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password rules |
 | `<app>/` | One small Django app per topic (added per project) |
 
 - Every public view sets title and meta description via `core.seo.SeoMixin`;
@@ -17,6 +18,12 @@ Overview of how the project is built and run. Decisions and their rationale:
   on every response, `/robots.txt` disallows everything, `base.html` adds
   `<meta name="robots" content="noindex, nofollow">`; no canonical, Open
   Graph or sitemap.
+- Sessions: "Angemeldet bleiben" keeps the session for 30 days
+  (`SESSION_COOKIE_AGE`); without it the session ends when the browser
+  closes (shared devices in the club). Logout is POST only.
+- Passwords: `accounts.password_validation.RoleMinimumLengthValidator`
+  (participants 6, staff 8 characters) plus Django's similarity, common and
+  numeric validators.
 - `/version` returns the Git commit of the running image as JSON
   (`APP_COMMIT`, set by CI); local builds report `dev`.
 
