@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-18 (PR "Add login, logout and long sessions")_
+_Last updated: 2026-11-18 (PR "Let coaches create participant accounts")_
 
 ## Live
 
@@ -60,6 +60,9 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #10: login `/anmelden/` with "Angemeldet bleiben" (30 days, otherwise until
   the browser closes), logout (POST) in the header, minimum password length
   6 for participants and 8 for staff.
+- #11: coaches create participant accounts with profile in one admin form,
+  edit them, set new passwords and deactivate them; staff accounts and
+  rights fields are out of their reach (migration `accounts/0003`).
 
 ## Open issues
 
@@ -76,8 +79,8 @@ Overview: `gh issue list`. At the time of writing:
 ## Next steps
 
 1. Maintainer merges this PR (changes `compose.prod.yaml`).
-2. M2 (accounts and profiles): #11 coach-created accounts (hardened user admin, coach permissions for
-   users – migration).
+2. M2 (accounts and profiles): #12 password reset by email, #13 own
+   profile and visibility, #14 avatars.
 3. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars).
 
