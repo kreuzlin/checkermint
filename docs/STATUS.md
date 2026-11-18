@@ -57,12 +57,13 @@ Overview: `gh issue list`. At the time of writing:
 | 2 | DNS for checkermint.ch (apex and `www` only) | Maintainer |
 | 3 | Outgoing mail `coach@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Logo, colours and badge artwork | Maintainer |
+| 6–51 | Version 1, one issue per PR, grouped in milestones M1–M11 (brief, section 10); PRs with migrations or server changes are marked and merged by the maintainer | Claude Code |
 
 ## Next steps
 
 1. Maintainer merges this PR (changes `compose.prod.yaml`).
-2. Issues for version 1 follow the GitHub milestones "M1 Setup" to
-   "M11 Go-live" (brief, section 10); continue with the rest of M1.
+2. Continue with the rest of M1: #6 (noindex), #7 (remove public media
+   route, maintainer merges), #8 (Markdown rendering).
 3. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars).
 
