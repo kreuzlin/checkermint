@@ -9,7 +9,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 |---|---|
 | `config/` | Settings (one module, configured via environment), URLs, WSGI |
 | `core/` | Base layout, home page, SEO (`core/seo.py`), noindex middleware, Markdown rendering (`core/markdown.py`, `markdown` template filter), navigation, `/version`, `/robots.txt`, error pages |
-| `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password rules |
+| `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), password rules |
 | `<app>/` | One small Django app per topic (added per project) |
 
 - Every public view sets title and meta description via `core.seo.SeoMixin`;
@@ -24,6 +24,12 @@ Overview of how the project is built and run. Decisions and their rationale:
 - Passwords: `accounts.password_validation.RoleMinimumLengthValidator`
   (participants 6, staff 8 characters) plus Django's similarity, common and
   numeric validators.
+- Password reset: Django's flow with German templates
+  (`accounts/templates/accounts/`). Only active users with a stored email
+  address get a link (valid `PASSWORD_RESET_TIMEOUT`, 3 days, single use);
+  the confirmation page looks the same for unknown addresses. Without an
+  email address a coach sets a new password in the admin. Emails go to the
+  console until SMTP is configured (#3, M9).
 - `/version` returns the Git commit of the running image as JSON
   (`APP_COMMIT`, set by CI); local builds report `dev`.
 
