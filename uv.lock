@@ -12,30 +12,7 @@ wheels = [
 ]
 
 [[package]]
-name = "django"
-version = "5.2.19"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "asgiref" },
-    { name = "sqlparse" },
-    { name = "tzdata", marker = "sys_platform == 'win32'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/02/29/a487a108caa76430c8b616aa90a6d09cf431306112c14093e6f0a7454e17/django-5.2.19.tar.gz", hash = "sha256:ad03d8abc51dbff95ebf34b27123cf0c26a3b62db7ba0cd520783686362533d1", size = 10969285, upload-time = "2026-11-03T15:22:09.468Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/3c/fb/65b4e897d1268288a46457493d9aec6541be8be08e0093a93cc101c03ab2/django-5.2.19-py3-none-any.whl", hash = "sha256:5965d974a5218a2b68a11dd1276434707f23886525c23f0598eccedaf4f4ca00", size = 8319631, upload-time = "2026-11-03T15:22:03.67Z" },
-]
-
-[[package]]
-name = "django-environ"
-version = "0.14.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/57/e1/4c4ddcf6e90f023e89edb1d92f9a7fffce61ad4b691df497f2f5c0be6e26/django_environ-0.14.0.tar.gz", hash = "sha256:b6c48d93b9d2ff8a3ea14099e90c35aa4f101c1b4d5f262dfee0d27b06742ed7", size = 60417, upload-time = "2026-06-18T22:49:55.847Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/1a/fe/67b423fc30f16d10259e901320fbc121746bf168aaaad9043e6ebb0110c1/django_environ-0.14.0-py3-none-any.whl", hash = "sha256:8dbe8a57f0a540ab8abd6f54f230de5e99e3a2c9d797cb9caecb037bca3d47d8", size = 20934, upload-time = "2026-06-18T22:49:54.355Z" },
-]
-
-[[package]]
-name = "django-template"
+name = "checkermint"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
@@ -62,6 +39,29 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [{ name = "ruff", specifier = ">=0.17.5" }]
+
+[[package]]
+name = "django"
+version = "5.2.19"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "asgiref" },
+    { name = "sqlparse" },
+    { name = "tzdata", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/02/29/a487a108caa76430c8b616aa90a6d09cf431306112c14093e6f0a7454e17/django-5.2.19.tar.gz", hash = "sha256:ad03d8abc51dbff95ebf34b27123cf0c26a3b62db7ba0cd520783686362533d1", size = 10969285, upload-time = "2026-11-03T15:22:09.468Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3c/fb/65b4e897d1268288a46457493d9aec6541be8be08e0093a93cc101c03ab2/django-5.2.19-py3-none-any.whl", hash = "sha256:5965d974a5218a2b68a11dd1276434707f23886525c23f0598eccedaf4f4ca00", size = 8319631, upload-time = "2026-11-03T15:22:03.67Z" },
+]
+
+[[package]]
+name = "django-environ"
+version = "0.14.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/57/e1/4c4ddcf6e90f023e89edb1d92f9a7fffce61ad4b691df497f2f5c0be6e26/django_environ-0.14.0.tar.gz", hash = "sha256:b6c48d93b9d2ff8a3ea14099e90c35aa4f101c1b4d5f262dfee0d27b06742ed7", size = 60417, upload-time = "2026-06-18T22:49:55.847Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1a/fe/67b423fc30f16d10259e901320fbc121746bf168aaaad9043e6ebb0110c1/django_environ-0.14.0-py3-none-any.whl", hash = "sha256:8dbe8a57f0a540ab8abd6f54f230de5e99e3a2c9d797cb9caecb037bca3d47d8", size = 20934, upload-time = "2026-06-18T22:49:54.355Z" },
+]
 
 [[package]]
 name = "gunicorn"

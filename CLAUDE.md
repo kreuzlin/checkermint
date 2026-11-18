@@ -1,9 +1,7 @@
 # CLAUDE.md
 
-Guidelines for working on this repository ({{PROJECT_NAME}}, {{LIVE_URL}}).
+Guidelines for working on this repository (Checkermint, https://checkermint.ch).
 Applies to Claude Code and human contributors.
-
-<!-- Template: replace all placeholders ({{…}}), see docs/NEW_PROJECT.md. -->
 
 ## Session start
 
@@ -19,21 +17,42 @@ conversation history of earlier sessions is not available. Run `/start`
 4. `gh pr list --state open`
 5. `gh issue list --state open`
 6. `gh run list --limit 10` (failed or cancelled runs on `main`?)
-7. Live version: `curl -s {{LIVE_URL}}/version` and compare with
+7. Live version: `curl -s https://checkermint.ch/version` and compare with
    `git rev-parse origin/main`.
 
 Report the result to the maintainer in German before starting new work.
 
 ## Project context
 
-- {{PROJECT_NAME}}: _one or two sentences on what the site is for and who
-  maintains the content._
-- Live on {{LIVE_URL}} (server details in `docs/STATUS.md`). DNS changes are
-  done by the maintainer.
-- Content is maintained through the Django admin – the admin must be
-  understandable for non-technical users (German `verbose_name`s, help texts,
-  sensible list views and filters).
-- Scope of version 1: see README.md. No features beyond that without asking.
+- Checkermint is the training platform of the VRoboT robotics club: coaches
+  publish tasks, participants (children aged 7 to 16) submit solutions,
+  coaches review them with stars and feedback, participants collect points,
+  levels per topic and badges.
+- **Requirements: [`docs/PROJECT_BRIEF.md`](docs/PROJECT_BRIEF.md)** – roles,
+  privacy principles, functional scope of version 1, milestones. Read the
+  relevant section before working on a feature.
+- Live on https://checkermint.ch (server details in `docs/STATUS.md`). DNS
+  changes are done by the maintainer; only the apex and `www` records of
+  checkermint.ch are ever changed.
+- Tasks, topics, hints, badges and accounts are maintained by coaches through
+  the Django admin – the admin must be understandable for non-technical users
+  (German `verbose_name`s, help texts, sensible list views and filters).
+- Scope of version 1: brief, section 5 (out of scope: section 6). No features
+  beyond that without asking.
+
+## Privacy (binding)
+
+The privacy principles in the brief (section 4) are hard rules. In short:
+
+- Uploads (photos, files) are never public: stored outside the static/public
+  path and served only through an authenticated Django view, never by Caddy.
+- EXIF metadata (incl. GPS) is stripped from every uploaded image.
+- Real names and email addresses never appear on public pages; public
+  profiles show only what the participant has made public.
+- Nothing is indexed: `robots.txt` disallows everything, every response sends
+  `X-Robots-Tag: noindex, nofollow`, no sitemap.
+- No third-party requests: no external fonts, avatar APIs, trackers or
+  analytics.
 
 ## Stack (binding)
 
@@ -100,9 +119,9 @@ Rationale lives in `docs/decisions/`. To deviate, write a new ADR first.
 - **Deploying** (after Claude's own merge, if the PR changes the app):
   1. Wait until CI on `main` has pushed the image for the merge commit:
      `gh run list --branch main --limit 1`, then `gh run watch <run-id>`.
-  2. `ssh {{SSH_TARGET}} 'cd /srv/{{PROJECT_SLUG}} && scripts/deploy.sh'`
-  3. `curl -s {{LIVE_URL}}/version` must show the merge commit;
-     `curl -s -o /dev/null -w "%{http_code}\n" {{LIVE_URL}}/` must be `200`.
+  2. `ssh {{SSH_TARGET}} 'cd /srv/checkermint && scripts/deploy.sh'`
+  3. `curl -s https://checkermint.ch/version` must show the merge commit;
+     `curl -s -o /dev/null -w "%{http_code}\n" https://checkermint.ch/` must be `200`.
   - Docs- or CI-only changes need no deploy (the live commit then lags behind
     `main`). If CI or the deploy fails, report it and stop – no retries that
     change the server.
@@ -151,10 +170,12 @@ Rationale lives in `docs/decisions/`. To deviate, write a new ADR first.
   use images whose usage rights are clear.
 - Never render user content with `|safe`.
 - Images always have an alt text field; it is required when an image is set.
-- Editors are staff users in an editor group (never superusers). A new
-  content model gets its permissions for that group via a data migration.
-- Uploaded files (images, PDFs) live under `MEDIA_ROOT` on a Docker volume;
-  static files are collected during the image build.
+- Coaches are staff users in the group "Coach" (never superusers);
+  participants are plain users without staff status. A new content model
+  gets its permissions for the coach group via a data migration.
+- Uploaded files (photos, files) live under `MEDIA_ROOT` on a Docker volume
+  and are private (see "Privacy"); static files are collected during the
+  image build.
 - Time logic (e.g. "past events") uses `django.utils.timezone.now()`, never
   naive datetimes.
 

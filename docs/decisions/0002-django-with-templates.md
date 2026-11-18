@@ -1,7 +1,7 @@
 # 0002: Django with server-side templates
 
 - Status: accepted
-- Date: YYYY-MM-DD
+- Date: 2026-11-18
 
 ## Context
 

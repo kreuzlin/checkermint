@@ -1,6 +1,5 @@
 [project]
-# Rename for the new project, then run `uv lock` (docs/NEW_PROJECT.md).
-name = "django-template"
+name = "checkermint"
 version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
