@@ -9,6 +9,7 @@ dependencies = [
     "markdown>=3.11.3",
     "nh3>=0.3.8",
     "psycopg[binary]>=3.3.9",
+    "robohash>=2.0",
     "whitenoise>=6.12.0",
 ]
 

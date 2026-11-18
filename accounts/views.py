@@ -1,15 +1,19 @@
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse_lazy
-from django.views.generic import DetailView, ListView, UpdateView
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
+from django.views.decorators.http import require_GET
+from django.views.generic import DetailView, ListView, UpdateView, View
 
 from core.seo import SeoMixin
 
+from .avatars import render_avatar
 from .forms import LoginForm, PasswordResetForm, ProfileForm, SetPasswordForm
-from .models import Profile
+from .models import Profile, new_avatar_seed
 from .roles import is_coach
 
 
@@ -158,3 +162,37 @@ class ParticipantDetailView(LoginRequiredMixin, SeoMixin, DetailView):
         context["is_own"] = is_own
         context["show_email"] = is_own or is_coach(user)
         return context
+
+
+class RollAvatarView(LoginRequiredMixin, View):
+    """ "Neuen Roboter würfeln": a new random seed (brief 5.2, ADR 0012)."""
+
+    http_method_names = ["post"]
+
+    def post(self, request):
+        profile = get_object_or_404(Profile, user=request.user)
+        profile.avatar_seed = new_avatar_seed()
+        profile.save(update_fields=["avatar_seed", "updated_at"])
+        messages.success(
+            request,
+            "Hier ist dein neuer Roboter. Gefällt er dir nicht, würfle einfach "
+            "nochmals.",
+        )
+        return redirect(reverse("accounts:profile_edit") + "#avatar")
+
+
+# One year: a new seed is a new URL, so the image never changes.
+AVATAR_MAX_AGE = 60 * 60 * 24 * 365
+
+
+@require_GET
+def avatar(request, seed, size):
+    """PNG of a robot avatar; only seeds of existing profiles are rendered.
+
+    Avatars are always public (brief 4.6), so no login is required.
+    """
+    if not Profile.objects.filter(avatar_seed=seed).exists():
+        raise Http404
+    response = HttpResponse(render_avatar(seed, int(size)), content_type="image/png")
+    response["Cache-Control"] = f"public, max-age={AVATAR_MAX_AGE}, immutable"
+    return response

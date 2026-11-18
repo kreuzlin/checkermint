@@ -1,8 +1,20 @@
 {% extends "base.html" %}
-{% load markdown %}
+{% load avatars %}
 
 {% block content %}
   <h1>Mein Profil</h1>
+
+  <section class="avatar-box" id="avatar" aria-labelledby="avatar-heading">
+    {% avatar profile 128 alt="Dein Roboter-Avatar" %}
+    <div>
+      <h2 id="avatar-heading">Dein Roboter</h2>
+      <p class="help">Öffentlich sichtbar. Würfle so lange, bis er dir gefällt.</p>
+      <form method="post" action="{% url 'accounts:roll_avatar' %}">
+        {% csrf_token %}
+        <button type="submit" class="button">Neuen Roboter würfeln</button>
+      </form>
+    </div>
+  </section>
 
   <dl class="facts">
     <dt>Spitzname</dt>

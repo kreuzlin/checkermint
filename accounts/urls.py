@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 
@@ -28,6 +28,16 @@ urlpatterns = [
         name="password_reset_complete",
     ),
     path("profil/", views.ProfileEditView.as_view(), name="profile_edit"),
+    path(
+        "profil/roboter-wuerfeln/",
+        views.RollAvatarView.as_view(),
+        name="roll_avatar",
+    ),
+    re_path(
+        r"^avatar/(?P<seed>[0-9a-f]{8,32})-(?P<size>64|128|256)\.png$",
+        views.avatar,
+        name="avatar",
+    ),
     path(
         "teilnehmende/",
         views.ParticipantListView.as_view(),
