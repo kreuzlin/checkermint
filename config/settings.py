@@ -91,10 +91,20 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
     },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    # Participants (children) 6 characters, staff 8 (brief, section 11).
+    {"NAME": "accounts.password_validation.RoleMinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+# --- Login and sessions ---------------------------------------------------
+
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "core:home"
+LOGOUT_REDIRECT_URL = "core:home"
+# "Angemeldet bleiben": 30 days. Without it, the session ends when the
+# browser closes (accounts.views.LoginView).
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
 
 # --- Internationalisation -------------------------------------------------
 
