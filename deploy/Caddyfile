@@ -11,9 +11,9 @@
 	encode zstd gzip
 
 	header {
-		# "noindex, nofollow" by default (test phase); set ROBOTS_TAG=all in
-		# .env when the site goes live.
-		X-Robots-Tag "{$ROBOTS_TAG}"
+		# Never indexed (brief 4.7). Fixed, not configurable; Django sends
+		# the same header (core.middleware.NoIndexMiddleware).
+		X-Robots-Tag "noindex, nofollow"
 		# Browsers use HTTPS only for the next year (not for subdomains,
 		# so mail and other services on subdomains are unaffected).
 		Strict-Transport-Security "max-age=31536000"
@@ -22,14 +22,9 @@
 		-Server
 	}
 
-	# Uploaded images and documents (Django's MEDIA_ROOT volume).
-	handle_path /media/* {
-		root * /srv/media
-		header Cache-Control "public, max-age=86400"
-		file_server
-	}
-
-	# Everything else, including /static/ (served by WhiteNoise).
+	# Everything, including /static/ (served by WhiteNoise). Uploaded files
+	# are private and only served by Django after an access check
+	# (ADR 0009); Caddy has no access to the media volume.
 	handle {
 		reverse_proxy web:8000
 	}

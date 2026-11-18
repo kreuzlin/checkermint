@@ -24,14 +24,18 @@ Overview of how the project is built and run. Decisions and their rationale:
 
 ```
 Browser ──HTTPS──▶ caddy ──▶ web (Gunicorn + Django, WhiteNoise for /static/)
-                     │              │
-                     └─ /media/ ◀───┴── media volume      db (PostgreSQL)
+                                    │
+                                    ├── media volume (private uploads)
+                                    └── db (PostgreSQL)
 ```
 
-- **caddy**: TLS (Let's Encrypt), security headers, redirects of extra host
-  names, serves uploaded files from the `media` volume.
+- **caddy**: TLS (Let's Encrypt), security headers (incl. a fixed
+  `X-Robots-Tag: noindex, nofollow`), redirects of extra host names. No
+  access to uploaded files.
 - **web**: the image from GHCR, built by CI for `linux/amd64`. Static files
-  are collected at build time and served by WhiteNoise.
+  are collected at build time and served by WhiteNoise. Uploaded files live
+  in the `media` volume, mounted only here, and are served by Django after
+  an access check (ADR 0009) – never from a public `/media/` URL.
 - **db**: PostgreSQL 18, data in the `postgres_data` volume.
 
 ## Delivery
