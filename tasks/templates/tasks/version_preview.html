@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load markdown %}
+
+{% block content %}
+  <p class="message" role="note">
+    <strong>Vorschau</strong> von Version {{ version.number }}
+    ({{ version.get_status_display }}) – so sehen Teilnehmende die Aufgabe.
+    <a href="{% url 'admin:tasks_taskversion_change' version.pk %}">Zurück zur Verwaltung</a>
+  </p>
+
+  {% include "tasks/_version_content.html" %}
+
+  {% if hints %}
+    <details>
+      <summary>Hinweise (nur in der Vorschau sichtbar)</summary>
+      <ol>
+        {% for hint in hints %}
+          <li><code>{{ hint.key }}</code><div class="prose">{{ hint.text|markdown }}</div></li>
+        {% endfor %}
+      </ol>
+    </details>
+  {% endif %}
+{% endblock %}

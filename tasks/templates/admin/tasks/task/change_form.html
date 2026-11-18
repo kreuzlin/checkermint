@@ -1,0 +1,29 @@
+{% extends "admin/change_form.html" %}
+
+{% block object-tools-items %}
+  {% if draft %}
+    <li><a href="{% url 'admin:tasks_taskversion_change' draft.pk %}">Entwurf bearbeiten (Version {{ draft.number }})</a></li>
+  {% elif can_add_version %}
+    <li>
+      <form method="post" action="{% url 'admin:tasks_task_new_version' original.pk %}" class="object-tool-form">
+        {% csrf_token %}
+        <button type="submit">Neue Version erstellen</button>
+      </form>
+    </li>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    .object-tool-form { display: inline; margin: 0; }
+    .object-tool-form button {
+      display: block; padding: 3px 12px; border: 0; border-radius: 15px;
+      background: var(--object-tools-bg); color: var(--object-tools-fg);
+      font-size: 0.6875rem; font-weight: 400; letter-spacing: 0.5px;
+      text-transform: uppercase; cursor: pointer;
+    }
+    .object-tool-form button:hover { background: var(--object-tools-hover-bg); }
+  </style>
+{% endblock %}

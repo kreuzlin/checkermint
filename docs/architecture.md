@@ -39,6 +39,14 @@ Overview of how the project is built and run. Decisions and their rationale:
   (a new seed is a new URL). "Neuen Roboter würfeln" (POST
   `/profil/roboter-wuerfeln/`) sets a new seed. The footer credits the
   CC-BY artwork; a snapshot test of a few seeds guards package upgrades.
+- Task versions in the admin (ADR 0010): the task page lists all versions
+  and has "Neue Version erstellen" (`Task.create_draft`: copies the latest
+  published version with requirements and hints, keys kept; at most one
+  draft). Drafts are edited with requirement and hint inlines, checked with
+  "Vorschau" (site layout, `tasks/_version_content.html`, shared with the
+  later task page) and published after a confirmation step. Published
+  versions are view-only; versions are not listed on the admin index.
+  The pinned count per version follows with task attempts (#19).
 - Navigation entries can be `members_only` (`core.navigation.NavItem`).
 - Password reset: Django's flow with German templates
   (`accounts/templates/accounts/`). Only active users with a stored email
