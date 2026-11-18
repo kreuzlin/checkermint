@@ -109,7 +109,6 @@ Edit `.env` for production:
 | `CSRF_TRUSTED_ORIGINS` | `https://<domain>` |
 | `SITE_ADDRESS` | `<domain>` (`:80` for a test on the IP, see below) |
 | `REDIRECT_ADDRESSES` | e.g. `www.<domain>`, or empty |
-| `ROBOTS_TAG` | `noindex, nofollow` (test phase), `all` when live |
 | `POSTGRES_PASSWORD` | new random password, same in `DATABASE_URL` |
 | `EMAIL_*`, `DEFAULT_FROM_EMAIL` | SMTP server and the website's own mailbox |
 
@@ -152,7 +151,7 @@ affected containers:
 
 ```bash
 docker compose -f compose.prod.yaml up -d --force-recreate web    # Django settings
-docker compose -f compose.prod.yaml up -d --force-recreate caddy  # SITE_ADDRESS, ROBOTS_TAG
+docker compose -f compose.prod.yaml up -d --force-recreate caddy  # SITE_ADDRESS, REDIRECT_ADDRESSES
 ```
 
 ## 4. Deploying updates
@@ -192,8 +191,9 @@ Schedule the UpCloud backup after the dump (ADR 0008).
 
 - `scripts/backup-db.sh` writes `backups/db-YYYY-MM-DD.dump`
   (`pg_dump` custom format) and keeps 14 days (`KEEP_DAYS`).
-- Uploaded files live in the Docker volume `<project>_media`; the UpCloud
-  backup of the disk covers them.
+- Uploaded files live in the Docker volume `<project>_media`, mounted only
+  into `web` (private, ADR 0009); the UpCloud backup of the disk covers
+  them.
 
 Restore a dump into the running database:
 
@@ -226,14 +226,15 @@ docker compose -f compose.prod.yaml logs --tail 100 caddy  # access log, TLS
    REDIRECT_ADDRESSES=www.<domain>
    ALLOWED_HOSTS=<domain>
    CSRF_TRUSTED_ORIGINS=https://<domain>
-   ROBOTS_TAG=all
    ```
 
    ```bash
    scripts/deploy.sh   # recreates web and caddy with the new .env
    ```
 
-4. Check: `https://<domain>/` (200, no `X-Robots-Tag: noindex`), redirects
+4. Check: `https://<domain>/` (200, `X-Robots-Tag: noindex, nofollow` –
+   the site is never indexed), `https://<domain>/media/…` is not served
+   (404), redirects
    (301 to the main address), admin login, forms and email.
 5. Record the go-live in `docs/STATUS.md`. Caddy sends HSTS for one year
    (without subdomains) – from now on the domain must stay on HTTPS.

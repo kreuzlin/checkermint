@@ -1,7 +1,6 @@
 """Root URL configuration."""
 
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
@@ -14,7 +13,5 @@ urlpatterns = [
     # Feature apps go here, e.g. path("kontakt/", include("contact.urls")).
     path("", include("core.urls")),
 ]
-
-if settings.DEBUG:
-    # Development only: in production Caddy serves uploaded files.
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Uploaded files are never served from a public URL, not even in development
+# (ADR 0009); a view with access checks serves them.

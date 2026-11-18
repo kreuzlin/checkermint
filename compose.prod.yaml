@@ -26,6 +26,8 @@ services:
     restart: unless-stopped
     env_file: .env
     volumes:
+      # Uploaded files: private, only the web container mounts them and
+      # Django serves them after an access check (ADR 0009).
       - media:/app/media
     depends_on:
       db:
@@ -45,13 +47,10 @@ services:
       SITE_ADDRESS: ${SITE_ADDRESS}
       # Default: a harmless placeholder, so Caddy starts without redirects.
       REDIRECT_ADDRESSES: ${REDIRECT_ADDRESSES:-http://localhost}
-      ROBOTS_TAG: ${ROBOTS_TAG:-noindex, nofollow}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       # Optional server-specific snippets (e.g. Basic Auth), not in git.
       - ./deploy/caddy.d:/etc/caddy/caddy.d:ro
-      # Uploaded files are served by Caddy directly.
-      - media:/srv/media:ro
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
