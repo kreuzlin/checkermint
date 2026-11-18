@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.generic import TemplateView
 
 from .seo import SeoMixin
@@ -16,3 +16,8 @@ def version(request):
     response = JsonResponse({"commit": commit, "short": commit[:7]})
     response["Cache-Control"] = "no-store"
     return response
+
+
+def robots_txt(request):
+    """Disallow all crawlers everywhere; there is no sitemap (brief, 4.7)."""
+    return HttpResponse("User-agent: *\nDisallow: /\n", content_type="text/plain")

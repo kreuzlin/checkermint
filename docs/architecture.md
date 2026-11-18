@@ -12,7 +12,11 @@ Overview of how the project is built and run. Decisions and their rationale:
 | `<app>/` | One small Django app per topic (added per project) |
 
 - Every public view sets title and meta description via `core.seo.SeoMixin`;
-  `base.html` renders `<title>`, description, canonical and Open Graph tags.
+  `base.html` renders `<title>` and description. Nothing is indexed:
+  `core.middleware.NoIndexMiddleware` sends `X-Robots-Tag: noindex, nofollow`
+  on every response, `/robots.txt` disallows everything, `base.html` adds
+  `<meta name="robots" content="noindex, nofollow">`; no canonical, Open
+  Graph or sitemap.
 - `/version` returns the Git commit of the running image as JSON
   (`APP_COMMIT`, set by CI); local builds report `dev`.
 
