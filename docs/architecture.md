@@ -8,7 +8,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | Path | Purpose |
 |---|---|
 | `config/` | Settings (one module, configured via environment), URLs, WSGI |
-| `core/` | Base layout, home page, SEO (`core/seo.py`), noindex middleware, Markdown rendering (`core/markdown.py`, `markdown` template filter), navigation, `/version`, `/robots.txt`, error pages |
+| `core/` | Base layout, home page, private file view (`core/private_files.py`, `/dateien/…`), SEO (`core/seo.py`), noindex middleware, Markdown rendering (`core/markdown.py`, `markdown` template filter), navigation, `/version`, `/robots.txt`, error pages |
 | `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
 | `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011) |
 | `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder |
@@ -47,6 +47,15 @@ Overview of how the project is built and run. Decisions and their rationale:
   later task page) and published after a confirmation step. Published
   versions are view-only; versions are not listed on the admin index.
   The pinned count per version follows with task attempts (#19).
+- Private uploads (ADR 0009): models store files with
+  `core.private_files.RandomUploadPath` (UUID names) and register a
+  `PrivateFileKind` (owner model, file getter, access check, inline or
+  download). `/dateien/<kind>/<pk>/[<variant>/]` loads the object, checks
+  access and streams the stored file; no access, unknown objects or missing
+  files all answer 404. Headers: `Cache-Control: private, no-store` (unless
+  the kind says otherwise), `nosniff`, downloads as
+  `application/octet-stream` attachments; inline only for images we
+  re-encoded, with a sandboxing CSP.
 - Navigation entries can be `members_only` (`core.navigation.NavItem`).
 - Password reset: Django's flow with German templates
   (`accounts/templates/accounts/`). Only active users with a stored email
