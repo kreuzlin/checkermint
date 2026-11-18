@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load markdown %}
+
+{% block content %}
+  <h1>Mein Profil</h1>
+
+  <dl class="facts">
+    <dt>Spitzname</dt>
+    <dd>{{ profile.nickname }} <span class="help">(öffentlich; ändern kann ihn ein Coach)</span></dd>
+    <dt>Echter Name</dt>
+    <dd>{{ profile.real_name }} <span class="help">(nur für Angemeldete sichtbar, nie öffentlich)</span></dd>
+    <dt>Benutzername</dt>
+    <dd>{{ user.username }}</dd>
+  </dl>
+  <p><a href="{% url 'accounts:participant_detail' nickname=profile.nickname %}">So sehen dich andere Angemeldete</a></p>
+
+  <form method="post" class="form" novalidate>
+    {% csrf_token %}
+    {% include "accounts/_form_errors.html" %}
+
+    {% include "accounts/_field.html" with field=form.email %}
+    {% include "accounts/_field.html" with field=form.about %}
+
+    <fieldset>
+      <legend>Was ist öffentlich?</legend>
+      <p class="help">
+        Spitzname, Avatar, Punkte und Levels sind immer öffentlich. Alles
+        andere entscheidest du selbst. Angemeldete sehen dein ganzes Profil.
+      </p>
+      {% include "accounts/_field.html" with field=form.show_about %}
+      {% include "accounts/_field.html" with field=form.show_badges %}
+      {% include "accounts/_field.html" with field=form.show_solved_tasks %}
+    </fieldset>
+
+    <fieldset>
+      <legend>Benachrichtigungen</legend>
+      {% include "accounts/_field.html" with field=form.email_notifications %}
+    </fieldset>
+
+    <button type="submit" class="button">Speichern</button>
+  </form>
+{% endblock %}

@@ -178,3 +178,54 @@ main {
   font: inherit;
   cursor: pointer;
 }
+
+fieldset {
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem 0;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+legend {
+  padding: 0 0.25rem;
+  font-weight: 700;
+}
+
+.form-field textarea {
+  width: 100%;
+  max-width: 40rem;
+  padding: 0.5rem;
+  border: 1px solid var(--text-muted);
+  border-radius: 4px;
+  font: inherit;
+}
+
+/* Status messages after saving (text, not colour alone). */
+.message {
+  margin: 0 0 1rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 4px solid var(--accent);
+}
+
+.message-error {
+  border-left-color: var(--error);
+}
+
+/* Definition lists for profile facts */
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1rem;
+}
+
+.facts dt {
+  font-weight: 600;
+}
+
+.facts dd {
+  margin: 0;
+}
+
+.profile-list {
+  padding-left: 1.25rem;
+}

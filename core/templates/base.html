@@ -27,7 +27,11 @@
       {% endif %}
       <div class="user-menu">
         {% if user.is_authenticated %}
-          <span class="user-name">{% firstof user.profile.nickname user.username %}</span>
+          {% if user.profile %}
+            <a href="{% url 'accounts:profile_edit' %}" class="user-name"{% if request.resolver_match.view_name == "accounts:profile_edit" %} aria-current="page"{% endif %}>{{ user.profile.nickname }}</a>
+          {% else %}
+            <span class="user-name">{{ user.username }}</span>
+          {% endif %}
           <form method="post" action="{% url 'accounts:logout' %}" class="inline-form">
             {% csrf_token %}
             <button type="submit" class="link-button">Abmelden</button>

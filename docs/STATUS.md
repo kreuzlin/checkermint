@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-18 (PR "Add password reset by email")_
+_Last updated: 2026-11-18 (PR "Let participants edit their profile")_
 
 ## Live
 
@@ -63,6 +63,10 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #12: password reset by email (`/passwort-vergessen/`, German pages and
   email, link valid 3 days) for accounts with an email address; otherwise a
   coach sets a new password. Emails go to the console until SMTP (#3, M9).
+- #13: own profile `/profil/` (about text, optional email, visibility
+  switches, notifications; nickname and real name only via coaches),
+  internal directory and profiles `/teilnehmende/` for logged-in users
+  (email only for the person and coaches).
 
 ## Open issues
 
@@ -80,7 +84,7 @@ Overview: `gh issue list`. At the time of writing:
 
 1. Maintainer merges PR #57 (#11 coach-created accounts, contains a
    migration).
-2. M2 (accounts and profiles): #13 own profile and visibility, #14 avatars.
+2. M2 (accounts and profiles): #14 avatars.
 3. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars).
 

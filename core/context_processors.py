@@ -9,13 +9,15 @@ from .navigation import MAIN_NAVIGATION
 def site(request):
     current = request.resolver_match
     current_name = current.view_name if current else None
+    logged_in = request.user.is_authenticated
     nav_items = [
         {
-            "label": label,
-            "url": reverse(url_name),
-            "active": url_name == current_name,
+            "label": item.label,
+            "url": reverse(item.url_name),
+            "active": item.url_name == current_name,
         }
-        for label, url_name in MAIN_NAVIGATION
+        for item in MAIN_NAVIGATION
+        if logged_in or not item.members_only
     ]
     return {
         "site_name": settings.SITE_NAME,
