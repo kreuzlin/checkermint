@@ -55,7 +55,13 @@ Overview of how the project is built and run. Decisions and their rationale:
   files all answer 404. Headers: `Cache-Control: private, no-store` (unless
   the kind says otherwise), `nosniff`, downloads as
   `application/octet-stream` attachments; inline only for images we
-  re-encoded, with a sandboxing CSP.
+  re-encoded, with a sandboxing CSP. Registered kinds: `anleitungsbild`
+  (instruction images, `tasks.apps`).
+- Images on upload: `core.images.process_image` decodes, applies the EXIF
+  orientation, drops all metadata, limits to 2000 px and re-encodes (JPEG,
+  or PNG with transparency). Markdown images are only allowed when the
+  caller passes the allowed images (`core.markdown.render_markdown(text,
+  images=…)`); external and unknown images never render.
 - Navigation entries can be `members_only` (`core.navigation.NavItem`).
 - Password reset: Django's flow with German templates
   (`accounts/templates/accounts/`). Only active users with a stored email

@@ -1,9 +1,14 @@
+import re
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
+
+from accounts.roles import is_coach
+from core.private_files import RandomUploadPath
 
 
 class Topic(models.Model):
@@ -529,3 +534,121 @@ class Hint(VersionChild):
 
     def __str__(self):
         return f"Hinweis {self.key}"
+
+
+# --- Images in instructions (brief 5.4, ADR 0010, ADR 0009) ---------------
+
+IMAGE_REFERENCE = re.compile(r"\(bild:(\d+)\)")
+
+
+def referenced_image_ids(text: str) -> set[int]:
+    """Ids of images referenced as ![…](bild:12) in Markdown."""
+    return {int(match) for match in IMAGE_REFERENCE.findall(text or "")}
+
+
+class InstructionImage(models.Model):
+    """An image for the instructions of a task, shared by its versions.
+
+    Stored privately (ADR 0009) and re-encoded without metadata. Once
+    saved it is never replaced; it cannot be deleted while a published
+    version references it, so old versions keep rendering (ADR 0010).
+    """
+
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE,
+        related_name="instruction_images",
+        verbose_name="Aufgabe",
+    )
+    image = models.ImageField(
+        "Bild",
+        upload_to=RandomUploadPath("anleitungen"),
+        width_field="width",
+        height_field="height",
+    )
+    width = models.PositiveIntegerField(editable=False, null=True)
+    height = models.PositiveIntegerField(editable=False, null=True)
+    alt_text = models.CharField(
+        "Alternativtext",
+        max_length=200,
+        help_text="Was ist auf dem Bild zu sehen? Für Screenreader und falls das Bild fehlt.",
+    )
+    original_filename = models.CharField(
+        "Ursprünglicher Dateiname", max_length=200, blank=True, editable=False
+    )
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name="Hochgeladen von",
+    )
+    created_at = models.DateTimeField("Hochgeladen", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Bild in der Anleitung"
+        verbose_name_plural = "Bilder in der Anleitung"
+        ordering = ["task", "pk"]
+
+    def __str__(self):
+        return self.alt_text
+
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            stored = InstructionImage.objects.filter(pk=self.pk).values_list(
+                "image", "task_id"
+            )
+            if stored and stored[0] != (self.image.name, self.task_id):
+                raise PublishedVersionError(
+                    "Ein hochgeladenes Bild lässt sich nicht ersetzen; lade ein neues hoch."
+                )
+            if self.used_by_published_version():
+                raise PublishedVersionError()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.used_by_published_version():
+            raise PublishedVersionError(
+                "Dieses Bild wird von einer veröffentlichten Version verwendet."
+            )
+        name, storage = self.image.name, self.image.storage
+        result = super().delete(*args, **kwargs)
+        if name:
+            storage.delete(name)
+        return result
+
+    @property
+    def reference(self) -> str:
+        """Markdown to paste into the instructions."""
+        return f"![{self.alt_text}](bild:{self.pk})"
+
+    def versions_using(self):
+        return [
+            version
+            for version in self.task.versions.all()
+            if self.pk in referenced_image_ids(version.instructions)
+        ]
+
+    def used_by_published_version(self) -> bool:
+        if self.pk is None:
+            return False
+        return any(
+            self.pk in referenced_image_ids(text)
+            for text in self.task.versions.published().values_list(
+                "instructions", flat=True
+            )
+        )
+
+    def visible_to(self, user) -> bool:
+        """Coaches always; other logged-in users if a published version of a
+        visible task shows it (ADR 0009)."""
+        if not user.is_authenticated:
+            return False
+        if is_coach(user):
+            return True
+        return (
+            self.task.is_published
+            and not self.task.is_archived
+            and self.used_by_published_version()
+        )

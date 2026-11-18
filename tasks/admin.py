@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.shortcuts import get_object_or_404, redirect
@@ -5,7 +6,18 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.html import format_html
 
-from .models import Hint, LevelThreshold, Task, TaskRequirement, TaskVersion, Topic
+from core.images import process_image
+from core.private_files import private_file_url
+
+from .models import (
+    Hint,
+    InstructionImage,
+    LevelThreshold,
+    Task,
+    TaskRequirement,
+    TaskVersion,
+    Topic,
+)
 
 
 @admin.register(Topic)
@@ -63,6 +75,87 @@ class VersionListInline(admin.TabularInline):
         return False
 
 
+class InstructionImageForm(forms.ModelForm):
+    class Meta:
+        model = InstructionImage
+        fields = ["image", "alt_text"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            # Uploaded images are immutable: upload a new one instead.
+            for field in self.fields.values():
+                field.disabled = True
+
+    def clean_image(self):
+        uploaded = self.cleaned_data.get("image")
+        if self.instance.pk or not uploaded:
+            return uploaded
+        processed = process_image(uploaded)
+        self.original_filename = uploaded.name[:200]
+        processed.content.name = f"bild{processed.extension}"
+        return processed.content
+
+    def save(self, commit=True):
+        if hasattr(self, "original_filename"):
+            self.instance.original_filename = self.original_filename
+        return super().save(commit=commit)
+
+
+class InstructionImageFormSet(forms.BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        for form in self.forms:
+            image = form.instance
+            if (
+                self.can_delete
+                and self._should_delete_form(form)
+                and image.pk
+                and image.used_by_published_version()
+            ):
+                raise forms.ValidationError(
+                    f"«{image.alt_text}» wird von einer veröffentlichten Version "
+                    "verwendet und kann nicht gelöscht werden."
+                )
+
+
+class InstructionImageInline(admin.TabularInline):
+    """Upload images, then paste their Markdown into a draft version."""
+
+    model = InstructionImage
+    form = InstructionImageForm
+    formset = InstructionImageFormSet
+    extra = 1
+    fields = ["preview", "image", "alt_text", "reference", "used_in"]
+    readonly_fields = ["preview", "reference", "used_in"]
+    verbose_name_plural = (
+        "Bilder in der Anleitung (hochladen, dann den Markdown-Code in die "
+        "Anleitung des Entwurfs kopieren)"
+    )
+
+    @admin.display(description="Vorschau")
+    def preview(self, obj):
+        if not obj.pk:
+            return ""
+        return format_html(
+            '<img src="{}" alt="" style="max-width: 120px; max-height: 80px">',
+            private_file_url("anleitungsbild", obj),
+        )
+
+    @admin.display(description="In die Anleitung kopieren")
+    def reference(self, obj):
+        if not obj.pk:
+            return "Nach dem Speichern"
+        return format_html("<code>{}</code>", obj.reference)
+
+    @admin.display(description="Verwendet in")
+    def used_in(self, obj):
+        if not obj.pk:
+            return ""
+        versions = obj.versions_using()
+        return ", ".join(f"Version {v.number}" for v in versions) or "–"
+
+
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
     list_display = [
@@ -87,10 +180,20 @@ class TaskAdmin(admin.ModelAdmin):
         "is_published",
         "is_archived",
     ]
-    inlines = [VersionListInline]
+    inlines = [InstructionImageInline, VersionListInline]
 
     def get_queryset(self, request):
         return super().get_queryset(request).distinct()
+
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        for obj in formset.deleted_objects:
+            obj.delete()
+        for instance in instances:
+            if isinstance(instance, InstructionImage) and instance.pk is None:
+                instance.uploaded_by = request.user
+            instance.save()
+        formset.save_m2m()
 
     @admin.display(description="Aktuelle Version")
     def current_version(self, obj):
