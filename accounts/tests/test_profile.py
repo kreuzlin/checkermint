@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from accounts.models import Profile
-from accounts.roles import COACH_GROUP_NAME, is_coach
+from accounts.roles import COACH_GROUP_NAME, COACH_PERMISSIONS, is_coach
 
 User = get_user_model()
 
@@ -61,18 +61,20 @@ class ProfileTests(TestCase):
 class CoachRoleTests(TestCase):
     def test_coach_group_permissions(self):
         group = Group.objects.get(name=COACH_GROUP_NAME)
-        codenames = set(group.permissions.values_list("codename", flat=True))
-        self.assertEqual(
-            codenames,
-            {
-                "view_user",
-                "add_user",
-                "change_user",
-                "view_profile",
-                "add_profile",
-                "change_profile",
-            },
+        permissions = set(
+            group.permissions.values_list("content_type__app_label", "codename")
         )
+        expected = {
+            (app_label, f"{action}_{model}")
+            for app_label, models in COACH_PERMISSIONS.items()
+            for model, actions in models.items()
+            for action in actions
+        }
+        self.assertEqual(permissions, expected)
+        self.assertIn(("accounts", "change_profile"), permissions)
+        self.assertIn(("auth", "add_user"), permissions)
+        # Accounts are deactivated, never deleted by coaches.
+        self.assertNotIn(("auth", "delete_user"), permissions)
 
     def test_is_coach(self):
         group = Group.objects.get(name=COACH_GROUP_NAME)

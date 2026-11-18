@@ -18,6 +18,11 @@ COACH_PERMISSIONS = {
     "auth": {"user": ["view", "add", "change"]},
     # "add" is needed for the profile inline on the account form.
     "accounts": {"profile": ["view", "add", "change"]},
+    "tasks": {
+        "topic": ["view", "add", "change", "delete"],
+        "levelthreshold": ["view", "add", "change", "delete"],
+    },
+    "badges": {"badge": ["view", "add", "change", "delete"]},
 }
 
 
