@@ -21,6 +21,12 @@ COACH_PERMISSIONS = {
     "tasks": {
         "topic": ["view", "add", "change", "delete"],
         "levelthreshold": ["view", "add", "change", "delete"],
+        # Published versions, requirements and hints stay immutable through
+        # the model guards (ADR 0010), whatever the permissions say.
+        "task": ["view", "add", "change", "delete"],
+        "taskversion": ["view", "add", "change", "delete"],
+        "taskrequirement": ["view", "add", "change", "delete"],
+        "hint": ["view", "add", "change", "delete"],
     },
     "badges": {"badge": ["view", "add", "change", "delete"]},
 }

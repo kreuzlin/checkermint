@@ -10,7 +10,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | `config/` | Settings (one module, configured via environment), URLs, WSGI |
 | `core/` | Base layout, home page, SEO (`core/seo.py`), noindex middleware, Markdown rendering (`core/markdown.py`, `markdown` template filter), navigation, `/version`, `/robots.txt`, error pages |
 | `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
-| `tasks/` | Topics, shared level table (`LevelThreshold`), `tasks.levels.level_for_points`; tasks and versions follow (M3) |
+| `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011) |
 | `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder |
 | `<app>/` | One small Django app per topic (added per project) |
 
