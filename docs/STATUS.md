@@ -60,6 +60,9 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #10: login `/anmelden/` with "Angemeldet bleiben" (30 days, otherwise until
   the browser closes), logout (POST) in the header, minimum password length
   6 for participants and 8 for staff.
+- #11: coaches create participant accounts with profile in one admin form,
+  edit them, set new passwords and deactivate them; staff accounts and
+  rights fields are out of their reach (migration `accounts/0003`).
 - #12: password reset by email (`/passwort-vergessen/`, German pages and
   email, link valid 3 days) for accounts with an email address; otherwise a
   coach sets a new password. Emails go to the console until SMTP (#3, M9).
@@ -90,12 +93,9 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. Maintainer merges PR #57 (#11 coach-created accounts, contains a
-   migration).
-2. Maintainer merges the PR for #15 (migrations; after #57, since both
-   change `COACH_PERMISSIONS`). Next in M3: #16 tasks with immutable
-   versions, requirements and hints.
-3. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
+1. Maintainer merges PR #61 (#15, migrations). Next in M3: #16 tasks with
+   immutable versions, requirements and hints.
+2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars).
 
 ## Working agreements (summary)

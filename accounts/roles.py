@@ -11,11 +11,13 @@
 COACH_GROUP_NAME = "Coach"
 
 # app_label → model → actions.
-# User accounts (auth.user) are added together with a hardened user admin
-# (#11), so that coaches can never grant themselves staff or superuser
-# rights.
+# Users: the user admin (accounts.admin.UserAdmin) limits coaches to
+# participant accounts and never shows staff, superuser, group or permission
+# fields. No delete: accounts are deactivated instead.
 COACH_PERMISSIONS = {
-    "accounts": {"profile": ["view", "change"]},
+    "auth": {"user": ["view", "add", "change"]},
+    # "add" is needed for the profile inline on the account form.
+    "accounts": {"profile": ["view", "add", "change"]},
     "tasks": {
         "topic": ["view", "add", "change", "delete"],
         "levelthreshold": ["view", "add", "change", "delete"],

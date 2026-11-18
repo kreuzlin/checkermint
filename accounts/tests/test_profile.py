@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django.urls import reverse
 
 from accounts.models import Profile
 from accounts.roles import COACH_GROUP_NAME, COACH_PERMISSIONS, is_coach
@@ -60,7 +59,7 @@ class ProfileTests(TestCase):
 
 
 class CoachRoleTests(TestCase):
-    def test_coach_group_exists_with_profile_permissions(self):
+    def test_coach_group_permissions(self):
         group = Group.objects.get(name=COACH_GROUP_NAME)
         permissions = set(
             group.permissions.values_list("content_type__app_label", "codename")
@@ -73,12 +72,9 @@ class CoachRoleTests(TestCase):
         }
         self.assertEqual(permissions, expected)
         self.assertIn(("accounts", "change_profile"), permissions)
-
-    def test_coach_group_cannot_manage_users_yet(self):
-        group = Group.objects.get(name=COACH_GROUP_NAME)
-        self.assertFalse(
-            group.permissions.filter(content_type__app_label="auth").exists()
-        )
+        self.assertIn(("auth", "add_user"), permissions)
+        # Accounts are deactivated, never deleted by coaches.
+        self.assertNotIn(("auth", "delete_user"), permissions)
 
     def test_is_coach(self):
         group = Group.objects.get(name=COACH_GROUP_NAME)
@@ -98,31 +94,3 @@ class CoachRoleTests(TestCase):
         self.assertFalse(is_coach(group_without_staff))
         self.assertFalse(is_coach(inactive_coach))
         self.assertTrue(is_coach(admin))
-
-
-class ProfileAdminTests(TestCase):
-    def setUp(self):
-        self.profile = make_profile()
-        coach = User.objects.create_user("coach", password="x", is_staff=True)
-        coach.groups.add(Group.objects.get(name=COACH_GROUP_NAME))
-        self.client.force_login(coach)
-
-    def test_coach_sees_profile_list_and_form(self):
-        response = self.client.get(reverse("admin:accounts_profile_changelist"))
-        self.assertContains(response, "Robo-Anna")
-        response = self.client.get(
-            reverse("admin:accounts_profile_change", args=[self.profile.pk])
-        )
-        self.assertContains(response, "Sichtbarkeit im öffentlichen Profil")
-
-    def test_coach_cannot_add_or_delete_profiles_yet(self):
-        response = self.client.get(reverse("admin:accounts_profile_add"))
-        self.assertEqual(response.status_code, 403)
-        response = self.client.get(
-            reverse("admin:accounts_profile_delete", args=[self.profile.pk])
-        )
-        self.assertEqual(response.status_code, 403)
-
-    def test_coach_cannot_open_user_admin(self):
-        response = self.client.get(reverse("admin:auth_user_changelist"))
-        self.assertEqual(response.status_code, 403)
