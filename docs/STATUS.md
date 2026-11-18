@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-18 (PR "Set up project from template")_
+_Last updated: 2026-11-18 (PR "Block search engines everywhere")_
 
 ## Live
 
@@ -17,8 +17,11 @@ _Last updated: 2026-11-18 (PR "Set up project from template")_
 - Deployed commit: `curl -s https://checkermint.ch/version`, compare with
   `git rev-parse origin/main`. Last deploy: `—`. Docs- or CI-only changes
   need no deploy (the live commit then lags behind `main`).
-- Search engines: never indexed (brief, section 4): `ROBOTS_TAG=noindex,
-  nofollow` permanently, `robots.txt` disallows everything, no sitemap.
+- Search engines: never indexed (brief, section 4). Django sends
+  `X-Robots-Tag: noindex, nofollow` on every response, `/robots.txt`
+  disallows everything, `<meta name="robots">` in the layout, no sitemap,
+  canonical or Open Graph tags. Caddy still sets `X-Robots-Tag` from
+  `ROBOTS_TAG` (overrides Django's header); #7 makes it fixed.
 
 ## Infrastructure
 
@@ -46,6 +49,7 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   (except `{{SSH_TARGET}}`), project brief added, ADRs 0009–0013 (private
   media, task versioning, submission requirements, avatars with Robohash
   set1, points and levels).
+- #6: search engines blocked in the app (middleware, robots.txt, meta tag).
 
 ## Open issues
 
@@ -62,8 +66,8 @@ Overview: `gh issue list`. At the time of writing:
 ## Next steps
 
 1. Maintainer merges this PR (changes `compose.prod.yaml`).
-2. Continue with the rest of M1: #6 (noindex), #7 (remove public media
-   route, maintainer merges), #8 (Markdown rendering).
+2. Continue with the rest of M1: #7 (remove public media route, fix Caddy's
+   `X-Robots-Tag`; maintainer merges), #8 (Markdown rendering).
 3. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars).
 

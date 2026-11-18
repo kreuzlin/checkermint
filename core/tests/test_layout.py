@@ -49,10 +49,6 @@ class HomePageTests(TestCase):
             f'<meta name="description" content="{settings.SITE_DESCRIPTION}">',
             html=True,
         )
-        self.assertContains(self.response, 'property="og:title"')
-        self.assertContains(
-            self.response, '<link rel="canonical" href="http://testserver/">', html=True
-        )
 
     def test_language_is_swiss_german(self):
         self.assertContains(self.response, '<html lang="de-ch">')

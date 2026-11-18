@@ -2,8 +2,8 @@
 
 Every public view uses `SeoMixin` (or passes `page_title` and
 `meta_description` into the template context itself). The base template
-renders `<title>`, `<meta name="description">` and the Open Graph tags from
-these values, falling back to the site defaults from settings.
+renders `<title>` and `<meta name="description">` from these values,
+falling back to the site defaults from settings.
 """
 
 from django.conf import settings

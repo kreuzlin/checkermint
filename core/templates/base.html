@@ -6,14 +6,7 @@
   {% document_title page_title as full_title %}
   <title>{% block title %}{{ full_title }}{% endblock %}</title>
   <meta name="description" content="{{ meta_description|default:site_description }}">
-  <link rel="canonical" href="{{ request.build_absolute_uri }}">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="{{ site_name }}">
-  <meta property="og:locale" content="de_CH">
-  <meta property="og:title" content="{{ full_title }}">
-  <meta property="og:description" content="{{ meta_description|default:site_description }}">
-  <meta property="og:url" content="{{ request.build_absolute_uri }}">
-  {% if og_image %}<meta property="og:image" content="{{ og_image }}">{% endif %}
+  <meta name="robots" content="noindex, nofollow">
   <link rel="stylesheet" href="{% static 'core/css/site.css' %}">
   {% block extra_head %}{% endblock %}
 </head>
