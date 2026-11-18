@@ -44,8 +44,8 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 
 - Milestone 1 (setup), partly: GitHub settings, placeholders replaced
   (except `{{SSH_TARGET}}`), project brief added, ADRs 0009–0013 (private
-  media, task versioning, submission requirements, avatars – proposed,
-  points and levels).
+  media, task versioning, submission requirements, avatars with Robohash
+  set1, points and levels).
 
 ## Open issues
 
@@ -60,10 +60,11 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. Maintainer confirms or changes ADR 0012 (avatar generation).
-2. Agree the issue plan for version 1 (brief, section 10), then create the
-   issues.
-3. Start milestone 2 (accounts and profiles).
+1. Maintainer merges this PR (changes `compose.prod.yaml`).
+2. Issues for version 1 follow the GitHub milestones "M1 Setup" to
+   "M11 Go-live" (brief, section 10); continue with the rest of M1.
+3. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
+   codes), htmx served as a local static file, `robohash` (avatars).
 
 ## Working agreements (summary)
 
