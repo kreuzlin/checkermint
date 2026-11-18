@@ -20,12 +20,12 @@ except for switching to `main` and pulling.
 5. `gh issue list --state open`
 6. `gh run list --limit 10`
 7. Live site:
-   - `curl -s {{LIVE_URL}}/version`
+   - `curl -s https://checkermint.ch/version`
    - `git rev-parse origin/main`
    - Compare: is the deployed commit the head of `main`? If not, list the
      commits not yet deployed (`git log --oneline <deployed>..origin/main`)
      and check that CI pushed an image for `origin/main` (step 6).
-   - `curl -s -o /dev/null -w "%{http_code}\n" {{LIVE_URL}}/`
+   - `curl -s -o /dev/null -w "%{http_code}\n" https://checkermint.ch/`
 
 Then summarise in German, short:
 - what is live (commit, date) and whether it matches `main`,

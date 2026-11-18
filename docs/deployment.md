@@ -1,16 +1,16 @@
 # Deployment and operations
 
-How the production server runs {{LIVE_URL}}. Architecture and rationale:
+How the production server runs https://checkermint.ch. Architecture and rationale:
 [`architecture.md`](architecture.md), ADRs 0005–0008. Placeholders in
 examples: `<server-ip>`, `<domain>`.
 
 ## Overview
 
 - UpCloud server, Ubuntu 26.04 LTS, Docker Engine with the Compose plugin.
-- Repo checkout in `/srv/{{PROJECT_SLUG}}` (public repo, no credentials
+- Repo checkout in `/srv/checkermint` (public repo, no credentials
   needed). It provides `compose.prod.yaml`, `deploy/Caddyfile` and the
   scripts; the app itself comes as an image from GHCR.
-- `.env` in `/srv/{{PROJECT_SLUG}}` holds all secrets (mode `600`, never
+- `.env` in `/srv/checkermint` holds all secrets (mode `600`, never
   committed).
 - Containers: `db` (PostgreSQL 18), `web` (Gunicorn), `caddy` (HTTPS).
 
@@ -93,9 +93,9 @@ dig +short <domain> AAAA @<authoritative-name-server>
 As `deploy`:
 
 ```bash
-sudo mkdir -p /srv/{{PROJECT_SLUG}} && sudo chown deploy:deploy /srv/{{PROJECT_SLUG}}
-git clone https://github.com/{{GITHUB_REPO}}.git /srv/{{PROJECT_SLUG}}
-cd /srv/{{PROJECT_SLUG}}
+sudo mkdir -p /srv/checkermint && sudo chown deploy:deploy /srv/checkermint
+git clone https://github.com/kreuzlin/checkermint.git /srv/checkermint
+cd /srv/checkermint
 cp .env.example .env && chmod 600 .env
 ```
 
@@ -163,8 +163,8 @@ Wait until the CI run for the merge commit has pushed it
 previous build. Then:
 
 ```bash
-ssh {{SSH_TARGET}} 'cd /srv/{{PROJECT_SLUG}} && scripts/deploy.sh'
-curl -s {{LIVE_URL}}/version   # {"commit": "<sha>", "short": "<sha7>"}
+ssh {{SSH_TARGET}} 'cd /srv/checkermint && scripts/deploy.sh'
+curl -s https://checkermint.ch/version   # {"commit": "<sha>", "short": "<sha7>"}
 ```
 
 The script pulls the repo and images, runs migrations, restarts the
@@ -181,7 +181,7 @@ are not rolled back automatically.
 
 ```cron
 # Database dump before the UpCloud backup, nightly 02:00
-0 2 * * * cd /srv/{{PROJECT_SLUG}} && scripts/backup-db.sh
+0 2 * * * cd /srv/checkermint && scripts/backup-db.sh
 ```
 
 Add project-specific jobs (e.g. deleting old form submissions) here and in

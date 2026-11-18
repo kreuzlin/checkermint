@@ -1,13 +1,15 @@
-# Django template
+# Checkermint
 
-Template for small content websites with Django, PostgreSQL and Docker
-Compose, deployed to a single server with Caddy. Includes working rules for
-Claude Code (`CLAUDE.md`, `/start`), CI that builds `linux/amd64` images,
-deploy and backup scripts, and a minimal Django app with tests.
+[![CI](https://github.com/kreuzlin/checkermint/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kreuzlin/checkermint/actions/workflows/ci.yml)
 
-**New project:** use this repository as a template, then follow
-[`docs/NEW_PROJECT.md`](docs/NEW_PROJECT.md) (GitHub settings, placeholders,
-server, DNS, mail, images).
+Training platform of the VRoboT robotics club, at <https://checkermint.ch>.
+Coaches publish tasks ("Aufgaben"), participants submit solutions (text,
+code, photos, files), coaches review them with 1 to 3 stars and feedback,
+and participants collect points, levels per topic and badges.
+
+Requirements, privacy principles and the scope of version 1:
+[`docs/PROJECT_BRIEF.md`](docs/PROJECT_BRIEF.md). Created from
+`kreuzlin/django-template` ([`docs/NEW_PROJECT.md`](docs/NEW_PROJECT.md)).
 
 ## Stack
 
@@ -67,8 +69,9 @@ directly (not `uv run`).
 
 ## Documentation
 
-- [`docs/NEW_PROJECT.md`](docs/NEW_PROJECT.md) – checklist for a new project
 - [`docs/STATUS.md`](docs/STATUS.md) – current state, open issues, next steps (start here)
+- [`docs/PROJECT_BRIEF.md`](docs/PROJECT_BRIEF.md) – requirements and scope of version 1
+- [`docs/NEW_PROJECT.md`](docs/NEW_PROJECT.md) – checklist used to set up this project from the template
 - [`CLAUDE.md`](CLAUDE.md) – working rules for Claude Code (and humans), incl. the session start routine (`/start`) and the merge/deploy rules
 - [`docs/architecture.md`](docs/architecture.md) – structure, runtime, delivery
 - [`docs/deployment.md`](docs/deployment.md) – server setup, deployments, backups

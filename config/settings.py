@@ -125,13 +125,12 @@ if "test" in sys.argv[1:2]:
 
 # --- Site -----------------------------------------------------------------
 
-# Replace the placeholders when creating a project (docs/NEW_PROJECT.md).
-SITE_NAME = "{{PROJECT_NAME}}"
-SITE_SHORT_NAME = "{{PROJECT_SHORT_NAME}}"
+SITE_NAME = "Trainingsplattform des VRoboT"
+SITE_SHORT_NAME = "Checkermint"
 # Document title of the home page; other pages use "<page> – <short name>".
 SITE_TITLE = f"{SITE_SHORT_NAME} – {SITE_NAME}"
 # Default meta description for pages that do not set their own.
-SITE_DESCRIPTION = "{{SITE_DESCRIPTION}}"
+SITE_DESCRIPTION = "Checkermint ist die Trainingsplattform des Robotikvereins VRoboT: Aufgaben lösen, Feedback von den Coaches erhalten und Level für Level weiterkommen."
 # Git commit of the running image (Dockerfile build arg GIT_COMMIT, set by CI),
 # shown at /version. "dev" for local builds.
 APP_COMMIT = env("APP_COMMIT", default="dev")
