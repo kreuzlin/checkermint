@@ -1,0 +1,40 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Start</a>
+    › <a href="{% url 'admin:tasks_task_changelist' %}">Aufgaben</a>
+    › <a href="{% url 'admin:tasks_task_change' version.task_id %}">{{ version.task.slug }}</a>
+    › <a href="{% url 'admin:tasks_taskversion_change' version.pk %}">Version {{ version.number }}</a>
+    › Veröffentlichen
+  </div>
+{% endblock %}
+
+{% block content %}
+  <p>
+    Nach dem Veröffentlichen lässt sich <strong>{{ version.title }}</strong>
+    (Version {{ version.number }}) nicht mehr ändern, auch nicht für
+    Tippfehler. Jede Änderung braucht dann eine neue Version.
+  </p>
+  <ul>
+    <li>Anforderungen: {{ version.requirements.count }}</li>
+    <li>Hinweise: {{ version.hints.count }}</li>
+    <li>Grundpunkte: {{ version.base_points }}</li>
+    <li>Änderungsnotiz: {{ version.change_note|default:"–" }}</li>
+  </ul>
+  {% if previous %}
+    <p>
+      Teilnehmende, die Version {{ previous.number }} schon begonnen haben,
+      bleiben dort, bis sie selbst wechseln. Sie sehen dabei die
+      Änderungsnotiz.
+      {% if not version.change_note %}<strong>Tipp:</strong> Trag vorher eine Änderungsnotiz ein.{% endif %}
+    </p>
+  {% endif %}
+  <p><a href="{% url 'admin:tasks_taskversion_preview' version.pk %}" target="_blank" rel="noopener">Vorschau ansehen</a></p>
+
+  <form method="post">
+    {% csrf_token %}
+    <input type="submit" value="Ja, veröffentlichen">
+    <a href="{% url 'admin:tasks_taskversion_change' version.pk %}" class="button cancel-link">Abbrechen</a>
+  </form>
+{% endblock %}

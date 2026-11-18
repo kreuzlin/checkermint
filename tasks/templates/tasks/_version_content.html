@@ -1,0 +1,20 @@
+{% load markdown %}
+{% comment %}What participants see of a task version (shared by the preview and, later, the task page).{% endcomment %}
+<h1>{{ version.title }}</h1>
+<p class="help">{{ task.topic }} · ab Level {{ task.min_level }} · {{ version.base_points }} Grundpunkte · Version {{ version.number }}</p>
+
+<div class="prose">{{ version.instructions|markdown }}</div>
+
+<h2>Was du einreichst</h2>
+<ul>
+  {% for requirement in requirements %}
+    <li>
+      <strong>{{ requirement.label }}</strong> ({{ requirement.get_type_display }}{% if requirement.max_count > 1 %}, {{ requirement.min_count }} bis {{ requirement.max_count }}{% endif %}{% if not requirement.required %}, freiwillig{% endif %})
+      {% if requirement.help_text %}<br><span class="help">{{ requirement.help_text }}</span>{% endif %}
+    </li>
+  {% empty %}
+    <li>Noch keine Anforderungen.</li>
+  {% endfor %}
+</ul>
+
+<p>{% with count=hints|length %}{% if count == 1 %}Es gibt 1 Hinweis.{% elif count %}Es gibt {{ count }} Hinweise.{% else %}Keine Hinweise.{% endif %}{% endwith %}</p>

@@ -186,6 +186,55 @@ class Task(models.Model):
     def latest_published_version(self):
         return self.versions.published().order_by("-number").first()
 
+    def draft_version(self):
+        return self.versions.drafts().first()
+
+    def create_draft(self, user=None):
+        """ "Neue Version erstellen" (brief 5.4, ADR 0010).
+
+        Copies the latest published version with its requirements and hints
+        (keys kept) into a new draft. Without any version, an empty draft is
+        created. Returns the existing draft if there is one.
+        """
+        with transaction.atomic():
+            # Lock the task so two coaches cannot create two drafts at once.
+            Task.objects.select_for_update().get(pk=self.pk)
+            draft = self.draft_version()
+            if draft:
+                return draft
+            source = self.latest_published_version()
+            if source is None:
+                return TaskVersion.objects.create(
+                    task=self, title=self.slug, instructions="", created_by=user
+                )
+            draft = TaskVersion.objects.create(
+                task=self,
+                title=source.title,
+                instructions=source.instructions,
+                base_points=source.base_points,
+                created_by=user,
+            )
+            TaskRequirement.objects.bulk_create(
+                TaskRequirement(
+                    task_version=draft,
+                    key=r.key,
+                    order=r.order,
+                    type=r.type,
+                    label=r.label,
+                    help_text=r.help_text,
+                    required=r.required,
+                    min_count=r.min_count,
+                    max_count=r.max_count,
+                    options=r.options,
+                )
+                for r in source.requirements.all()
+            )
+            Hint.objects.bulk_create(
+                Hint(task_version=draft, key=h.key, order=h.order, text=h.text)
+                for h in source.hints.all()
+            )
+            return draft
+
     def clean(self):
         if self.is_published and (
             not self.pk or not self.versions.published().exists()
@@ -344,6 +393,7 @@ class VersionChildQuerySet(models.QuerySet):
         return super().delete()
 
     def bulk_create(self, objs, *args, **kwargs):
+        objs = list(objs)
         version_ids = {obj.task_version_id for obj in objs}
         if TaskVersion.objects.published().filter(pk__in=version_ids).exists():
             raise PublishedVersionError()
