@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-18 (PR "Render Markdown safely")_
+_Last updated: 2026-11-18 (PR "Add profile model and coach group")_
 
 ## Live
 
@@ -54,6 +54,9 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   Django does not route `/media/` (not even with `DEBUG`).
 - #8: `|markdown` filter (`markdown` + `nh3` allow-list; no images, no raw
   HTML, safe links). Milestone M1 complete.
+- #9: app `accounts` with `Profile` (nickname, real name, avatar seed, about,
+  visibility flags private by default, email notifications) and the group
+  "Coach" (data migration; for now only view/change profiles).
 
 ## Open issues
 
@@ -70,8 +73,9 @@ Overview: `gh issue list`. At the time of writing:
 ## Next steps
 
 1. Maintainer merges this PR (changes `compose.prod.yaml`).
-2. M2 (accounts and profiles), starting with #9 (profile model and coach
-   group – contains a migration, maintainer merges).
+2. M2 (accounts and profiles): #10 login and long sessions, then #11
+   coach-created accounts (hardened user admin, coach permissions for
+   users – migration).
 3. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars).
 
