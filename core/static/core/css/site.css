@@ -382,3 +382,11 @@ a.button {
   border: 1px solid var(--line);
   border-radius: 4px;
 }
+
+.message p {
+  margin: 0.25rem 0;
+}
+
+.message-warning {
+  border-left-color: var(--error);
+}

@@ -89,6 +89,14 @@ Overview of how the project is built and run. Decisions and their rationale:
   limits per file: `UPLOAD_MAX_PHOTO_MB` (15) and `UPLOAD_MAX_FILE_MB`
   (20) from `.env`; the request limit in Caddy follows with #25 and must
   allow several photos per request.
+- Version switch (#26, ADR 0015): if the attempt pins an older version than
+  the latest published one, the task page and the form show "Es gibt eine
+  neuere Version dieser Aufgabe" with the change note.
+  `/aufgaben/<slug>/wechseln/` shows the change notes of all newer versions
+  and what of the draft is carried over or lost
+  (`submissions.switching.plan_switch`); the POST switches only to the
+  confirmed version (`switch_version`), replacing the draft with one on the
+  new version.
 - Private uploads (ADR 0009): models store files with
   `core.private_files.RandomUploadPath` (UUID names) and register a
   `PrivateFileKind` (owner model, file getter, access check, inline or

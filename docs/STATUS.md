@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Add photo and file requirements")_
+_Last updated: 2026-11-19 (PR "Let participants switch to a newer task version")_
 
 ## Live
 
@@ -41,7 +41,7 @@ _Last updated: 2026-11-19 (PR "Add photo and file requirements")_
 
 Runbook: [`deployment.md`](deployment.md). Architecture:
 [`architecture.md`](architecture.md). Decisions: [`decisions/`](decisions/)
-(project-specific: 0009–0014).
+(project-specific: 0009–0015).
 
 ## Done (version 1)
 
@@ -125,6 +125,10 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   `UPLOAD_MAX_FILE_MB` (new in `.env.example`, defaults 15 and 20).
   ADR 0014: code uploads stored as text, every item owns its files,
   generated alt text for participant photos.
+- #26: notice "Es gibt eine neuere Version dieser Aufgabe" with the change
+  note, confirmation listing what of the draft is lost, switch to the
+  confirmed version only; the draft is replaced by one on the new version
+  with copies of the items matching by key and type (ADR 0015).
 
 ## Open issues
 
@@ -140,10 +144,8 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. Maintainer merges the PR for #24 (new `.env.example` variables; the
-   defaults work without changing `.env`). Next in M4: #25 upload limit
-   in Caddy (server change), #26 switching to a newer task version, #27
-   participant history.
+1. Next in M4: #27 participant history; #25 upload limit in Caddy
+   (server change, merged by the maintainer).
 2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +

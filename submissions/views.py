@@ -16,6 +16,7 @@ from .services import (
     starting_content,
     submit,
 )
+from .switching import SwitchNotPossible, newer_version, plan_switch, switch_version
 
 SAVE, SUBMIT = "speichern", "einreichen"
 
@@ -65,6 +66,7 @@ class SubmissionView(LoginRequiredMixin, SeoMixin, TemplateView):
             version=self.version,
             form=form,
             draft=get_draft(self.request.user, self.task),
+            newer=newer_version(self.attempt),
             unsupported_required=form.unsupported_required(),
         )
         return context
@@ -98,3 +100,47 @@ class SubmissionView(LoginRequiredMixin, SeoMixin, TemplateView):
                 request, "Super, deine Lösung ist eingereicht! Ein Coach schaut sie an."
             )
         return redirect("tasks:task_detail", slug=self.task.slug)
+
+
+class SwitchVersionView(LoginRequiredMixin, SeoMixin, TemplateView):
+    """ "Auf neue Version wechseln" with a confirmation (brief 5.4)."""
+
+    template_name = "submissions/switch_confirm.html"
+    meta_description = "Auf die neuste Version einer Aufgabe wechseln."
+    http_method_names = ["get", "post"]
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+        self.task, _, state = task_for(request.user, kwargs["slug"])
+        self.detail = redirect("tasks:task_detail", slug=self.task.slug)
+        if is_coach(request.user) or state.is_locked:
+            return self.detail
+        try:
+            self.plan = plan_switch(request.user, self.task)
+        except SwitchNotPossible as error:
+            messages.info(request, str(error))
+            return self.detail
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_page_title(self):
+        return f"Neue Version: {self.plan.target.title}"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(task=self.task, plan=self.plan)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        try:
+            target_id = int(request.POST.get("version", ""))
+            switch_version(request.user, self.task, target_id)
+        except ValueError:
+            return self.detail
+        except SwitchNotPossible as error:
+            messages.error(request, str(error))
+            return redirect("submissions:switch", slug=self.task.slug)
+        messages.success(
+            request, f"Du arbeitest jetzt mit Version {self.plan.target.number}."
+        )
+        return self.detail

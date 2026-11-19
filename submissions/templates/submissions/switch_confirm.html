@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <p><a href="{% url 'tasks:task_detail' slug=task.slug %}">← Zurück zur Aufgabe</a></p>
+  <h1>Auf Version {{ plan.target.number }} wechseln?</h1>
+  <p>Du arbeitest gerade mit Version {{ plan.current.number }} von «{{ plan.current.title }}». Neu ist:</p>
+  <ul>
+    {% for version in plan.newer_versions %}
+      <li><strong>Version {{ version.number }}</strong>{% if version.title != plan.current.title %} («{{ version.title }}»){% endif %}: {{ version.change_note|default:"keine Änderungsnotiz" }}</li>
+    {% endfor %}
+  </ul>
+
+  {% if plan.draft %}
+    <h2>Dein Entwurf</h2>
+    {% if plan.carried %}
+      <p>{% if plan.carried|length == 1 %}1 Teil deines Entwurfs wird{% else %}{{ plan.carried|length }} Teile deines Entwurfs werden{% endif %} übernommen.</p>
+    {% endif %}
+    {% if plan.dropped %}
+      <div class="message message-warning" role="alert">
+        <p><strong>Achtung, das geht beim Wechsel verloren:</strong></p>
+        <ul>
+          {% for dropped in plan.dropped %}
+            <li>{{ dropped.requirement_label }} ({{ dropped.count }}): {{ dropped.reason }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% elif not plan.carried %}
+      <p>Dein Entwurf ist leer, es geht nichts verloren.</p>
+    {% else %}
+      <p>Es geht nichts verloren.</p>
+    {% endif %}
+  {% endif %}
+  <p class="help">Bereits eingereichte Lösungen bleiben bei ihrer Version. Zurückwechseln geht nicht.</p>
+
+  <form method="post" class="form-actions">
+    {% csrf_token %}
+    <input type="hidden" name="version" value="{{ plan.target.pk }}">
+    <button type="submit" class="button">Ja, auf Version {{ plan.target.number }} wechseln</button>
+    <a href="{% url 'tasks:task_detail' slug=task.slug %}">Bei Version {{ plan.current.number }} bleiben</a>
+  </form>
+{% endblock %}
