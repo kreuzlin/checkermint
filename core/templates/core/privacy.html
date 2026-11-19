@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="prose legal">
+  <h1>Datenschutz</h1>
+  <p class="lead">{{ site_short_name }} speichert so wenig wie möglich und zeigt öffentlich nur, was die Kinder und Jugendlichen selbst freigeben.</p>
+
+  <h2>Wer ist verantwortlich?</h2>
+  <p>{{ club_name }}. Fragen zum Datenschutz an <a href="mailto:{{ privacy_email }}">{{ privacy_email }}</a>.</p>
+
+  <h2>Wozu gibt es {{ site_short_name }}?</h2>
+  <p>{{ site_short_name }} ist die Trainingsplattform des Vereins: Die Coaches stellen Aufgaben bereit, die Teilnehmenden reichen Lösungen ein und erhalten Rückmeldungen. Die Daten werden nur dafür verwendet.</p>
+
+  <h2>Welche Daten werden gespeichert?</h2>
+  <ul>
+    <li><strong>Konto:</strong> Benutzername, Spitzname, echter Name und Passwort (nur verschlüsselt gespeichert, niemand kann es lesen). Freiwillig eine E-Mail-Adresse. Die Konten legen die Coaches an; eine Registrierung gibt es nicht.</li>
+    <li><strong>Profil:</strong> der Roboter-Avatar (aus einer Zufallszahl erzeugt, kein Foto), der freiwillige Text «Über mich», die Einstellungen, was öffentlich ist, und ob E-Mail-Benachrichtigungen erwünscht sind.</li>
+    <li><strong>Lernfortschritt:</strong> begonnene Aufgaben, eingereichte Lösungen (Text, Code, Fotos, Dateien), Bewertungen mit Sternen und Rückmeldung, Hinweis-Anfragen und Badges. Punkte und Level werden daraus berechnet.</li>
+    <li><strong>Fotos:</strong> Beim Hochladen werden alle Zusatzdaten im Bild entfernt, auch der Aufnahmeort.</li>
+    <li><strong>Cookies:</strong> nur technisch nötige – eines für die Anmeldung (mit «Angemeldet bleiben» 30 Tage, sonst bis der Browser geschlossen wird) und eines, das Formulare vor Missbrauch schützt. Keine Werbe- oder Statistik-Cookies.</li>
+    <li><strong>Server-Protokolle:</strong> Für den Betrieb und die Fehlersuche hält der Server fest, wann welche Seite aufgerufen wurde, mit IP-Adresse und Browser-Angaben. Sie werden nicht ausgewertet und regelmässig gelöscht.</li>
+  </ul>
+
+  <h2>Wer sieht was?</h2>
+  <ul>
+    <li><strong>Alle (öffentlich):</strong> Spitzname, Roboter-Avatar, Punkte und Level pro Thema. Badges, «Über mich» und die Titel gelöster Aufgaben nur, wenn das Kind sie selbst freigibt. Das öffentliche Profil ist nirgends verlinkt; es kennt nur, wer den Link bekommt.</li>
+    <li><strong>Angemeldete Mitglieder:</strong> zusätzlich den echten Namen, «Über mich», die Badges und die Rangliste.</li>
+    <li><strong>Nur die Person selbst und die Coaches:</strong> die E-Mail-Adresse, die eingereichten Lösungen mit Fotos und Dateien, Rückmeldungen und Hinweis-Anfragen.</li>
+  </ul>
+  <p>Fotos, Dateien und Lösungen sind nie öffentlich. Der echte Name erscheint auf keiner öffentlichen Seite.</p>
+
+  <h2>Keine Drittanbieter, keine Suchmaschinen</h2>
+  <p>{{ site_short_name }} lädt nichts von anderen Anbietern: keine fremden Schriften, keine Statistik- oder Werbedienste. Suchmaschinen werden angewiesen, keine Seite aufzunehmen.</p>
+
+  <h2>Wo liegen die Daten?</h2>
+  <ul>
+    <li><strong>Server:</strong> bei UpCloud, in einem Rechenzentrum in Deutschland.</li>
+    <li><strong>E-Mail-Versand:</strong> über Hostpoint (Schweiz), nur an Personen mit hinterlegter E-Mail-Adresse – zum Beispiel wenn eine Lösung bewertet wurde oder ein neues Passwort angefordert wird.</li>
+  </ul>
+  <p>Die Daten werden nicht verkauft und an niemanden sonst weitergegeben.</p>
+
+  <h2>Wie lange?</h2>
+  <p>So lange das Konto besteht. Wer den Verein verlässt, dessen Konto wird deaktiviert; auf Wunsch löschen wir es mit allen Daten. Sicherungskopien werden nach einer begrenzten Zeit automatisch überschrieben.</p>
+
+  <h2>Ihre Rechte</h2>
+  <p>Sie können jederzeit Auskunft verlangen, welche Daten gespeichert sind, und sie berichtigen oder löschen lassen. Bei Kindern können das auch die Eltern. Schreiben Sie an <a href="mailto:{{ privacy_email }}">{{ privacy_email }}</a>.</p>
+
+  <p class="help">Stand: {{ privacy_updated }}</p>
+</div>
+{% endblock %}

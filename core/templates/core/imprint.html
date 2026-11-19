@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load avatars %}
+
+{% block content %}
+<div class="prose legal">
+  <h1>Impressum</h1>
+
+  <h2>Betreiber</h2>
+  <p>{{ club_name }}<br>
+    <a href="https://vrobot.ch">vrobot.ch</a><br>
+    E-Mail: <a href="mailto:{{ privacy_email }}">{{ privacy_email }}</a></p>
+
+  <h2>Datenschutz</h2>
+  <p>Was {{ site_short_name }} speichert und warum: <a href="{% url 'core:privacy' %}">Datenschutz</a>.</p>
+
+  <h2>Bildnachweise</h2>
+  <p>{% avatar_credits %}</p>
+</div>
+{% endblock %}

@@ -157,6 +157,10 @@ SITE_SHORT_NAME = "Checkermint"
 SITE_TITLE = f"{SITE_SHORT_NAME} – {SITE_NAME}"
 # Default meta description for pages that do not set their own.
 SITE_DESCRIPTION = "Checkermint ist die Trainingsplattform des Robotikvereins VRoboT: Aufgaben lösen, Feedback von den Coaches erhalten und Level für Level weiterkommen."
+
+# Operator and privacy contact, shown on the imprint and privacy pages (#47).
+CLUB_NAME = "Verein Robotik Talente (VRoboT)"
+PRIVACY_EMAIL = "privacy@checkermint.ch"
 # Git commit of the running image (Dockerfile build arg GIT_COMMIT, set by CI),
 # shown at /version. "dev" for local builds.
 APP_COMMIT = env("APP_COMMIT", default="dev")

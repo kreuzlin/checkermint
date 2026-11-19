@@ -26,5 +26,7 @@ def site(request):
         "site_name": settings.SITE_NAME,
         "site_short_name": settings.SITE_SHORT_NAME,
         "site_description": settings.SITE_DESCRIPTION,
+        "club_name": settings.CLUB_NAME,
+        "privacy_email": settings.PRIVACY_EMAIL,
         "nav_items": nav_items,
     }

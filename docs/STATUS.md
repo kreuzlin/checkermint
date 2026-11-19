@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Add ranking per topic")_
+_Last updated: 2026-11-19 (PR "Add privacy page and imprint")_
 
 ## Live
 
@@ -72,8 +72,8 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   (email only for the person and coaches).
 - #14: robot avatars with Robohash set1, generated locally (no external
   requests), "Neuen Roboter würfeln" on `/profil/`, shown in the header,
-  directory and profiles; CC-BY credits in the footer (to be repeated on
-  the imprint page, #47).
+  directory and profiles; CC-BY credits in the footer and on the imprint
+  page (#47).
 - #15: apps `tasks` (topics, shared level table with level 1 at 0 points,
   validated: no gaps, strictly increasing) and `badges` (static artwork or
   placeholder until #4); admin for coaches (migrations `tasks/0001–0002`,
@@ -248,6 +248,14 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #48: ranking per topic `/rangliste/` for logged-in users, linked only
   at the bottom of the catalogue: rank (ties share), avatar, nickname,
   level and points; participants without points only counted.
+- #47: privacy page `/datenschutz/` and imprint `/impressum/`, linked in
+  the footer of every page (and from the landing page). Operator:
+  "Verein Robotik Talente (VRoboT)" (name as on vrobot.ch), contact
+  `privacy@checkermint.ch` (maintainer's decision, 2026-11-19), server at
+  UpCloud in Germany, mail via Hostpoint. Both live in `settings.py`
+  (`CLUB_NAME`, `PRIVACY_EMAIL`); the "Stand" date in
+  `core.views.PRIVACY_UPDATED`. The imprint has no postal address yet.
+  Text to be reviewed by the maintainer. **Milestone M10 complete.**
 - 2026-11-19: on the maintainer's one-time instruction, Claude merged #73
   (Caddy upload limit, a server change) itself. The merge exceptions in
   CLAUDE.md stay in force: PRs with migrations or server/deployment
@@ -268,13 +276,15 @@ Overview: `gh issue list`. At the time of writing:
 | 2 | DNS for checkermint.ch (apex and `www` only) | Maintainer |
 | 3 | Outgoing mail `coach@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Badge artwork (logo and colours delivered) | Maintainer |
-| 42–47, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
+| 42–44, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
 | 77 | Show who uploaded a submission item (follow-up to #30; migration) | Claude Code |
+| 97 | Rotate container logs on the server (the privacy page says logs are deleted regularly) | Maintainer (server PR) |
+| – | Create the mailbox or alias `privacy@checkermint.ch` (Hostpoint, with #3) | Maintainer |
 
 ## Next steps
 
-1. M10: #47 privacy page and imprint (needs the maintainer's details
-   for the imprint and a review of the text).
+1. Maintainer: review the texts of the landing page, privacy page and
+   imprint; decide whether the imprint gets a postal address.
    M9 (email): #43 and #44 can be built against the console backend;
    #42 needs SMTP access (#3).
 2. Maintainer: manual test of phone upload and live update
