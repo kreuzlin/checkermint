@@ -12,7 +12,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
 | `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`; points from `submissions.progress`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011), task attempts (`tasks.attempts`), catalogue `/aufgaben/` and task page `/aufgaben/<slug>/` (`tasks.catalogue`) |
 | `hints/` | Hint requests (`HintRequest`, `hints.services`): "Hinweis anfragen" on the task page (POST `/aufgaben/<slug>/hinweis-anfragen/`), granted hints with replies; grant or decline in the coach queue (POST `/warteschlange/hinweis/<id>/`); read-only admin for coaches |
-| `overviews/` | Coach overviews (no models): progress matrix `/fortschritt/` (`overviews.matrix.progress_matrix`, "Fortschritt" in the navigation, coaches only) |
+| `overviews/` | Coach overviews (no models): progress matrix `/fortschritt/` (`overviews.matrix.progress_matrix`, "Fortschritt" in the navigation, coaches only), participant detail `/fortschritt/teilnehmende/<nickname>/` (`overviews.participant`) |
 | `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder; awards (`UserBadge`, `badges.awards`: `award_for`, `recent_badges`, `badges_of`) |
 | `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; requirement handlers (`submissions/handlers.py`), submission form `/aufgaben/<slug>/loesung/`, version switch `/aufgaben/<slug>/wechseln/`, history `/verlauf/` (`submissions.history`), coach queue `/warteschlange/` (`submissions.queue`), review form `/warteschlange/<id>/`, phone upload `/hochladen/<token>/` (`submissions.upload_links`); read-only admin for coaches |
 | `<app>/` | One small Django app per topic (added per project) |
@@ -159,6 +159,16 @@ Overview of how the project is built and run. Decisions and their rationale:
   (attempts, non-draft submissions and points per user and topic are
   each loaded once). The table scrolls sideways inside its box; the first
   column stays visible.
+- Participant detail (#40, brief 5.10.3):
+  `/fortschritt/teilnehmende/<nickname>/` for coaches, linked from the
+  matrix rows and the internal profile. Real name, level per topic and
+  suggested next tasks come from the participant's own catalogue
+  (`tasks.catalogue.catalogue`, `submissions.dashboard.suggested_tasks`:
+  started first, then open by minimum level, at most 5). All non-draft
+  submissions (also of archived tasks) newest first with status, stars,
+  points, feedback and a link to the review page; all hint requests with
+  message, outcome, reply and the requested hint. Participants get 403;
+  staff, inactive or unknown nicknames 404.
 - Points and levels (#33, ADR 0013): `submissions.progress` computes
   everything from approved submissions, nothing is stored.
   `points_by_task` / `task_points`: the best `base_points × stars` per

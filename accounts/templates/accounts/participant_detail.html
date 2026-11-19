@@ -19,7 +19,7 @@
   </dl>
 
   {% if viewer_is_coach %}
-    <p><a href="{% url 'submissions:coach_upload_choose' nickname=profile.nickname %}">Fotos oder Dateien für {{ profile.nickname }} hochladen</a></p>
+    <p><a href="{% url 'overviews:participant' nickname=profile.nickname %}">Fortschritt von {{ profile.nickname }}</a> · <a href="{% url 'submissions:coach_upload_choose' nickname=profile.nickname %}">Fotos oder Dateien für {{ profile.nickname }} hochladen</a></p>
   {% endif %}
 
   <h2>Badges</h2>
