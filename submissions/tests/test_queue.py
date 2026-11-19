@@ -82,7 +82,7 @@ class CoachQueueTests(TestCase):
         self.assertContains(response, "Wartezeit: 3")
         self.assertContains(
             response,
-            reverse("admin:submissions_submission_change", args=[submission.pk]),
+            reverse("submissions:review", kwargs={"pk": submission.pk}),
         )
 
     def test_empty_queue(self):

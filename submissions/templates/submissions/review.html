@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}<link rel="stylesheet" href="{% static 'submissions/css/code.css' %}"><script src="{% static 'core/js/htmx-2.0.4.min.js' %}" defer></script>{% endblock %}
+
+{% block content %}
+  {% with profile=participant.profile version=submission.task_version %}
+    <p><a href="{% url 'submissions:queue' %}">← Warteschlange</a></p>
+    <h1>{{ version.title }}</h1>
+    <p>
+      <a href="{% url 'accounts:participant_detail' nickname=profile.nickname %}">{{ profile.nickname }}</a> ({{ profile.real_name }})
+      · {{ submission.task.topic }}
+      · <a href="{% url 'admin:tasks_taskversion_preview' version.pk %}">Version {{ version.number }} ansehen</a>
+      <span class="help">({{ version.base_points }} Grundpunkte)</span>
+    </p>
+    {% if newer %}
+      <p class="message" role="note"><strong>Hinweis:</strong> Es gibt eine neuere Version (Version {{ newer.number }}){% if newer.change_note %}: {{ newer.change_note }}{% else %}.{% endif %} {{ profile.nickname }} hat Version {{ version.number }} bearbeitet – bewerte nach dieser Version.</p>
+    {% endif %}
+
+    <h2>Lösung</h2>
+    {% include "submissions/_submission.html" %}
+
+    {% include "submissions/_review_form.html" %}
+
+    {% if earlier %}
+      <h2>Frühere Einreichungen</h2>
+      {% for submission in earlier %}
+        <details>
+          <summary>{{ submission.submitted_at|date:"j. F Y, H:i" }} · {{ submission.get_status_display }}{% if submission.stars %} {{ submission.star_symbols }}{% endif %} · Version {{ submission.task_version.number }}</summary>
+          {% include "submissions/_submission.html" %}
+        </details>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+{% endblock %}

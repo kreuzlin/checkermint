@@ -18,6 +18,7 @@ urlpatterns = [
     ),
     path("verlauf/", views.HistoryView.as_view(), name="history"),
     path("warteschlange/", views.CoachQueueView.as_view(), name="queue"),
+    path("warteschlange/<int:pk>/", views.ReviewView.as_view(), name="review"),
     path(
         "teilnehmende/<str:nickname>/hochladen/",
         views.CoachUploadChooseView.as_view(),

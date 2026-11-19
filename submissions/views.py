@@ -11,9 +11,16 @@ from core.seo import SeoMixin
 from tasks.attempts import visible_version
 from tasks.catalogue import Status, catalogue, task_for
 
-from .forms import PhoneUploadForm, SubmissionForm, stored_signature
+from .forms import (
+    APPROVE,
+    PhoneUploadForm,
+    ReviewForm,
+    SubmissionForm,
+    stored_signature,
+)
 from .handlers import UploadHandler, handler_for
 from .history import history_events
+from .models import Submission
 from .queue import queue_entries
 from .services import (
     SubmissionNotAllowed,
@@ -21,9 +28,11 @@ from .services import (
     ensure_draft,
     get_draft,
     items_by_requirement,
+    review_submission,
     save_draft,
     starting_content,
     submit,
+    submitted_submissions,
 )
 from .switching import SwitchNotPossible, newer_version, plan_switch, switch_version
 from .upload_links import (
@@ -405,3 +414,104 @@ class CoachQueueView(CoachRequiredMixin, SeoMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["entries"] = queue_entries()
         return context
+
+
+def next_in_queue(exclude_pk=None):
+    """The oldest waiting entry other than `exclude_pk`, or None."""
+    for entry in queue_entries():
+        if entry.submission.pk != exclude_pk:
+            return entry
+    return None
+
+
+class ReviewView(CoachRequiredMixin, SeoMixin, TemplateView):
+    """Coach: review one submission (brief 5.8, #32).
+
+    Stars and feedback, then "Annehmen" (1–3 stars) or "Überarbeitung
+    nötig" (feedback only). With htmx only the form block is replaced;
+    without JavaScript the page redirects to the queue.
+    """
+
+    template_name = "submissions/review.html"
+    meta_description = "Eine eingereichte Lösung bewerten."
+    http_method_names = ["get", "post"]
+
+    def load_submission(self):
+        # Only after CoachRequiredMixin.dispatch: participants get 403, never
+        # a 404 that tells them which submission ids exist.
+        self.submission = get_object_or_404(
+            Submission.objects.exclude(status=Submission.Status.DRAFT).select_related(
+                "user__profile", "task__topic", "task_version", "reviewed_by__profile"
+            ),
+            pk=self.kwargs["pk"],
+        )
+
+    def get(self, request, *args, **kwargs):
+        self.load_submission()
+        return super().get(request, *args, **kwargs)
+
+    def get_page_title(self):
+        return f"Bewerten: {self.submission.task_version.title}"
+
+    @property
+    def is_htmx(self) -> bool:
+        return self.request.headers.get("HX-Request") == "true"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        submission = self.submission
+        latest = submission.task.latest_published_version()
+        newer = (
+            latest
+            if latest and latest.number > submission.task_version.number
+            else None
+        )
+        context.update(
+            submission=submission,
+            participant=submission.user,
+            earlier=submitted_submissions(submission.user, submission.task).exclude(
+                pk=submission.pk
+            ),
+            newer=newer,
+            form=kwargs.get("form") or ReviewForm(),
+            is_open=submission.status == Submission.Status.SUBMITTED,
+            next_entry=next_in_queue(exclude_pk=submission.pk),
+        )
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.load_submission()
+        form = ReviewForm(request.POST)
+        if not form.is_valid():
+            return self.render_review(form=form)
+        data = form.cleaned_data
+        status = (
+            Submission.Status.APPROVED
+            if data["decision"] == APPROVE
+            else Submission.Status.NEEDS_REVISION
+        )
+        try:
+            self.submission = review_submission(
+                self.submission, request.user, status, data["stars"], data["feedback"]
+            )
+        except SubmissionNotAllowed as error:
+            self.load_submission()  # show the review that came first
+            if self.is_htmx:
+                return self.render_review(error=str(error))
+            messages.error(request, str(error))
+            return redirect("submissions:review", pk=self.submission.pk)
+        nickname = self.submission.user.profile.nickname
+        if status == Submission.Status.APPROVED:
+            done = f"Lösung von {nickname} angenommen ({self.submission.star_symbols})."
+        else:
+            done = f"Lösung von {nickname} zur Überarbeitung zurückgegeben."
+        if self.is_htmx:
+            return self.render_review(done=done)
+        messages.success(request, done)
+        return redirect("submissions:queue")
+
+    def render_review(self, **kwargs):
+        context = self.get_context_data(**kwargs)
+        if self.is_htmx:
+            return render(self.request, "submissions/_review_form.html", context)
+        return self.render_to_response(context)

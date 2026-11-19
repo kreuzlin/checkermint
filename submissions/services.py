@@ -200,3 +200,27 @@ def ensure_draft(user, task) -> Submission:
         return save_draft(
             user, task, {pk: list(items) for pk, items in previous.items()}
         )
+
+
+def review_submission(
+    submission: Submission, coach, status: str, stars: int | None, feedback: str
+) -> Submission:
+    """Submitted → approved (with stars) or needs revision (brief 5.8).
+
+    Locks the row, so two coaches cannot review the same submission. Points,
+    levels and badges follow from the data (#33, #34).
+    """
+    if status not in Submission.REVIEWED:
+        raise ValueError("A review either approves or asks for a revision.")
+    with transaction.atomic():
+        locked = Submission.objects.select_for_update().get(pk=submission.pk)
+        if locked.status != Submission.Status.SUBMITTED:
+            raise SubmissionNotAllowed("Diese Lösung hat schon jemand bewertet.")
+        locked.status = status
+        locked.stars = stars if status == Submission.Status.APPROVED else None
+        locked.feedback = feedback
+        locked.reviewed_by = coach
+        locked.reviewed_at = timezone.now()
+        locked.full_clean()
+        locked.save()
+        return locked

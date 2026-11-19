@@ -162,3 +162,49 @@ class PhoneUploadForm(forms.Form):
             sum(1 for value in values if isinstance(value, dict))
             for values in self.items.values()
         )
+
+
+APPROVE, REVISE = "annehmen", "ueberarbeiten"
+
+
+class ReviewForm(forms.Form):
+    """Stars and feedback; the button decides the outcome (brief 5.8)."""
+
+    stars = forms.TypedChoiceField(
+        label="Sterne",
+        choices=[(1, "★ 1 Stern"), (2, "★★ 2 Sterne"), (3, "★★★ 3 Sterne")],
+        coerce=int,
+        required=False,
+        empty_value=None,
+        widget=forms.RadioSelect,
+        help_text="Nur beim Annehmen; bei «Überarbeitung nötig» gibt es keine Sterne.",
+    )
+    feedback = forms.CharField(
+        label="Rückmeldung",
+        required=False,
+        max_length=5000,
+        widget=forms.Textarea(attrs={"rows": 6}),
+        help_text="Kurz und ermutigend. Markdown, z. B. **fett** oder `code`.",
+    )
+    decision = forms.ChoiceField(
+        choices=[(APPROVE, "Annehmen"), (REVISE, "Überarbeitung nötig")],
+        # Sent by the clicked button, never rendered as a field.
+        error_messages={"required": "Wähle «Annehmen» oder «Überarbeitung nötig»."},
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        decision = cleaned.get("decision")
+        stars = cleaned.get("stars")
+        feedback = (cleaned.get("feedback") or "").strip()
+        cleaned["feedback"] = feedback
+        if decision == APPROVE and stars is None:
+            self.add_error("stars", "Zum Annehmen braucht es 1 bis 3 Sterne.")
+        if decision == REVISE:
+            # Feedback only (brief 5.8); a star chosen before is dropped.
+            cleaned["stars"] = None
+            if not feedback:
+                self.add_error(
+                    "feedback", "Schreib kurz, was noch fehlt oder besser werden soll."
+                )
+        return cleaned

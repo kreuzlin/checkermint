@@ -441,3 +441,14 @@ a.button {
 .qr-link code {
   word-break: break-all;
 }
+
+/* Review form: star choice as large, easy-to-hit options. */
+.stars-choice {
+  padding-bottom: 0.75rem;
+}
+
+.stars-option {
+  display: inline-block;
+  margin: 0 1rem 0.5rem 0;
+  white-space: nowrap;
+}

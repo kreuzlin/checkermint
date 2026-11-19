@@ -1,0 +1,45 @@
+{% load markdown %}
+{% comment %}Review block (brief 5.8). htmx replaces just this block after posting; without JavaScript the form posts normally.{% endcomment %}
+<section id="bewertung" class="review" aria-labelledby="bewertung-titel">
+  <h2 id="bewertung-titel">Bewertung</h2>
+  {% if done %}
+    <p class="message" role="status"><strong>Gespeichert:</strong> {{ done }}</p>
+  {% elif error %}
+    <p class="form-errors" role="alert"><strong>Fehler:</strong> {{ error }}</p>
+  {% endif %}
+
+  {% if is_open %}
+    <form method="post" class="form review-form" novalidate hx-post="{{ request.path }}" hx-target="#bewertung" hx-swap="outerHTML">
+      {% csrf_token %}
+      {% if form.decision.errors %}<p class="form-errors" role="alert"><strong>Fehler:</strong> {{ form.decision.errors.0 }}</p>{% endif %}
+      <fieldset class="stars-choice"{% if form.stars.help_text %} aria-describedby="{{ form.stars.auto_id }}_helptext"{% endif %}>
+        <legend>{{ form.stars.label }}</legend>
+        {% for radio in form.stars %}<label class="stars-option">{{ radio.tag }} {{ radio.choice_label }}</label>{% endfor %}
+        <div class="help" id="{{ form.stars.auto_id }}_helptext">{{ form.stars.help_text }}</div>
+        {% for error in form.stars.errors %}<p class="field-error"><strong>Fehler:</strong> {{ error }}</p>{% endfor %}
+      </fieldset>
+      {% include "accounts/_field.html" with field=form.feedback %}
+      <p class="form-actions">
+        <button type="submit" name="decision" value="annehmen" class="button">Annehmen</button>
+        <button type="submit" name="decision" value="ueberarbeiten" class="button button-secondary">Überarbeitung nötig (ohne Sterne)</button>
+      </p>
+    </form>
+  {% else %}
+    <p>
+      <strong>{{ submission.get_status_display }}</strong>{% if submission.stars %} <span class="stars" aria-label="{{ submission.stars }} von 3 Sternen">{{ submission.star_symbols }}</span>{% endif %}
+      <span class="help">{% if submission.reviewed_by.profile %}von {{ submission.reviewed_by.profile.nickname }}, {% endif %}{{ submission.reviewed_at|date:"j. F Y, H:i" }}</span>
+    </p>
+    {% if submission.feedback %}<div class="feedback prose">{{ submission.feedback|markdown }}</div>{% endif %}
+  {% endif %}
+
+  {% if not is_open %}
+    <p>
+      {% if next_entry %}
+        <a class="button" href="{% url 'submissions:review' pk=next_entry.submission.pk %}">Nächste Lösung: {{ next_entry.submission.task_version.title }} von {{ next_entry.submission.user.profile.nickname }}</a>
+      {% else %}
+        Die Warteschlange ist leer.
+      {% endif %}
+      <a href="{% url 'submissions:queue' %}">Zur Warteschlange</a>
+    </p>
+  {% endif %}
+</section>
