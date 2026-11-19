@@ -38,6 +38,9 @@ COACH_PERMISSIONS = {
     # View only: submissions are made by participants and reviewed in the
     # coach views (#31, #32), never edited in the admin.
     "submissions": {"submission": ["view"], "submissionitem": ["view"]},
+    # View only: requests come from participants, decisions from the queue
+    # (#37); the history is never edited or deleted (brief 5.5).
+    "hints": {"hintrequest": ["view"]},
 }
 
 

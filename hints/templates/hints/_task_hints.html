@@ -1,0 +1,44 @@
+{% load markdown %}
+{% comment %}Hints on the task page for participants (brief 5.5, #36). Needs `hint_state`, `task`, `hint_form`.{% endcomment %}
+{% if hint_state.total %}
+  <section class="hints" aria-labelledby="hinweise">
+    <h2 id="hinweise">Hinweise</h2>
+    <p class="help">Du hast {{ hint_state.granted|length }} von {{ hint_state.total }} Hinweis{{ hint_state.total|pluralize:"en" }} erhalten. Hinweise kosten keine Punkte – ein Coach entscheidet, ob du einen bekommst.</p>
+
+    {% if hint_state.granted %}
+      <ol class="hint-list">
+        {% for entry in hint_state.granted %}
+          <li class="hint">
+            <div class="prose">{{ entry.hint.text|markdown }}</div>
+            {% if entry.request.coach_reply %}
+              <div class="feedback"><strong>Antwort von {% firstof entry.request.decided_by.profile.nickname "einem Coach" %}:</strong> {{ entry.request.coach_reply }}</div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+    {% endif %}
+
+    {% if hint_state.open_request %}
+      <p class="message" role="status"><strong>Anfrage wartet auf einen Coach.</strong>{% if hint_state.open_request.message %} Deine Nachricht: «{{ hint_state.open_request.message }}»{% endif %}</p>
+    {% elif hint_state.last_declined %}
+      <div class="message message-warning" role="status">
+        <p><strong>Deine letzte Anfrage wurde abgelehnt.</strong>{% if hint_state.last_declined.coach_reply %} {% firstof hint_state.last_declined.decided_by.profile.nickname "Der Coach" %} schreibt: «{{ hint_state.last_declined.coach_reply }}»{% endif %}</p>
+        <p>Probier es noch einmal selbst – du kannst später wieder fragen.</p>
+      </div>
+    {% endif %}
+
+    {% if hint_state.can_request %}
+      <form method="post" action="{% url 'hints:request' slug=task.slug %}" class="form hint-request-form">
+        {% csrf_token %}
+        <div class="form-field">
+          <label for="{{ hint_form.message.id_for_label }}">{{ hint_form.message.label }}</label>
+          {{ hint_form.message }}
+          <p class="help">{{ hint_form.message.help_text }}</p>
+        </div>
+        <button type="submit" class="button button-secondary">Hinweis anfragen</button>
+      </form>
+    {% elif not hint_state.open_request %}
+      <p class="help">Du hast alle Hinweise erhalten.</p>
+    {% endif %}
+  </section>
+{% endif %}

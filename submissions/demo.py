@@ -1,9 +1,8 @@
 """Demo data for local development (`manage.py seed_demo`).
 
 Creates a coach, participants, topics, levels, tasks (one with two
-versions, one unpublished draft), hints, badges (awarded on approval) and
-submissions in every
-state, so the coach queue, review and progress views can be tried by hand.
+versions, one unpublished draft), hints with requests in every state,
+badges (awarded on approval) and submissions in every state, so the coach queue, review and progress views can be tried by hand.
 
 Demo rows are recognised by the `demo-` prefix of usernames, task slugs
 and topic slugs, and by `DEMO_BADGES`; `remove_demo_data` deletes only those.
@@ -26,6 +25,7 @@ from accounts.roles import COACH_GROUP_NAME
 from badges.awards import award_for
 from badges.models import Badge
 from core.images import process_photo
+from hints.models import HintRequest
 from tasks.attempts import start_attempt
 from tasks.models import Hint, LevelThreshold, Task, TaskRequirement, TaskVersion, Topic
 
@@ -210,6 +210,7 @@ class Seeder:
         }
         self.tasks()
         self.submissions()
+        self.hint_requests()
         self.sensor_v2()
 
     def check_names(self):
@@ -590,6 +591,45 @@ class Seeder:
 
         # Luna: new, has only started the LED circuit.
         start_attempt(luna, self.led)
+
+    def hint_requests(self):
+        """One granted, one declined and one open request (#36)."""
+        anna, ben, luna = (self.users[n] for n in ("RoboAnna", "BenBot", "LunaLED"))
+        granted = HintRequest.Status.GRANTED
+        declined = HintRequest.Status.DECLINED
+        for user, task, key, message, decision, reply, hours in [
+            (
+                anna,
+                self.sensor,
+                "adc",
+                "Wo schliesse ich den Sensor an?",
+                granted,
+                "Nimm GP26, das ist ADC0.",
+                50,
+            ),
+            (
+                ben,
+                self.blink,
+                "delay",
+                "Wie warte ich eine halbe Sekunde?",
+                declined,
+                "Schau zuerst im Beispiel Blink nach.",
+                30,
+            ),
+            (luna, self.blink, "delay", "Meine LED blinkt nicht.", None, "", 2),
+        ]:
+            attempt = start_attempt(user, task)
+            hint = attempt.task_version.hints.get(key=key)
+            HintRequest.objects.create(
+                task_attempt=attempt,
+                hint=hint,
+                message=message,
+                status=decision or HintRequest.Status.OPEN,
+                coach_reply=reply,
+                decided_by=self.coach if decision else None,
+                requested_at=self.ago(hours=hours),
+                decided_at=self.ago(hours=hours - 1) if decision else None,
+            )
 
     def sensor_v2(self):
         """Version 2 of the sensor task: Max stays pinned to version 1."""

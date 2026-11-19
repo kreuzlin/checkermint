@@ -36,6 +36,8 @@
       {% if state.status.value == "geloest" and not draft %}<p class="help">Mit einer neuen Lösung kannst du mehr Sterne holen; deine Punkte sinken dadurch nie.</p>{% endif %}
     {% endif %}
 
+    {% if hint_state %}{% include "hints/_task_hints.html" %}{% endif %}
+
     {% if submissions %}
       <h2>Bisherige Einreichungen</h2>
       {% for submission in submissions %}
