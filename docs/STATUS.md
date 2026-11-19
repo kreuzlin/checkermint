@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Add progress matrix for coaches")_
+_Last updated: 2026-11-19 (PR "Add participant detail for coaches")_
 
 ## Live
 
@@ -226,6 +226,11 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   participant; same rules as the catalogue, fixed number of queries.
   `task_state` now takes a `coach` flag (the catalogue no longer asks
   the database once per task).
+- #40: participant detail `/fortschritt/teilnehmende/<nickname>/` for
+  coaches (linked from the progress matrix and the internal profile): real
+  name, level per topic, suggested next tasks (same rules as the
+  dashboard), all submissions with status, stars, points and feedback
+  (linked to the review page) and all hint requests with their outcome.
 - 2026-11-19: on the maintainer's one-time instruction, Claude merged #73
   (Caddy upload limit, a server change) itself. The merge exceptions in
   CLAUDE.md stay in force: PRs with migrations or server/deployment
@@ -246,12 +251,12 @@ Overview: `gh issue list`. At the time of writing:
 | 2 | DNS for checkermint.ch (apex and `www` only) | Maintainer |
 | 3 | Outgoing mail `coach@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Badge artwork (logo and colours delivered) | Maintainer |
-| 36–50 | Version 1, one issue per PR, grouped in milestones M7–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
+| 41–50 | Version 1, one issue per PR, grouped in milestones M8–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
 | 77 | Show who uploaded a submission item (follow-up to #30; migration) | Claude Code |
 
 ## Next steps
 
-1. M8 coach overviews: #40 participant detail, #41 task detail.
+1. M8 coach overviews: #41 task detail (completes M8).
 2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
 3. #77 show who uploaded a submission item (migration; M6 is done, so

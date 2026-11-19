@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load avatars markdown %}
+
+{% block content %}
+{% with profile=detail.profile %}
+  <h1 class="with-avatar">{% avatar profile 64 %} {{ profile.nickname }}</h1>
+  <p class="help">Nur für Coaches sichtbar. <a href="{% url 'overviews:matrix' %}">Zurück zum Fortschritt</a> · <a href="{% url 'accounts:participant_detail' nickname=profile.nickname %}">Profil</a></p>
+
+  <dl class="facts">
+    <dt>Echter Name</dt>
+    <dd>{{ profile.real_name|default:"nicht erfasst" }}</dd>
+  </dl>
+
+  <div class="dashboard">
+    <section class="dashboard-block" aria-labelledby="level">
+      <h2 id="level">Level pro Thema</h2>
+      {% for section in detail.sections %}
+        <h3>{{ section.topic.name }}</h3>
+        {% include "tasks/_topic_level.html" with level=section.progress %}
+      {% empty %}
+        <p class="help">Noch keine veröffentlichten Aufgaben.</p>
+      {% endfor %}
+    </section>
+
+    <section class="dashboard-block" aria-labelledby="vorschlaege">
+      <h2 id="vorschlaege">Als Nächstes</h2>
+      {% if detail.suggestions %}
+        <ul class="task-list">
+          {% for entry in detail.suggestions %}
+            <li class="task-item">
+              <a class="task-title" href="{% url 'tasks:task_detail' slug=entry.task.slug %}">{{ entry.version.title }}</a>
+              <span class="task-status">{{ entry.task.topic }} · ab Level {{ entry.task.min_level }} · {{ entry.status.label }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+        <p class="help">Begonnene Aufgaben zuerst, dann offene mit dem tiefsten Mindest-Level.</p>
+      {% else %}
+        <p class="help">Gerade keine offene Aufgabe.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <h2 id="einreichungen">Einreichungen</h2>
+  {% if detail.submissions %}
+    <ol class="history">
+      {% for submission in detail.submissions %}
+        <li class="history-event">
+          <p class="history-head">
+            <time datetime="{{ submission.submitted_at|date:'c' }}">{{ submission.submitted_at|date:"j. F Y, H:i" }}</time>
+            · {{ submission.task.topic }}
+          </p>
+          <p>
+            <a href="{% url 'submissions:review' pk=submission.pk %}">{{ submission.task_version.title }}</a>
+            <span class="help">Version {{ submission.task_version.number }}</span>
+          </p>
+          <p>
+            <strong>{{ submission.get_status_display }}</strong>{% if submission.stars %} <span class="stars" aria-label="{{ submission.stars }} von 3 Sternen">{{ submission.star_symbols }}</span> · {{ submission.points }} Punkte{% endif %}
+            {% if submission.reviewed_at %}<span class="help">{% if submission.reviewed_by.profile %}von {{ submission.reviewed_by.profile.nickname }}, {% endif %}{{ submission.reviewed_at|date:"j. F Y" }}</span>{% elif submission.status == "submitted" %}<span class="help">– wartet auf einen Coach</span>{% endif %}
+          </p>
+          {% if submission.feedback %}<div class="feedback prose">{{ submission.feedback|markdown }}</div>{% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="help">Noch nichts eingereicht.</p>
+  {% endif %}
+
+  <h2 id="hinweise">Hinweis-Anfragen</h2>
+  {% if detail.hint_requests %}
+    <ol class="history">
+      {% for hint_request in detail.hint_requests %}
+        {% with task=hint_request.task_attempt.task hint=hint_request.hint %}
+          <li class="history-event">
+            <p class="history-head">
+              <time datetime="{{ hint_request.requested_at|date:'c' }}">{{ hint_request.requested_at|date:"j. F Y, H:i" }}</time>
+              · {{ task.topic }}
+            </p>
+            <p>{{ hint.task_version.title }} <span class="help">Version {{ hint.task_version.number }}</span></p>
+            <p>
+              <strong>{{ hint_request.get_status_display }}</strong>
+              {% if hint_request.is_open %}<span class="help">– <a href="{% url 'submissions:queue' %}">in der Warteschlange</a></span>
+              {% else %}<span class="help">{% if hint_request.decided_by.profile %}von {{ hint_request.decided_by.profile.nickname }}, {% endif %}{{ hint_request.decided_at|date:"j. F Y" }}</span>{% endif %}
+            </p>
+            {% if hint_request.message %}<p>Nachricht: «{{ hint_request.message }}»</p>{% endif %}
+            {% if hint_request.coach_reply %}<p>Antwort: «{{ hint_request.coach_reply }}»</p>{% endif %}
+            <details>
+              <summary>Angefragter Hinweis</summary>
+              <div class="prose">{{ hint.text|markdown }}</div>
+            </details>
+          </li>
+        {% endwith %}
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="help">Noch keine Hinweis-Anfragen.</p>
+  {% endif %}
+{% endwith %}
+{% endblock %}
