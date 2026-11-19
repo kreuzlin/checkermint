@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-18 (PR "Add images in task instructions")_
+_Last updated: 2026-11-19 (PR "Add task attempts that pin the version")_
 
 ## Live
 
@@ -85,8 +85,7 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #17: admin workflow for task versions: version list on the task,
   "Neue Version erstellen" (copy into a draft), draft editing with
   requirement and hint inlines, preview as participants see it, publish
-  with confirmation; published versions read-only. Pinned count per
-  version follows with #19.
+  with confirmation; published versions read-only.
 - #21 (ahead of #18, which needs it): private files only through
   `/dateien/<kind>/<pk>/` with per-object access checks, random storage
   names and safe headers.
@@ -94,6 +93,11 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   without metadata), referenced as `![…](bild:<id>)`, served privately,
   immutable once a published version uses them (migrations
   `tasks/0005–0006`).
+- #19: `TaskAttempt` pins the version per participant and task
+  (`tasks.attempts.start_attempt`, `visible_version`); the version list on
+  a task shows how many participants are pinned to each version
+  (migration `tasks/0007`). The "Aufgabe starten" button comes with the
+  task page (#20).
 
 ## Open issues
 
@@ -109,8 +113,8 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. Maintainer merges the PR for #18 (migrations). Next in M3: #19 task
-   attempts that pin the version, #20 task catalogue and task page.
+1. Maintainer merges the PR for #19 (migration). Next in M3: #20 task
+   catalogue and task page (incl. "Aufgabe starten").
 2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars).
 

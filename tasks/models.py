@@ -652,3 +652,76 @@ class InstructionImage(models.Model):
             and not self.task.is_archived
             and self.used_by_published_version()
         )
+
+
+# --- Task attempts: the pinned version per participant (brief 5.4) --------
+
+
+class TaskAttempt(models.Model):
+    """A participant has started a task; pins the version they see (ADR 0010).
+
+    Created on the first of "Aufgabe starten", the first draft submission or
+    the first hint request (see `tasks.attempts.start_attempt`). The version
+    changes only when the participant switches explicitly (#26).
+    """
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="task_attempts",
+        verbose_name="Teilnehmer/in",
+    )
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.PROTECT,
+        related_name="attempts",
+        verbose_name="Aufgabe",
+    )
+    task_version = models.ForeignKey(
+        TaskVersion,
+        on_delete=models.PROTECT,
+        related_name="attempts",
+        verbose_name="Version",
+    )
+    started_at = models.DateTimeField("Gestartet", default=timezone.now)
+    switched_at = models.DateTimeField(
+        "Zuletzt Version gewechselt", null=True, blank=True
+    )
+
+    class Meta:
+        verbose_name = "Aufgaben-Versuch"
+        verbose_name_plural = "Aufgaben-Versuche"
+        ordering = ["-started_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "task"],
+                name="tasks_attempt_unique_user_task",
+                violation_error_message="Diese Aufgabe ist schon gestartet.",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.user} – {self.task_version}"
+
+    def save(self, *args, **kwargs):
+        # Checked on every save, not only in forms: an attempt must never
+        # pin a draft or a version of another task.
+        version = TaskVersion.objects.filter(pk=self.task_version_id).first()
+        if version is None or version.task_id != self.task_id:
+            raise ValueError("The version must belong to the attempt's task.")
+        if not version.is_published:
+            raise ValueError("An attempt can only pin a published version.")
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        version = self.task_version
+        if version is None:
+            return
+        if version.task_id != self.task_id:
+            raise ValidationError(
+                {"task_version": "Die Version gehört zu einer anderen Aufgabe."}
+            )
+        if not version.is_published:
+            raise ValidationError(
+                {"task_version": "Nur veröffentlichte Versionen lassen sich starten."}
+            )
