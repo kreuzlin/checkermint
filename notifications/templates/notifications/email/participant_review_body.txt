@@ -1,0 +1,16 @@
+{% autoescape off %}Hallo {{ nickname }}
+
+{% if approved %}Super! Ein Coach hat deine Lösung für «{{ title }}» angenommen: {{ stars }} von 3 Sternen, {{ points }} Punkte.{% if badge %}
+Dazu hast du das Badge «{{ badge }}» bekommen.{% endif %}{% else %}Ein Coach hat sich deine Lösung für «{{ title }}» angeschaut und bittet dich, sie zu überarbeiten.{% endif %}{% if feedback %}
+
+Rückmeldung:
+{{ feedback }}{% endif %}
+
+Zur Aufgabe:
+{{ url }}
+
+Diese E-Mails kannst du in deinem Profil abschalten:
+{{ profile_url }}
+
+{{ site_name }} – {{ site_full_name }}
+{% endautoescape %}

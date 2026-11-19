@@ -1,0 +1,1 @@
+{% autoescape off %}{% if granted %}Dein Hinweis ist da{% else %}Antwort auf deine Hinweis-Anfrage{% endif %}: {{ title }}{% endautoescape %}

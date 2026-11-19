@@ -8,7 +8,10 @@ from django.views.generic import TemplateView, View
 from accounts.mixins import CoachRequiredMixin
 from accounts.roles import is_coach
 from core.seo import SeoMixin
-from notifications.emails import notify_coaches_of_submission
+from notifications.emails import (
+    notify_coaches_of_submission,
+    notify_participant_of_review,
+)
 from tasks.attempts import visible_version
 from tasks.catalogue import Status, catalogue, task_for, visible_tasks
 from tasks.models import Topic
@@ -539,6 +542,7 @@ class ReviewView(CoachRequiredMixin, SeoMixin, TemplateView):
                 return self.render_review(error=str(error))
             messages.error(request, str(error))
             return redirect("submissions:review", pk=self.submission.pk)
+        notify_participant_of_review(request, self.submission)
         nickname = self.submission.user.profile.nickname
         if status == Submission.Status.APPROVED:
             done = f"Lösung von {nickname} angenommen ({self.submission.star_symbols})."

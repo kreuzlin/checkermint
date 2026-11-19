@@ -275,6 +275,12 @@ Overview of how the project is built and run. Decisions and their rationale:
   transaction commits, one message per recipient, links built from the
   triggering request (no site-address setting); a mail server error is
   logged and never breaks the action. Only nicknames, never real names.
+  Participants (#44) get a mail when a coach approves (stars, points,
+  badge, feedback) or asks for a revision (feedback), and when a hint
+  request is granted or declined (with the reply); link to the task page.
+  Only active participants with an email address and the switch on
+  (`participant_recipient`). A refused second review or decision sends
+  nothing.
 - `/version` returns the Git commit of the running image as JSON
   (`APP_COMMIT`, set by CI); local builds report `dev`.
 
