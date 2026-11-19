@@ -30,6 +30,9 @@ COACH_PERMISSIONS = {
         "instructionimage": ["view", "add", "change", "delete"],
     },
     "badges": {"badge": ["view", "add", "change", "delete"]},
+    # View only: submissions are made by participants and reviewed in the
+    # coach views (#31, #32), never edited in the admin.
+    "submissions": {"submission": ["view"], "submissionitem": ["view"]},
 }
 
 
