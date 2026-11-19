@@ -262,3 +262,32 @@ legend {
 .site-footer p {
   margin: 0 0 0.25rem;
 }
+
+/* Task catalogue: locked tasks are greyed out and say so in text. */
+.topic {
+  margin-bottom: 2rem;
+}
+
+.task-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.task-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.task-status {
+  color: var(--text-muted);
+}
+
+.task-locked .task-title {
+  color: var(--text-muted);
+}

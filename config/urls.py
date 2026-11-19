@@ -11,6 +11,7 @@ admin.site.index_title = "Inhalte verwalten"
 urlpatterns = [
     path("admin/", admin.site.urls),
     # Feature apps go here, e.g. path("kontakt/", include("contact.urls")).
+    path("aufgaben/", include("tasks.urls")),
     path("", include("accounts.urls")),
     path("", include("core.urls")),
 ]
