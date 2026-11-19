@@ -7,8 +7,11 @@ draft is replaced: a new draft on the new version gets copies of the items
 whose requirement exists there with the same key and type (up to the new
 maximum count); the old draft and its other items are deleted.
 
-Submissions already submitted keep their version. Granted hints follow with
-hint requests (#38).
+Submissions already submitted keep their version. Granted hints stay
+granted where the new version has a hint with the same key (#38,
+`hints.services.plan_carry_over`); the confirmation lists them and the
+granted hints that are lost. An open hint request for a hint the new
+version no longer has blocks the switch until a coach decided it.
 """
 
 from dataclasses import dataclass, field
@@ -16,6 +19,7 @@ from dataclasses import dataclass, field
 from django.db import transaction
 from django.utils import timezone
 
+from hints.services import HintCarryOver, plan_carry_over
 from tasks.models import TaskAttempt, TaskVersion
 
 from .models import Submission, SubmissionItem
@@ -24,6 +28,12 @@ from .services import copy_file, get_draft
 
 class SwitchNotPossible(Exception):
     pass
+
+
+OPEN_REQUEST_BLOCKS = (
+    "Deine Hinweis-Anfrage gilt für einen Hinweis, den es in der neuen Version "
+    "nicht mehr gibt. Warte auf die Antwort eines Coachs, dann kannst du wechseln."
+)
 
 
 @dataclass
@@ -42,6 +52,7 @@ class SwitchPlan:
     draft: Submission | None
     carried: list[tuple[SubmissionItem, object]] = field(default_factory=list)
     dropped: list[Dropped] = field(default_factory=list)
+    hints: HintCarryOver = field(default_factory=HintCarryOver)
 
 
 def newer_version(attempt: TaskAttempt | None) -> TaskVersion | None:
@@ -74,6 +85,7 @@ def plan_switch(user, task) -> SwitchPlan:
             .order_by("number")
         ),
         draft=get_draft(user, task),
+        hints=plan_carry_over(attempt, target),
     )
     if plan.draft is None:
         return plan
@@ -122,6 +134,8 @@ def switch_version(user, task, target_id: int) -> TaskAttempt:
             raise SwitchNotPossible(
                 "Inzwischen gibt es eine andere Version. Schau sie dir zuerst an."
             )
+        if plan.hints.blocks_switch:
+            raise SwitchNotPossible(OPEN_REQUEST_BLOCKS)
         if plan.draft is not None:
             # Read everything to keep before the old draft (and its files)
             # goes; each item owns its files (ADR 0014).

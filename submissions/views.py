@@ -34,7 +34,13 @@ from .services import (
     submit,
     submitted_submissions,
 )
-from .switching import SwitchNotPossible, newer_version, plan_switch, switch_version
+from .switching import (
+    OPEN_REQUEST_BLOCKS,
+    SwitchNotPossible,
+    newer_version,
+    plan_switch,
+    switch_version,
+)
 from .upload_links import (
     LIFETIME_MINUTES,
     InvalidUploadLink,
@@ -165,7 +171,9 @@ class SwitchVersionView(LoginRequiredMixin, SeoMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(task=self.task, plan=self.plan)
+        context.update(
+            task=self.task, plan=self.plan, open_request_blocks=OPEN_REQUEST_BLOCKS
+        )
         return context
 
     def post(self, request, *args, **kwargs):

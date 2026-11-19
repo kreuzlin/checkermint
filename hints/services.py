@@ -126,3 +126,44 @@ def decide_request(
         request.decided_at = timezone.now()
         request.save()
     return request
+
+
+@dataclass
+class HintCarryOver:
+    """What happens to the hints when switching to `target` (#38)."""
+
+    kept: list[Hint] = field(default_factory=list)  # hints of `target`
+    lost: list[tuple[int, Hint]] = field(default_factory=list)  # (number, hint)
+    open_request_lost: HintRequest | None = None
+
+    @property
+    def blocks_switch(self) -> bool:
+        return self.open_request_lost is not None
+
+
+def plan_carry_over(attempt: TaskAttempt, target: TaskVersion) -> HintCarryOver:
+    """Granted hints stay granted where `target` has a hint with the same key.
+
+    Nothing is copied: grants are looked up by key (see `granted_requests`).
+    Lost are granted hints of the pinned version whose key `target` does not
+    have. An open request for such a hint blocks the switch until a coach
+    decided it; otherwise a coach could grant a hint nobody sees any more.
+    """
+    granted = granted_requests(attempt)
+    target_keys = set(target.hints.values_list("key", flat=True))
+    plan = HintCarryOver(
+        kept=list(target.hints.filter(key__in=granted)),
+        lost=[
+            (number, hint)
+            for number, hint in enumerate(attempt.task_version.hints.all(), start=1)
+            if hint.key in granted and hint.key not in target_keys
+        ],
+    )
+    open_request = (
+        attempt.hint_requests.filter(status=HintRequest.Status.OPEN)
+        .select_related("hint")
+        .first()
+    )
+    if open_request is not None and open_request.hint.key not in target_keys:
+        plan.open_request_lost = open_request
+    return plan

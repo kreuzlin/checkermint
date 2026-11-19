@@ -100,7 +100,11 @@ Overview of how the project is built and run. Decisions and their rationale:
   and what of the draft is carried over or lost
   (`submissions.switching.plan_switch`); the POST switches only to the
   confirmed version (`switch_version`), replacing the draft with one on the
-  new version.
+  new version. The confirmation also lists granted hints that stay
+  granted and those the new version no longer has
+  (`hints.services.plan_carry_over`, #38); an open hint request for a hint
+  the new version no longer has blocks the switch until a coach decided
+  it.
 - Phone upload (#28, brief 5.7): with a draft and photo or file
   requirements, the form shows a QR code (`segno`, inline SVG, generated
   locally) for `/hochladen/<token>/`. The token is signed with Django's

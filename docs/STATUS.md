@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Decide hint requests in the coach queue")_
+_Last updated: 2026-11-19 (PR "List granted hints in the version switch")_
 
 ## Live
 
@@ -216,6 +216,10 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   "Freigeben" / "Ablehnen" with an optional reply via htmx (works
   without JavaScript); a request decided twice is refused. The coach
   home page counts solutions and hint requests separately.
+- #38: the version switch confirmation lists the granted hints that stay
+  granted (same key) and warns about granted hints the new version no
+  longer has; an open hint request for such a hint blocks the switch
+  until a coach decided it. **Milestone M7 complete.**
 - 2026-11-19: on the maintainer's one-time instruction, Claude merged #73
   (Caddy upload limit, a server change) itself. The merge exceptions in
   CLAUDE.md stay in force: PRs with migrations or server/deployment
@@ -241,8 +245,8 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. M7: #38 carry-over on version switch (list granted hints in the
-   switch confirmation; the carry-over itself already works by key).
+1. M8 coach overviews: #39 progress matrix, #40 participant detail,
+   #41 task detail.
 2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
 3. #77 show who uploaded a submission item (migration; M6 is done, so
