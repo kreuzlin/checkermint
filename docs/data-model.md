@@ -180,7 +180,7 @@ A participant has started a task; the attempt pins the version they see
 | `task` | FK → Task, protect | unique together with `user` |
 | `task_version` | FK → TaskVersion, protect | a published version of `task` (checked in `save()` and `clean()`) |
 | `started_at` | datetime | default now |
-| `switched_at` | datetime, optional | last explicit switch to a newer version (#26) |
+| `switched_at` | datetime, optional | last explicit switch to a newer version (`submissions.switching`, ADR 0015) |
 
 Helpers in `tasks.attempts`: `visible_version(user, task)` returns the
 pinned version, or the latest published version without an attempt;

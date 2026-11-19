@@ -6,6 +6,7 @@ from django.views.generic import TemplateView, View
 from accounts.roles import is_coach
 from core.seo import SeoMixin
 from submissions.services import get_draft, submitted_submissions
+from submissions.switching import newer_version
 
 from .attempts import TaskNotStartable, start_attempt, visible_version
 from .catalogue import Status, catalogue, task_for
@@ -61,6 +62,7 @@ class TaskDetailView(LoginRequiredMixin, SeoMixin, TemplateView):
             is_waiting=status is Status.SUBMITTED,
             is_coach=coach,
             draft=get_draft(user, self.task) if participant else None,
+            newer=newer_version(self.attempt) if participant else None,
             submissions=submitted_submissions(user, self.task),
             requirements=self.version.requirements.all(),
             hints=self.version.hints.all(),

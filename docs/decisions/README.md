@@ -24,3 +24,4 @@ to Checkermint.
 | 0012 | [Robot avatars generated locally with Robohash](0012-avatar-generation.md) | accepted |
 | 0013 | [Points and levels are derived, never stored by hand](0013-points-and-levels.md) | accepted |
 | 0014 | [Files in submissions: code as text, own files per item, generated alt text](0014-submission-files.md) | accepted |
+| 0015 | [A version switch replaces the draft](0015-version-switch-replaces-draft.md) | accepted |

@@ -10,6 +10,7 @@
     <h1>{{ version.title }}</h1>
     <p class="message" role="note"><strong>Gesperrt:</strong> Diese Aufgabe gibt es ab Level {{ task.min_level }} im Thema {{ task.topic }}. Sammle Punkte mit anderen Aufgaben in diesem Thema.</p>
   {% else %}
+    {% include "submissions/_newer_version.html" %}
     {% include "tasks/_version_content.html" %}
 
     <h2>Deine Lösung</h2>

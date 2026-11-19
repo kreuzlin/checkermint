@@ -1,0 +1,7 @@
+{% comment %}Discreet notice when a newer version exists (brief 5.4). Needs `newer` and `task`.{% endcomment %}
+{% if newer %}
+  <aside class="message newer-version" role="note">
+    <p><strong>Es gibt eine neuere Version dieser Aufgabe</strong> (Version {{ newer.number }}){% if newer.change_note %}: {{ newer.change_note }}{% else %}.{% endif %}</p>
+    <p><a href="{% url 'submissions:switch' slug=task.slug %}">Auf neue Version wechseln</a> <span class="help">– du kannst auch bei deiner Version bleiben.</span></p>
+  </aside>
+{% endif %}

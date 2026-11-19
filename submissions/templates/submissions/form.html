@@ -5,6 +5,7 @@
   <p><a href="{% url 'tasks:task_detail' slug=task.slug %}">← Zurück zur Aufgabe</a></p>
   <h1>Lösung: {{ version.title }}</h1>
   <p class="help">Version {{ version.number }}{% if draft %} · Entwurf zuletzt gespeichert{% endif %}</p>
+  {% include "submissions/_newer_version.html" %}
 
   <form method="post" enctype="multipart/form-data" class="form submission-form" novalidate>
     {% csrf_token %}
