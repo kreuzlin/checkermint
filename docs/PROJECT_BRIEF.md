@@ -156,7 +156,7 @@ Task, topic, hint, badge and account management stays in the Django admin as lon
 
 ### 5.11 Email notifications
 
-- Sender: coach@checkermint.ch via the Hostpoint SMTP server.
+- Sender: mail@checkermint.ch via the Hostpoint SMTP server.
 - To all coaches: when a submission, resubmission or hint request arrives. Each coach can turn this off in their profile.
 - To a participant (only if they have an email address): when their submission has been reviewed, and when their hint request has been granted or declined.
 - Password reset emails.
