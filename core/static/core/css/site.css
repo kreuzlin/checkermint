@@ -354,3 +354,31 @@ a.button {
   color: var(--text);
   letter-spacing: 0.1em;
 }
+
+.upload-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.upload-list li {
+  display: grid;
+  gap: 0.25rem;
+  justify-items: start;
+}
+
+.photo-link {
+  display: inline-block;
+  margin: 0 0.5rem 0.5rem 0;
+}
+
+.photo-thumb {
+  display: block;
+  max-width: 10rem;
+  max-height: 10rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}

@@ -1,5 +1,7 @@
 """Submission form with text and code requirements (brief 5.6, #23)."""
 
+from unittest import mock
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -8,7 +10,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from accounts.roles import COACH_GROUP_NAME
-from submissions.handlers import CodeHandler
+from submissions.handlers import HANDLERS, CodeHandler
 from submissions.models import Submission, SubmissionItem
 from tasks.catalogue import Status, catalogue
 from tasks.models import LevelThreshold, Task, TaskRequirement, TaskVersion, Topic
@@ -235,9 +237,13 @@ class SubmissionFlowTests(TestCase):
 
 
 class UnsupportedTypeTests(TestCase):
-    """Photo and file requirements follow with #24."""
+    """A type without a handler (e.g. a future type before its handler)."""
 
     def setUp(self):
+        patcher = mock.patch.dict(HANDLERS)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        del HANDLERS["photo"]
         self.user = User.objects.create_user("anna", password="geheim123")
         self.task, _ = text_and_code_task(extra_photo=True)
         self.url = reverse("submissions:edit", kwargs={"slug": self.task.slug})

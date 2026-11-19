@@ -8,7 +8,7 @@ once submitted, only the review fields change.
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 
 from core.private_files import RandomUploadPath
@@ -248,7 +248,8 @@ class SubmissionItem(models.Model):
         files = [(f.name, f.storage) for f in (self.file, self.thumbnail) if f]
         result = super().delete(*args, **kwargs)
         for name, storage in files:
-            storage.delete(name)
+            # Only once the deletion is committed: a rollback keeps the file.
+            transaction.on_commit(lambda n=name, s=storage: s.delete(n))
         return result
 
     def _stored_submission_is_draft(self) -> bool:

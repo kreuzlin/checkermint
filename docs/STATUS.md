@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Add submission form with text and code requirements")_
+_Last updated: 2026-11-19 (PR "Add photo and file requirements")_
 
 ## Live
 
@@ -116,7 +116,13 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   approval (prefilled from the last submission). The task page lists the
   participant's submissions with status, stars, feedback and version; the
   catalogue now also shows eingereicht, Überarbeitung nötig and gelöst
-  (with stars). Photo and file requirements: "Kommt bald" until #24.
+  (with stars).
+- #24: photo requirements (JPEG, PNG, HEIC, WebP; re-encoded without
+  metadata, auto-rotated, 2000 px, thumbnail) and file requirements
+  (optional allowed extensions); several per input, kept in the draft
+  until removed, copied on resubmission; served privately to the
+  participant and coaches. Size limits `UPLOAD_MAX_PHOTO_MB` /
+  `UPLOAD_MAX_FILE_MB` (new in `.env.example`, defaults 15 and 20).
 
 ## Open issues
 
@@ -132,11 +138,14 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. Next in M4: #24 photo and file requirements with image processing
-   (also registers the private file kind for submission items).
+1. Maintainer merges the PR for #24 (new `.env.example` variables; the
+   defaults work without changing `.env`). Next in M4: #25 upload limit
+   in Caddy (server change), #26 switching to a newer task version, #27
+   participant history.
 2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars),
-   `pygments` (code highlighting, added with #23).
+   `pygments` (code highlighting, added with #23), `pillow` +
+   `pillow-heif` (image processing incl. HEIC, explicit since #24).
 
 ## Working agreements (summary)
 

@@ -11,10 +11,15 @@ def field_name(requirement, suffix: str) -> str:
 class RequirementRow:
     """One requirement in the form, for the template."""
 
-    def __init__(self, requirement, handler, fields):
+    def __init__(self, requirement, handler, fields, previous):
         self.requirement = requirement
         self.handler = handler
-        self.fields = fields  # bound fields, filled by the form
+        self.fields = fields  # field names
+        self.previous = previous  # stored items shown in the form
+
+    @property
+    def template(self) -> str:
+        return self.handler.form_template if self.handler else ""
 
     @property
     def is_supported(self) -> bool:
@@ -38,20 +43,27 @@ class SubmissionForm(forms.Form):
         for requirement in self.requirements:
             handler = handler_for(requirement)
             names = []
+            stored = self.previous.get(requirement.pk, [])
             if handler is not None:
-                stored = self.previous.get(requirement.pk, [])
                 initial = handler.initial(requirement, stored)
-                for suffix, field in handler.form_fields(requirement).items():
+                for suffix, field in handler.form_fields(requirement, stored).items():
                     name = field_name(requirement, suffix)
                     self.fields[name] = field
                     if suffix in initial:
                         self.initial[name] = initial[suffix]
                     names.append(name)
-            self.rows.append(RequirementRow(requirement, handler, names))
+            self.rows.append(RequirementRow(requirement, handler, names, stored))
 
     def bound_rows(self):
         for row in self.rows:
-            yield row, [self[name] for name in row.fields]
+            yield (
+                row,
+                {
+                    name.removeprefix(row.requirement.key).removeprefix("-")
+                    or "main": self[name]
+                    for name in row.fields
+                },
+            )
 
     def clean(self):
         cleaned = super().clean()

@@ -77,9 +77,18 @@ Overview of how the project is built and run. Decisions and their rationale:
   file kept) and highlighted with Pygments (style `xcode`, all colours
   WCAG AA; CSS generated into `submissions/static/submissions/css/code.css`,
   the command is in the file). Requirement `options` for code:
-  `language` (Pygments name) and `extensions` (allowed endings). Types
-  without a handler (photo, file until #24) are shown as "Kommt bald"; a
-  version that requires one can only be saved as a draft.
+  `language` (Pygments name) and `extensions` (allowed endings). A type
+  without a handler is shown as "Kommt bald"; a version that requires one
+  can only be saved as a draft.
+- Photos and files (#24): several per input up to `max_count`; stored
+  items stay in the draft until "Entfernen" is ticked, and a resubmission
+  starts with copies of the last submission's items. Photos go through
+  `core.images.process_photo` (JPEG, PNG, WebP, HEIC via `pillow-heif`;
+  auto-rotate, metadata dropped, 2000 px plus a 400 px thumbnail). Files
+  are kept as uploaded, optionally limited by `options.extensions`. Size
+  limits per file: `UPLOAD_MAX_PHOTO_MB` (15) and `UPLOAD_MAX_FILE_MB`
+  (20) from `.env`; the request limit in Caddy follows with #25 and must
+  allow several photos per request.
 - Private uploads (ADR 0009): models store files with
   `core.private_files.RandomUploadPath` (UUID names) and register a
   `PrivateFileKind` (owner model, file getter, access check, inline or
@@ -89,10 +98,12 @@ Overview of how the project is built and run. Decisions and their rationale:
   the kind says otherwise), `nosniff`, downloads as
   `application/octet-stream` attachments; inline only for images we
   re-encoded, with a sandboxing CSP. Registered kinds: `anleitungsbild`
-  (instruction images, `tasks.apps`).
-- Images on upload: `core.images.process_image` decodes, applies the EXIF
-  orientation, drops all metadata, limits to 2000 px and re-encodes (JPEG,
-  or PNG with transparency). Markdown images are only allowed when the
+  (instruction images, `tasks.apps`), `einreichungsfoto` and
+  `einreichungsdatei` (submission items, `submissions.apps`).
+- Images on upload: `core.images.process_image` decodes (JPEG, PNG, WebP,
+  HEIC), applies the EXIF orientation, drops all metadata, limits to
+  2000 px and re-encodes (JPEG, or PNG with transparency);
+  `process_photo` also makes a thumbnail from the same decode. Markdown images are only allowed when the
   caller passes the allowed images (`core.markdown.render_markdown(text,
   images=…)`); external and unknown images never render.
 - Navigation entries can be `members_only` (`core.navigation.NavItem`).

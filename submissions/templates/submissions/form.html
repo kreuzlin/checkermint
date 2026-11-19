@@ -13,7 +13,7 @@
       <fieldset>
         <legend>{{ row.requirement.label }}{% if not row.requirement.required %} (freiwillig){% endif %}</legend>
         {% if row.is_supported %}
-          {% for field in fields %}{% include "accounts/_field.html" %}{% endfor %}
+          {% include row.template %}
         {% else %}
           <p class="message" role="note"><strong>Kommt bald:</strong> {{ row.requirement.get_type_display }} kannst du hier noch nicht hochladen.</p>
         {% endif %}
