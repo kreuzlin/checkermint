@@ -60,7 +60,7 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p>© {% now "Y" %} {{ site_name }}</p>
+      <p>© {% now "Y" %} {{ site_name }} · <a href="{% url 'core:privacy' %}">Datenschutz</a> · <a href="{% url 'core:imprint' %}">Impressum</a></p>
       <p>{% avatar_credits %}</p>
     </div>
   </footer>

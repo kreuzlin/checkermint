@@ -287,6 +287,11 @@ main {
   border-radius: var(--radius-small);
 }
 
+/* Privacy page and imprint (#47): readable line length. */
+.legal {
+  max-width: 44rem;
+}
+
 /* Landing page for visitors (#45). */
 .landing-hero {
   margin-bottom: 2rem;

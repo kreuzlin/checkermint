@@ -205,6 +205,12 @@ Overview of how the project is built and run. Decisions and their rationale:
   shows level, points and a progress bar per topic
   (`tasks/_topic_level.html`, text first, the bar only repeats it); the
   task page shows the participant's points for the task.
+- Privacy page `/datenschutz/` and imprint `/impressum/` (#47, brief
+  4.8): static templates in `core`, linked in the footer. Operator name and
+  privacy contact come from `settings.CLUB_NAME` / `PRIVACY_EMAIL` (context
+  processor); the imprint repeats the avatar credits (ADR 0012). When what
+  is stored, who sees it or a processor changes, update the privacy page
+  and `core.views.PRIVACY_UPDATED` in the same PR.
 - Home page (#35): visitors see the landing page (#45,
   `core/_landing.html`: what Checkermint is, how it works, who can take
   part with a link to vrobot.ch, a note for parents on what is public;

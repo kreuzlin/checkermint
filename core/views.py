@@ -41,6 +41,31 @@ class HomeView(SeoMixin, TemplateView):
         return context
 
 
+class PrivacyView(SeoMixin, TemplateView):
+    """Datenschutz (brief 4.8, #47). Keep it in sync with what is stored."""
+
+    template_name = "core/privacy.html"
+    page_title = "Datenschutz"
+    meta_description = "Welche Daten Checkermint speichert, wer sie sieht und warum."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["privacy_updated"] = PRIVACY_UPDATED
+        return context
+
+
+class ImprintView(SeoMixin, TemplateView):
+    """Impressum (brief 4.8, #47), incl. the avatar credits (ADR 0012)."""
+
+    template_name = "core/imprint.html"
+    page_title = "Impressum"
+    meta_description = "Wer Checkermint betreibt."
+
+
+# Date of the last content change of the privacy page (shown as "Stand").
+PRIVACY_UPDATED = "19. November 2026"
+
+
 def version(request):
     """Commit of the running build, e.g. to compare the live site with main."""
     commit = settings.APP_COMMIT
