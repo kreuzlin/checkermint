@@ -250,6 +250,16 @@ One value of a submission: a text, a code snippet, one photo, one file.
 Items can only be added, changed or deleted while the submission is a
 draft (`save`, `delete` and QuerySet guards raise
 `SubmissionLockedError`); afterwards only the review fields of the
-submission change. Deleting an item deletes its files. Serving the files
-(`PrivateFileKind`, owner and coaches) comes with photo and file
-requirements (#24). The admin shows submissions read-only to coaches.
+submission change. Deleting an item deletes its files once the
+transaction commits. Each item owns its files: when a resubmission keeps a
+photo or file of the previous submission, the file is copied. The admin
+shows submissions read-only to coaches.
+
+Per type: `text` and `code` use `text` (code from an uploaded file also
+keeps `original_filename`); `photo` uses `file` (re-encoded JPEG/PNG, at
+most 2000 px), `thumbnail` (at most 400 px) and `data` (`width`,
+`height`); `file` uses `file` as uploaded. Files are served at
+`/dateien/einreichungsfoto/<id>/[vorschau/]` (inline) and
+`/dateien/einreichungsdatei/<id>/` (always a download), only to the
+participant who owns the submission and to coaches; everyone else gets
+404.

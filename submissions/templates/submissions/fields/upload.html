@@ -1,0 +1,18 @@
+{% load submission_items %}
+{% comment %}Photos and files: stored items with "Entfernen", then the upload field.{% endcomment %}
+{% if row.previous %}
+  {% with remove=fields.entfernen %}
+    <ul class="upload-list">
+      {% for item in row.previous %}
+        <li>
+          {% submission_item item %}
+          {% if item.original_filename and item.requirement.type == "photo" %}<span class="help">{{ item.original_filename }}</span>{% endif %}
+          <label class="upload-remove"><input type="checkbox" name="{{ remove.html_name }}" value="{{ item.pk }}"{% if item.pk|stringformat:"s" in remove.value %} checked{% endif %}> Entfernen</label>
+        </li>
+      {% endfor %}
+    </ul>
+    {% for error in remove.errors %}<p class="field-error"><strong>Fehler:</strong> {{ error }}</p>{% endfor %}
+  {% endwith %}
+{% endif %}
+{% with field=fields.main %}{% include "accounts/_field.html" %}{% endwith %}
+{% if row.requirement.max_count > 1 %}<p class="help">{% if row.requirement.required %}{{ row.requirement.min_count }} bis {{ row.requirement.max_count }}{% else %}Bis zu {{ row.requirement.max_count }}{% endif %}{% if row.previous %}, gespeichert: {{ row.previous|length }}{% endif %}.</p>{% endif %}

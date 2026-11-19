@@ -174,7 +174,8 @@ class SubmissionItemTests(TestCase):
             thumbnail=ContentFile(b"y", name="a.jpg"),
         )
         storage, names = item.file.storage, [item.file.name, item.thumbnail.name]
-        item.delete()
+        with self.captureOnCommitCallbacks(execute=True):
+            item.delete()
         for name in names:
             self.assertFalse(storage.exists(name))
 

@@ -48,7 +48,7 @@ class ProcessImageTests(SimpleTestCase):
             process_image(SimpleUploadedFile("x.jpg", b"<script>alert(1)</script>"))
         buffer = io.BytesIO()
         Image.new("RGB", (5, 5)).save(buffer, format="GIF")
-        with self.assertRaisesMessage(ValidationError, "JPEG, PNG und WebP"):
+        with self.assertRaisesMessage(ValidationError, "JPEG, PNG, HEIC und WebP"):
             process_image(SimpleUploadedFile("x.gif", buffer.getvalue()))
 
     def test_too_large_upload_is_rejected(self):

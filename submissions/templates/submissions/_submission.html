@@ -11,10 +11,11 @@
       <div class="prose">{{ submission.feedback|markdown }}</div>
     </div>
   {% endif %}
-  {% for item in submission.items.all %}
+  {% regroup submission.items.all by requirement as parts %}
+  {% for part in parts %}
     <section class="submission-item">
-      <h4>{{ item.requirement.label }}</h4>
-      {% submission_item item %}
+      <h4>{{ part.grouper.label }}</h4>
+      {% for item in part.list %}{% submission_item item %}{% endfor %}
     </section>
   {% endfor %}
 </article>
