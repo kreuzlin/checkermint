@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "List granted hints in the version switch")_
+_Last updated: 2026-11-19 (PR "Add progress matrix for coaches")_
 
 ## Live
 
@@ -220,6 +220,12 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   granted (same key) and warns about granted hints the new version no
   longer has; an open hint request for such a hint blocks the switch
   until a coach decided it. **Milestone M7 complete.**
+- #39: progress matrix `/fortschritt/` ("Fortschritt" in the navigation,
+  coaches only, new app `overviews`): participants × tasks with the
+  status in words and the best stars, filter by topic with the level per
+  participant; same rules as the catalogue, fixed number of queries.
+  `task_state` now takes a `coach` flag (the catalogue no longer asks
+  the database once per task).
 - 2026-11-19: on the maintainer's one-time instruction, Claude merged #73
   (Caddy upload limit, a server change) itself. The merge exceptions in
   CLAUDE.md stay in force: PRs with migrations or server/deployment
@@ -245,8 +251,7 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. M8 coach overviews: #39 progress matrix, #40 participant detail,
-   #41 task detail.
+1. M8 coach overviews: #40 participant detail, #41 task detail.
 2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
 3. #77 show who uploaded a submission item (migration; M6 is done, so

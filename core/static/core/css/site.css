@@ -72,6 +72,9 @@ body {
 
 main {
   flex: 1 0 auto;
+  /* Let wide content (tables) scroll inside its box instead of widening
+     the page: flex items default to min-width: auto. */
+  min-width: 0;
 }
 
 a {
@@ -942,4 +945,102 @@ hr {
 
 .hint-decision-form .form-actions {
   margin: 0.5rem 0 0;
+}
+
+/* Text for screen readers only */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Progress matrix (#39): scrolls sideways, first column stays visible.
+   Every cell says its status in words; colour only repeats it. */
+.matrix-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.matrix-filter label {
+  font-weight: 700;
+}
+
+.matrix-filter select {
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-small);
+  background: var(--petrol-950);
+  color: var(--text);
+  font: inherit;
+}
+
+.matrix-scroll {
+  /* Containing block for the visually hidden texts in the cells, so they
+     stay inside the scroll box instead of widening the page. */
+  position: relative;
+  overflow-x: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--glow);
+}
+
+.matrix {
+  border-collapse: collapse;
+  min-width: 100%;
+  font-size: 0.9rem;
+}
+
+.matrix th,
+.matrix td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.matrix thead th {
+  background: var(--petrol-950);
+  font-weight: 700;
+}
+
+.matrix tbody th,
+.matrix thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--petrol-900);
+  border-right: 1px solid var(--line-strong);
+}
+
+.matrix-topic {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: normal;
+}
+
+.matrix-cell {
+  color: var(--text-muted);
+}
+
+.matrix-geloest {
+  background: rgba(0, 220, 173, 0.14);
+}
+
+.matrix-eingereicht {
+  background: rgba(118, 255, 245, 0.08);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.matrix-ueberarbeiten {
+  background: rgba(255, 209, 102, 0.1);
+  color: var(--text);
 }
