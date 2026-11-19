@@ -1,0 +1,10 @@
+{% comment %}A participant's level in one topic (ADR 0013). Needs `level` (tasks.levels.LevelInfo).{% endcomment %}
+<p class="topic-level">
+  <strong>Level {{ level.level }}</strong> · {{ level.points }} Punkt{{ level.points|pluralize:"e" }}
+  {% if level.next_level_points is None %}
+    <span class="help">· höchstes Level</span>
+  {% else %}
+    <span class="help">· noch {{ level.points_missing }} bis Level {{ level.level|add:1 }}</span>
+    <progress value="{{ level.points }}" max="{{ level.next_level_points }}" aria-label="Fortschritt bis Level {{ level.level|add:1 }}">{{ level.points }} von {{ level.next_level_points }}</progress>
+  {% endif %}
+</p>

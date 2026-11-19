@@ -32,6 +32,7 @@
           <a class="button" href="{% url 'submissions:edit' slug=task.slug %}">{% if draft %}Entwurf weiterbearbeiten{% elif state.status.value == "ueberarbeiten" %}Lösung überarbeiten{% elif state.status.value == "geloest" %}Neue Lösung einreichen{% else %}Lösung erfassen{% endif %}</a>
         {% endif %}
       </div>
+      {% if earned is not None %}<p><strong>Deine Punkte für diese Aufgabe: {{ earned }}</strong> <span class="help">(Grundpunkte × Sterne deiner besten Lösung)</span></p>{% endif %}
       {% if state.status.value == "geloest" and not draft %}<p class="help">Mit einer neuen Lösung kannst du mehr Sterne holen; deine Punkte sinken dadurch nie.</p>{% endif %}
     {% endif %}
 

@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Add review form")_
+_Last updated: 2026-11-19 (PR "Compute points and levels")_
 
 ## Live
 
@@ -162,8 +162,14 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   earlier submissions; "Annehmen" with 1–3 stars or "Überarbeitung nötig"
   with feedback (no stars). htmx replaces only the review block and links
   the next waiting submission; works without JavaScript. Reviews are
-  visible to the participant on the task page and in the history. Points
-  and levels follow with #33, notifications with #44.
+  visible to the participant on the task page and in the history.
+  Notifications follow with #44.
+- #33: points and levels computed from reviews (`submissions.progress`,
+  ADR 0013): best approved `base points × stars` per task, sum per topic,
+  level from the threshold table. Locked tasks now unlock for real. The
+  catalogue shows level, points and the points missing to the next level
+  per topic; the task page shows the points earned. In the demo data
+  RoboAnna is level 2 in Code.
 - Demo data for local development: `manage.py seed_demo` (only with
   `DEBUG`; `--reset`, `--remove`, password given or generated, see README).
   Covers every submission state, a resubmission, a task with two versions,
@@ -186,14 +192,13 @@ Overview: `gh issue list`. At the time of writing:
 | 2 | DNS for checkermint.ch (apex and `www` only) | Maintainer |
 | 3 | Outgoing mail `coach@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Logo, colours and badge artwork | Maintainer |
-| 32–51 | Version 1, one issue per PR, grouped in milestones M6–M11 (brief, section 10); PRs with migrations or server changes are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
+| 34–51 | Version 1, one issue per PR, grouped in milestones M6–M11 (brief, section 10); PRs with migrations or server changes are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
 | 77 | Show who uploaded a submission item (follow-up to #30; migration) | Claude Code, merged by the maintainer |
 
 ## Next steps
 
-1. Next session: M6 review and progress, continuing with #33 points and
-   levels, #34 badges (migration, merged by the maintainer) and #35
-   participant dashboard.
+1. Next session: M6 review and progress, continuing with #34 badges
+   (migration, merged by the maintainer) and #35 participant dashboard.
 2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
 3. Later, not before M6: #77 show who uploaded a submission item
