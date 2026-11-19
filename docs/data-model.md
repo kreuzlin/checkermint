@@ -166,6 +166,28 @@ references an image, it cannot be changed or deleted. Served at
 `/dateien/anleitungsbild/<id>/`: coaches always, other logged-in users
 only if a published version of a visible, not archived task uses it.
 
+### TaskAttempt
+
+A participant has started a task; the attempt pins the version they see
+(brief 5.4, ADR 0010).
+
+| Field | Type | Rules |
+|---|---|---|
+| `user` | FK → User, cascade | |
+| `task` | FK → Task, protect | unique together with `user` |
+| `task_version` | FK → TaskVersion, protect | a published version of `task` (checked in `save()` and `clean()`) |
+| `started_at` | datetime | default now |
+| `switched_at` | datetime, optional | last explicit switch to a newer version (#26) |
+
+Helpers in `tasks.attempts`: `visible_version(user, task)` returns the
+pinned version, or the latest published version without an attempt;
+`start_attempt(user, task)` creates the attempt with the latest published
+version (idempotent, safe against double clicks; refuses hidden, archived
+or unpublished tasks). It is called by "Aufgabe starten" (#20), the first
+draft submission (#23) and the first hint request (#36); the level lock is
+checked by the caller. The admin's version list on a task shows how many
+participants are pinned to each version.
+
 ## badges
 
 ### Badge

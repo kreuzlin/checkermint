@@ -64,9 +64,13 @@ class VersionListInline(admin.TabularInline):
     extra = 0
     can_delete = False
     show_change_link = True
-    fields = ["number", "status", "title", "published_at", "change_note"]
+    fields = ["number", "status", "title", "published_at", "change_note", "pinned"]
     readonly_fields = fields
     ordering = ["-number"]
+
+    @admin.display(description="Teilnehmende auf dieser Version")
+    def pinned(self, obj):
+        return obj.attempts.count()
 
     def has_add_permission(self, request, obj=None):
         return False
