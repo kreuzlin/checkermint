@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Add demo data command for local development")_
+_Last updated: 2026-11-19 (PR "Add review form")_
 
 ## Live
 
@@ -156,9 +156,14 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #31: coach queue `/warteschlange/` ("Warteschlange" in the navigation,
   coaches only): submitted solutions of active participants, oldest
   first, with participant, topic, task, version, waiting time and a
-  resubmission marker. Entries link to the read-only submission admin
-  until the review form (#32) replaces the link; hint requests join with
-  #37.
+  resubmission marker; hint requests join with #37.
+- #32: review form `/warteschlange/<id>/` (linked from the queue): the
+  solution, the exact version (admin preview), a note on newer versions,
+  earlier submissions; "Annehmen" with 1–3 stars or "Überarbeitung nötig"
+  with feedback (no stars). htmx replaces only the review block and links
+  the next waiting submission; works without JavaScript. Reviews are
+  visible to the participant on the task page and in the history. Points
+  and levels follow with #33, notifications with #44.
 - Demo data for local development: `manage.py seed_demo` (only with
   `DEBUG`; `--reset`, `--remove`, password given or generated, see README).
   Covers every submission state, a resubmission, a task with two versions,
@@ -186,9 +191,9 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. Next session: M6 review and progress, continuing with #32 review form
-   (replaces the admin link in the coach queue), #33 points and levels, #34 badges (migration,
-   merged by the maintainer) and #35 participant dashboard.
+1. Next session: M6 review and progress, continuing with #33 points and
+   levels, #34 badges (migration, merged by the maintainer) and #35
+   participant dashboard.
 2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
 3. Later, not before M6: #77 show who uploaded a submission item

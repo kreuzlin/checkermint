@@ -12,7 +12,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
 | `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011), task attempts (`tasks.attempts`), catalogue `/aufgaben/` and task page `/aufgaben/<slug>/` (`tasks.catalogue`) |
 | `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder |
-| `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; requirement handlers (`submissions/handlers.py`), submission form `/aufgaben/<slug>/loesung/`, version switch `/aufgaben/<slug>/wechseln/`, history `/verlauf/` (`submissions.history`), coach queue `/warteschlange/` (`submissions.queue`), phone upload `/hochladen/<token>/` (`submissions.upload_links`); read-only admin for coaches |
+| `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; requirement handlers (`submissions/handlers.py`), submission form `/aufgaben/<slug>/loesung/`, version switch `/aufgaben/<slug>/wechseln/`, history `/verlauf/` (`submissions.history`), coach queue `/warteschlange/` (`submissions.queue`), review form `/warteschlange/<id>/`, phone upload `/hochladen/<token>/` (`submissions.upload_links`); read-only admin for coaches |
 | `<app>/` | One small Django app per topic (added per project) |
 
 - Every public view sets title and meta description via `core.seo.SeoMixin`;
@@ -131,9 +131,19 @@ Overview of how the project is built and run. Decisions and their rationale:
   `submissions.queue.queue_entries()`: submitted, unreviewed submissions of
   active participants, oldest first, with participant (nickname and real
   name), topic, task, version, waiting time and a "erneut eingereicht"
-  marker. Until the review form exists (#32) each entry links to the
-  read-only submission admin. Hint requests join as a second entry kind
-  with #37.
+  marker; each entry links to the review form. Hint requests join as a
+  second entry kind with #37.
+- Review form (#32): `/warteschlange/<id>/` (coaches only; the submission
+  is looked up after the permission check, so participants always get
+  403). Shows the solution, a link to the admin preview of the exact
+  version, a note if a newer version exists, and earlier submissions.
+  `ReviewForm`: stars (radio), feedback (Markdown), the clicked button
+  decides: "Annehmen" needs 1–3 stars, "Überarbeitung nötig" needs
+  feedback and drops stars. `services.review_submission` locks the row
+  and refuses submissions that are no longer waiting (two coaches at
+  once). With htmx (`HX-Request`) only the `#bewertung` block is replaced
+  and offers the next waiting submission; without JavaScript the form
+  posts normally and redirects to the queue with a message.
 - Private uploads (ADR 0009): models store files with
   `core.private_files.RandomUploadPath` (UUID names) and register a
   `PrivateFileKind` (owner model, file getter, access check, inline or
