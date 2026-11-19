@@ -1,0 +1,45 @@
+{% load markdown %}
+{% comment %}A hint request in the coach queue (brief 5.10.1, #37). htmx replaces this entry after a decision; without JavaScript the form posts normally. Needs `hint_request`; optional `done`, `error`.{% endcomment %}
+{% with attempt=hint_request.task_attempt hint=hint_request.hint %}
+<li id="hinweis-anfrage-{{ hint_request.pk }}" class="queue-hint">
+  <p class="queue-hint-head">
+    <span class="queue-kind">Hinweis-Anfrage</span>
+    <a class="task-title" href="{% url 'tasks:task_detail' slug=attempt.task.slug %}">{{ hint.task_version.title }}</a>
+    <span class="help">{{ attempt.task.topic }} · Version {{ hint.task_version.number }}</span>
+  </p>
+  <p class="task-status">
+    {% if attempt.user.profile %}{{ attempt.user.profile.nickname }}{% if attempt.user.profile.real_name %} ({{ attempt.user.profile.real_name }}){% endif %}{% else %}{{ attempt.user.get_username }}{% endif %}
+    · <time datetime="{{ hint_request.requested_at|date:'c' }}" title="{{ hint_request.requested_at|date:'j. F Y, H:i' }}">Wartezeit: {{ hint_request.requested_at|timesince }}</time>
+  </p>
+
+  {% if hint_request.message %}<p><strong>Nachricht:</strong> «{{ hint_request.message }}»</p>{% endif %}
+  <div class="feedback"><p class="help">Angefragter Hinweis:</p><div class="prose">{{ hint.text|markdown }}</div></div>
+
+  {% if done %}
+    <p class="message" role="status"><strong>Gespeichert:</strong> {{ done }}</p>
+  {% elif error %}
+    <p class="form-errors" role="alert"><strong>Fehler:</strong> {{ error }}</p>
+  {% endif %}
+
+  {% if hint_request.is_open %}
+    <form method="post" action="{% url 'hints:decide' pk=hint_request.pk %}" class="form hint-decision-form" hx-post="{% url 'hints:decide' pk=hint_request.pk %}" hx-target="#hinweis-anfrage-{{ hint_request.pk }}" hx-swap="outerHTML">
+      {% csrf_token %}
+      <div class="form-field">
+        <label for="antwort-{{ hint_request.pk }}">Antwort</label>
+        <textarea id="antwort-{{ hint_request.pk }}" name="reply" rows="2" maxlength="300" aria-describedby="antwort-{{ hint_request.pk }}-hilfe"></textarea>
+        <p class="help" id="antwort-{{ hint_request.pk }}-hilfe">Freiwillig, die Teilnehmerin oder der Teilnehmer sieht sie. Beim Ablehnen zum Beispiel: «Prüf zuerst die Verkabelung.»</p>
+      </div>
+      <p class="form-actions">
+        <button type="submit" name="decision" value="freigeben" class="button">Freigeben</button>
+        <button type="submit" name="decision" value="ablehnen" class="button button-secondary">Ablehnen</button>
+      </p>
+    </form>
+  {% else %}
+    <p>
+      <strong>{{ hint_request.get_status_display }}</strong>
+      <span class="help">{% if hint_request.decided_by.profile %}von {{ hint_request.decided_by.profile.nickname }}, {% endif %}{{ hint_request.decided_at|date:"j. F Y, H:i" }}</span>
+    </p>
+    {% if hint_request.coach_reply %}<p>Antwort: «{{ hint_request.coach_reply }}»</p>{% endif %}
+  {% endif %}
+</li>
+{% endwith %}

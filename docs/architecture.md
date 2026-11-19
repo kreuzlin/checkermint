@@ -11,7 +11,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | `core/` | Base layout, home page, private file view (`core/private_files.py`, `/dateien/…`), SEO (`core/seo.py`), noindex middleware, Markdown rendering (`core/markdown.py`, `markdown` template filter), navigation, `/version`, `/robots.txt`, error pages |
 | `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
 | `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`; points from `submissions.progress`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011), task attempts (`tasks.attempts`), catalogue `/aufgaben/` and task page `/aufgaben/<slug>/` (`tasks.catalogue`) |
-| `hints/` | Hint requests (`HintRequest`, `hints.services`): "Hinweis anfragen" on the task page (POST `/aufgaben/<slug>/hinweis-anfragen/`), granted hints with replies; read-only admin for coaches |
+| `hints/` | Hint requests (`HintRequest`, `hints.services`): "Hinweis anfragen" on the task page (POST `/aufgaben/<slug>/hinweis-anfragen/`), granted hints with replies; grant or decline in the coach queue (POST `/warteschlange/hinweis/<id>/`); read-only admin for coaches |
 | `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder; awards (`UserBadge`, `badges.awards`: `award_for`, `recent_badges`, `badges_of`) |
 | `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; requirement handlers (`submissions/handlers.py`), submission form `/aufgaben/<slug>/loesung/`, version switch `/aufgaben/<slug>/wechseln/`, history `/verlauf/` (`submissions.history`), coach queue `/warteschlange/` (`submissions.queue`), review form `/warteschlange/<id>/`, phone upload `/hochladen/<token>/` (`submissions.upload_links`); read-only admin for coaches |
 | `<app>/` | One small Django app per topic (added per project) |
@@ -130,11 +130,21 @@ Overview of how the project is built and run. Decisions and their rationale:
   Items do not record who uploaded them.
 - Coach queue (#31): `/warteschlange/` ("Warteschlange" in the
   navigation, coaches only: `NavItem(coaches_only=True)`) lists
-  `submissions.queue.queue_entries()`: submitted, unreviewed submissions of
-  active participants, oldest first, with participant (nickname and real
-  name), topic, task, version, waiting time and a "erneut eingereicht"
-  marker; each entry links to the review form. Hint requests join as a
-  second entry kind with #37.
+  `submissions.queue.queue_entries()`: two kinds of entries of active
+  participants, merged and sorted by waiting time, oldest first, each
+  with participant (nickname and real name), topic, task, version and
+  waiting time:
+  - submitted, unreviewed submissions with an "erneut eingereicht"
+    marker, linking to the review form (`submission_entries()`; "Nächste
+    Lösung" in the review form only looks at these);
+  - open hint requests (#37, `hint_request_entries()`) with the
+    participant's message, the requested hint's text, an optional reply
+    and "Freigeben" / "Ablehnen" (POST `/warteschlange/hinweis/<id>/`,
+    `hints.views.DecideHintView`). With htmx only the entry is replaced
+    (`hints/_queue_entry.html`); without JavaScript the page redirects to
+    the queue with a message. A request decided by another coach in the
+    meantime shows that decision and an error.
+  The coach home page counts both kinds.
 - Points and levels (#33, ADR 0013): `submissions.progress` computes
   everything from approved submissions, nothing is stored.
   `points_by_task` / `task_points`: the best `base_points × stars` per

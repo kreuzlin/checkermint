@@ -6,7 +6,7 @@
   {% elif is_coach %}
     <h1>Hallo {% firstof user.profile.nickname user.get_username %}!</h1>
     <p>
-      {% if queue_size %}<a class="button" href="{% url 'submissions:queue' %}">Warteschlange: {{ queue_size }} Lösung{{ queue_size|pluralize:"en" }} warte{{ queue_size|pluralize:"t,n" }}</a>
+      {% if queue_size %}<a class="button" href="{% url 'submissions:queue' %}">Warteschlange: {% if queue_submissions %}{{ queue_submissions }} Lösung{{ queue_submissions|pluralize:"en" }}{% endif %}{% if queue_submissions and queue_hints %} und {% endif %}{% if queue_hints %}{{ queue_hints }} Hinweis-Anfrage{{ queue_hints|pluralize:"n" }}{% endif %} warte{{ queue_size|pluralize:"t,n" }}</a>
       {% else %}Die Warteschlange ist leer. <a href="{% url 'submissions:queue' %}">Zur Warteschlange</a>{% endif %}
     </p>
     {% include "badges/_recent.html" %}

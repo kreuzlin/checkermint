@@ -1,27 +1,35 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}<script src="{% static 'core/js/htmx-2.0.4.min.js' %}" defer></script>{% endblock %}
 
 {% block content %}
   <h1>Warteschlange</h1>
-  <p>Alles, was auf einen Coach wartet – das Älteste zuerst.</p>
+  <p>Alles, was auf einen Coach wartet – das Älteste zuerst: Lösungen zum Bewerten und Hinweis-Anfragen.</p>
 
   {% if entries %}
     <ol class="task-list queue">
       {% for entry in entries %}
-        {% with submission=entry.submission %}
-          <li class="task-item">
-            <span>
-              <a class="task-title" href="{% url 'submissions:review' pk=submission.pk %}">{{ submission.task_version.title }}</a>
-              <span class="help">{{ submission.task.topic }} · Version {{ submission.task_version.number }}{% if entry.is_resubmission %} · erneut eingereicht{% endif %}</span>
-            </span>
-            <span class="task-status">
-              {% if submission.user.profile %}{{ submission.user.profile.nickname }}{% if submission.user.profile.real_name %} ({{ submission.user.profile.real_name }}){% endif %}{% else %}{{ submission.user.get_username }}{% endif %}
-              · <time datetime="{{ entry.waiting_since|date:'c' }}" title="{{ entry.waiting_since|date:'j. F Y, H:i' }}">Wartezeit: {{ entry.waiting_since|timesince }}</time>
-            </span>
-          </li>
-        {% endwith %}
+        {% if entry.kind == SUBMISSION %}
+          {% with submission=entry.submission %}
+            <li class="task-item">
+              <span>
+                <span class="queue-kind">Lösung</span>
+                <a class="task-title" href="{% url 'submissions:review' pk=submission.pk %}">{{ submission.task_version.title }}</a>
+                <span class="help">{{ submission.task.topic }} · Version {{ submission.task_version.number }}{% if entry.is_resubmission %} · erneut eingereicht{% endif %}</span>
+              </span>
+              <span class="task-status">
+                {% if submission.user.profile %}{{ submission.user.profile.nickname }}{% if submission.user.profile.real_name %} ({{ submission.user.profile.real_name }}){% endif %}{% else %}{{ submission.user.get_username }}{% endif %}
+                · <time datetime="{{ entry.waiting_since|date:'c' }}" title="{{ entry.waiting_since|date:'j. F Y, H:i' }}">Wartezeit: {{ entry.waiting_since|timesince }}</time>
+              </span>
+            </li>
+          {% endwith %}
+        {% else %}
+          {% include "hints/_queue_entry.html" with hint_request=entry.hint_request %}
+        {% endif %}
       {% endfor %}
     </ol>
   {% else %}
-    <p>Nichts zu tun – alle Lösungen sind bewertet.</p>
+    <p>Nichts zu tun – alle Lösungen sind bewertet und alle Hinweis-Anfragen entschieden.</p>
   {% endif %}
 {% endblock %}

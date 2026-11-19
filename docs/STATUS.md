@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Let participants request hints")_
+_Last updated: 2026-11-19 (PR "Decide hint requests in the coach queue")_
 
 ## Live
 
@@ -156,7 +156,7 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #31: coach queue `/warteschlange/` ("Warteschlange" in the navigation,
   coaches only): submitted solutions of active participants, oldest
   first, with participant, topic, task, version, waiting time and a
-  resubmission marker; hint requests join with #37.
+  resubmission marker; hint requests joined with #37.
 - #32: review form `/warteschlange/<id>/` (linked from the queue): the
   solution, the exact version (admin preview), a note on newer versions,
   earlier submissions; "Annehmen" with 1–3 stars or "Überarbeitung nötig"
@@ -211,6 +211,11 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   the hint key, so it already carries over on a version switch (#38 adds
   the notice in the switch confirmation). Read-only admin for coaches.
   Demo data: one granted, one declined, one open request.
+- #37: open hint requests join the coach queue (merged with submissions,
+  oldest first) with the participant's message and the hint's text;
+  "Freigeben" / "Ablehnen" with an optional reply via htmx (works
+  without JavaScript); a request decided twice is refused. The coach
+  home page counts solutions and hint requests separately.
 - 2026-11-19: on the maintainer's one-time instruction, Claude merged #73
   (Caddy upload limit, a server change) itself. The merge exceptions in
   CLAUDE.md stay in force: PRs with migrations or server/deployment
@@ -236,9 +241,8 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. M7 hint requests: #37 grant or decline in the coach queue (htmx),
-   then #38 carry-over on version switch (list granted hints in the
-   switch confirmation).
+1. M7: #38 carry-over on version switch (list granted hints in the
+   switch confirmation; the carry-over itself already works by key).
 2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
 3. #77 show who uploaded a submission item (migration; M6 is done, so

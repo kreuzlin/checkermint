@@ -21,7 +21,7 @@ from .forms import (
 from .handlers import UploadHandler, handler_for
 from .history import history_events
 from .models import Submission
-from .queue import queue_entries
+from .queue import SUBMISSION, queue_entries, submission_entries
 from .services import (
     SubmissionNotAllowed,
     add_to_draft,
@@ -408,17 +408,18 @@ class CoachQueueView(CoachRequiredMixin, SeoMixin, TemplateView):
 
     template_name = "submissions/queue.html"
     page_title = "Warteschlange"
-    meta_description = "Eingereichte Lösungen, die auf einen Coach warten."
+    meta_description = "Lösungen und Hinweis-Anfragen, die auf einen Coach warten."
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["entries"] = queue_entries()
+        context["SUBMISSION"] = SUBMISSION
         return context
 
 
 def next_in_queue(exclude_pk=None):
-    """The oldest waiting entry other than `exclude_pk`, or None."""
-    for entry in queue_entries():
+    """The oldest waiting submission other than `exclude_pk`, or None."""
+    for entry in submission_entries():
         if entry.submission.pk != exclude_pk:
             return entry
     return None
