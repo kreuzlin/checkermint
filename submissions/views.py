@@ -9,7 +9,8 @@ from accounts.mixins import CoachRequiredMixin
 from accounts.roles import is_coach
 from core.seo import SeoMixin
 from tasks.attempts import visible_version
-from tasks.catalogue import Status, catalogue, task_for
+from tasks.catalogue import Status, catalogue, task_for, visible_tasks
+from tasks.models import Topic
 
 from .forms import (
     APPROVE,
@@ -22,6 +23,7 @@ from .handlers import UploadHandler, handler_for
 from .history import history_events
 from .models import Submission
 from .queue import SUBMISSION, queue_entries, submission_entries
+from .ranking import topic_ranking
 from .services import (
     SubmissionNotAllowed,
     add_to_draft,
@@ -203,6 +205,29 @@ class HistoryView(LoginRequiredMixin, SeoMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         paginator = Paginator(history_events(self.request.user), self.paginate_by)
         context["page_obj"] = paginator.get_page(self.request.GET.get("seite"))
+        return context
+
+
+class RankingView(LoginRequiredMixin, SeoMixin, TemplateView):
+    """Ranking per topic, logged-in users only (brief 5.9, #48). Linked only
+    from the bottom of the catalogue, not from the dashboard or navigation."""
+
+    template_name = "submissions/ranking.html"
+    page_title = "Rangliste"
+    meta_description = "Wer im Thema wie viele Punkte hat."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        topics = list(Topic.objects.filter(tasks__in=visible_tasks()).distinct())
+        slug = self.request.GET.get("thema", "")
+        topic = next(
+            (t for t in topics if t.slug == slug), topics[0] if topics else None
+        )
+        context.update(
+            topics=topics,
+            topic=topic,
+            ranking=topic_ranking(topic) if topic else None,
+        )
         return context
 
 

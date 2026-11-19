@@ -188,6 +188,12 @@ Overview of how the project is built and run. Decisions and their rationale:
   granted, declined, open), labelled with the newest version that has the
   key. Versions newest first with status, publish date, change note and
   pinned participants (all attempts, like the admin).
+- Ranking per topic (#48, brief 5.9): `/rangliste/?thema=<slug>`, logged-in
+  users only, linked only at the bottom of the catalogue (not from the
+  navigation, dashboard or landing page). `submissions.ranking`: active
+  participants with points in the topic, most points first, equal points
+  share a rank; nicknames only, the own row is marked "(du)"; others
+  without points are only counted. Default topic: the first one.
 - Points and levels (#33, ADR 0013): `submissions.progress` computes
   everything from approved submissions, nothing is stored.
   `points_by_task` / `task_points`: the best `base_points × stars` per

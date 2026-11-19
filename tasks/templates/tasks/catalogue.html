@@ -29,4 +29,5 @@
   {% empty %}
     <p>Noch keine Aufgaben.</p>
   {% endfor %}
+  {% if sections %}<p class="help"><a href="{% url 'submissions:ranking' %}">Rangliste pro Thema</a></p>{% endif %}
 {% endblock %}
