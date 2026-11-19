@@ -160,8 +160,8 @@ Overview: `gh issue list`. At the time of writing:
 1. Next: #29 live update of the draft (htmx polling), then #30 coach
    uploads.
 2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
-   codes), htmx served as a local static file, `robohash` (avatars),
-   `pygments` (code highlighting, added with #23); `segno` added with #28, `pillow` +
+   codes, added with #28), htmx served as a local static file, `robohash` (avatars),
+   `pygments` (code highlighting, added with #23), `pillow` +
    `pillow-heif` (image processing incl. HEIC, explicit since #24).
 
 ## Working agreements (summary)
