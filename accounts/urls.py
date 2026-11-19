@@ -48,4 +48,5 @@ urlpatterns = [
         views.ParticipantDetailView.as_view(),
         name="participant_detail",
     ),
+    path("p/<str:nickname>/", views.PublicProfileView.as_view(), name="public_profile"),
 ]
