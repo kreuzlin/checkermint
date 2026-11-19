@@ -310,7 +310,13 @@ Rules (`hints.services`):
   again.
 - **Granted by key:** a hint counts as granted for the attempt if a
   granted request exists for a hint with the same `key`. So granted hints
-  stay granted after a switch to a newer version (brief 5.5, #38).
+  stay granted after a switch to a newer version (brief 5.5, #38);
+  nothing is copied. `plan_carry_over(attempt, target)` lists for the
+  switch confirmation the granted hints that stay (`kept`) and those whose
+  key the new version does not have (`lost`). An open request for a hint
+  whose key the new version does not have blocks the switch
+  (`blocks_switch`) until a coach decided it, so no coach grants a hint
+  nobody would see.
 - `request_hint(user, task, message)` starts the task if needed
   (`start_attempt`, brief 5.4), locks the attempt row and refuses a second
   open request or a request when every hint is granted. The view

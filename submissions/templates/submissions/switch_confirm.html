@@ -30,12 +30,38 @@
       <p>Es geht nichts verloren.</p>
     {% endif %}
   {% endif %}
+  {% with hints=plan.hints %}
+    {% if hints.kept or hints.lost or hints.blocks_switch %}
+      <h2>Deine Hinweise</h2>
+      {% if hints.kept %}
+        <p>{% if hints.kept|length == 1 %}1 erhaltener Hinweis bleibt{% else %}{{ hints.kept|length }} erhaltene Hinweise bleiben{% endif %} freigeschaltet.</p>
+      {% endif %}
+      {% if hints.lost %}
+        <div class="message message-warning" role="alert">
+          <p><strong>Achtung, diese Hinweise gibt es in der neuen Version nicht mehr – du siehst sie danach nicht mehr:</strong></p>
+          <ul>
+            {% for number, hint in hints.lost %}
+              <li>Hinweis {{ number }}: «{{ hint.text|truncatechars:80 }}»</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+      {% if hints.blocks_switch %}
+        <p class="form-errors" role="alert"><strong>Wechseln geht gerade nicht:</strong> {{ open_request_blocks }}</p>
+      {% endif %}
+    {% endif %}
+  {% endwith %}
+
   <p class="help">Bereits eingereichte Lösungen bleiben bei ihrer Version. Zurückwechseln geht nicht.</p>
 
-  <form method="post" class="form-actions">
-    {% csrf_token %}
-    <input type="hidden" name="version" value="{{ plan.target.pk }}">
-    <button type="submit" class="button">Ja, auf Version {{ plan.target.number }} wechseln</button>
-    <a href="{% url 'tasks:task_detail' slug=task.slug %}">Bei Version {{ plan.current.number }} bleiben</a>
-  </form>
+  {% if plan.hints.blocks_switch %}
+    <p><a class="button button-secondary" href="{% url 'tasks:task_detail' slug=task.slug %}">Zurück zu Version {{ plan.current.number }}</a></p>
+  {% else %}
+    <form method="post" class="form-actions">
+      {% csrf_token %}
+      <input type="hidden" name="version" value="{{ plan.target.pk }}">
+      <button type="submit" class="button">Ja, auf Version {{ plan.target.number }} wechseln</button>
+      <a href="{% url 'tasks:task_detail' slug=task.slug %}">Bei Version {{ plan.current.number }} bleiben</a>
+    </form>
+  {% endif %}
 {% endblock %}
