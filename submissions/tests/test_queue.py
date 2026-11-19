@@ -79,7 +79,7 @@ class CoachQueueTests(TestCase):
         self.assertContains(response, "RoboAnna (Anna)")
         self.assertContains(response, "Sensor auslesen")
         self.assertContains(response, "Code")
-        self.assertContains(response, "wartet seit 3")
+        self.assertContains(response, "Wartezeit: 3")
         self.assertContains(
             response,
             reverse("admin:submissions_submission_change", args=[submission.pk]),

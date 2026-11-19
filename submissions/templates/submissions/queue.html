@@ -16,7 +16,7 @@
             </span>
             <span class="task-status">
               {% if submission.user.profile %}{{ submission.user.profile.nickname }}{% if submission.user.profile.real_name %} ({{ submission.user.profile.real_name }}){% endif %}{% else %}{{ submission.user.get_username }}{% endif %}
-              · <time datetime="{{ entry.waiting_since|date:'c' }}" title="{{ entry.waiting_since|date:'j. F Y, H:i' }}">wartet seit {{ entry.waiting_since|timesince }}</time>
+              · <time datetime="{{ entry.waiting_since|date:'c' }}" title="{{ entry.waiting_since|date:'j. F Y, H:i' }}">Wartezeit: {{ entry.waiting_since|timesince }}</time>
             </span>
           </li>
         {% endwith %}

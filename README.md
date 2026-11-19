@@ -54,6 +54,22 @@ The project directory is mounted into the container, so code changes reload
 automatically. After changing dependencies (`uv add …`), rebuild with
 `docker compose up --build`.
 
+Demo data (only with `DEBUG=true`, never in production): a coach,
+participants, topics, tasks and submissions in every state, so the coach
+queue and the participant pages can be tried by hand.
+
+```bash
+docker compose exec web python manage.py seed_demo                 # random password, printed
+docker compose exec web python manage.py seed_demo --password …    # same password for all accounts
+docker compose exec web python manage.py seed_demo --reset         # recreate the demo data
+docker compose exec web python manage.py seed_demo --remove        # delete the demo data only
+```
+
+Accounts: `demo-coach` (coach), `demo-anna`, `demo-ben`, `demo-chiara`,
+`demo-max`, `demo-luna`. Demo rows carry the prefix `demo-` (usernames,
+task and topic slugs); other local data is left alone. What the data
+contains: `submissions/demo.py`.
+
 Common tasks:
 
 ```bash
