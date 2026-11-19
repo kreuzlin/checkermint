@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Add submission models")_
+_Last updated: 2026-11-19 (PR "Add submission form with text and code requirements")_
 
 ## Live
 
@@ -110,6 +110,13 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   by check constraints) and `SubmissionItem` (text, private file, original
   file name, thumbnail, data; locked once submitted). Read-only admin for
   coaches (migrations `submissions/0001–0002`).
+- #23: submission form `/aufgaben/<slug>/loesung/` with requirement
+  handlers for `text` and `code` (paste or text file, Pygments
+  highlighting); draft, submit, resubmit after "needs revision" or
+  approval (prefilled from the last submission). The task page lists the
+  participant's submissions with status, stars, feedback and version; the
+  catalogue now also shows eingereicht, Überarbeitung nötig and gelöst
+  (with stars). Photo and file requirements: "Kommt bald" until #24.
 
 ## Open issues
 
@@ -125,10 +132,11 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. Maintainer merges the PR for #22 (migration). Next in M4: #23
-   submission form with text and code requirements.
+1. Next in M4: #24 photo and file requirements with image processing
+   (also registers the private file kind for submission items).
 2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
-   codes), htmx served as a local static file, `robohash` (avatars).
+   codes), htmx served as a local static file, `robohash` (avatars),
+   `pygments` (code highlighting, added with #23).
 
 ## Working agreements (summary)
 

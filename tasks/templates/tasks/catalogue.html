@@ -20,7 +20,7 @@
               <span class="task-status">Gesperrt – ab Level {{ entry.task.min_level }}</span>
             {% else %}
               <a class="task-title" href="{% url 'tasks:task_detail' slug=entry.task.slug %}">{{ entry.version.title }}</a>
-              <span class="task-status">{{ entry.status.label }}</span>
+              <span class="task-status">{{ entry.status.label }}{% if entry.state.stars %} <span class="stars" aria-label="{{ entry.state.stars }} von 3 Sternen">{{ entry.state.star_symbols }}</span>{% endif %}</span>
             {% endif %}
           </li>
         {% endfor %}

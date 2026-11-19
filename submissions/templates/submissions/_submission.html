@@ -1,0 +1,20 @@
+{% load markdown submission_items %}
+{% comment %}One submission with its items and review (task page, later history and review form).{% endcomment %}
+<article class="submission">
+  <header class="submission-header">
+    <strong>{{ submission.get_status_display }}</strong>{% if submission.stars %} · <span class="stars" aria-label="{{ submission.stars }} von 3 Sternen">{{ submission.star_symbols }}</span>{% endif %}
+    <span class="help">eingereicht am {{ submission.submitted_at|date:"j. F Y, H:i" }} · Version {{ submission.task_version.number }}</span>
+  </header>
+  {% if submission.feedback %}
+    <div class="feedback">
+      <p><strong>Rückmeldung{% if submission.reviewed_by.profile %} von {{ submission.reviewed_by.profile.nickname }}{% endif %}:</strong></p>
+      <div class="prose">{{ submission.feedback|markdown }}</div>
+    </div>
+  {% endif %}
+  {% for item in submission.items.all %}
+    <section class="submission-item">
+      <h4>{{ item.requirement.label }}</h4>
+      {% submission_item item %}
+    </section>
+  {% endfor %}
+</article>

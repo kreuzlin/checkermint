@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}<link rel="stylesheet" href="{% static 'submissions/css/code.css' %}">{% endblock %}
 
 {% block content %}
   <p><a href="{% url 'tasks:catalogue' %}">← Alle Aufgaben</a></p>
@@ -9,15 +12,33 @@
   {% else %}
     {% include "tasks/_version_content.html" %}
 
-    {% if can_start %}
-      <form method="post" action="{% url 'tasks:start' slug=task.slug %}">
-        {% csrf_token %}
-        <button type="submit" class="button">Aufgabe starten</button>
-      </form>
-    {% elif attempt %}
-      <p class="help">Begonnen am {{ attempt.started_at|date:"j. F Y" }}.</p>
-    {% elif is_coach %}
-      <p class="help">Als Coach siehst du die neuste veröffentlichte Version.</p>
+    <h2>Deine Lösung</h2>
+    {% if is_coach %}
+      <p class="help">Als Coach siehst du die neuste veröffentlichte Version. Lösungen bewertest du in der Warteschlange.</p>
+    {% else %}
+      {% if attempt %}<p class="help">Begonnen am {{ attempt.started_at|date:"j. F Y" }}.</p>{% endif %}
+      {% if is_waiting %}
+        <p class="message" role="status">Deine Lösung wartet auf einen Coach.</p>
+      {% endif %}
+      <div class="form-actions">
+        {% if can_start %}
+          <form method="post" action="{% url 'tasks:start' slug=task.slug %}" class="inline-form">
+            {% csrf_token %}
+            <button type="submit" class="button button-secondary">Aufgabe starten</button>
+          </form>
+        {% endif %}
+        {% if can_edit %}
+          <a class="button" href="{% url 'submissions:edit' slug=task.slug %}">{% if draft %}Entwurf weiterbearbeiten{% elif state.status.value == "ueberarbeiten" %}Lösung überarbeiten{% elif state.status.value == "geloest" %}Neue Lösung einreichen{% else %}Lösung erfassen{% endif %}</a>
+        {% endif %}
+      </div>
+      {% if state.status.value == "geloest" and not draft %}<p class="help">Mit einer neuen Lösung kannst du mehr Sterne holen; deine Punkte sinken dadurch nie.</p>{% endif %}
+    {% endif %}
+
+    {% if submissions %}
+      <h2>Bisherige Einreichungen</h2>
+      {% for submission in submissions %}
+        {% include "submissions/_submission.html" %}
+      {% endfor %}
     {% endif %}
   {% endif %}
 {% endblock %}

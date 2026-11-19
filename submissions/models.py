@@ -137,6 +137,10 @@ class Submission(models.Model):
         super().save(*args, **kwargs)
 
     @property
+    def star_symbols(self) -> str:
+        return "★" * (self.stars or 0)
+
+    @property
     def is_draft(self) -> bool:
         return self.status == self.Status.DRAFT
 
