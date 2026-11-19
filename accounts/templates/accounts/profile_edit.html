@@ -24,7 +24,7 @@
     <dt>Benutzername</dt>
     <dd>{{ user.username }}</dd>
   </dl>
-  <p><a href="{% url 'accounts:participant_detail' nickname=profile.nickname %}">So sehen dich andere Angemeldete</a></p>
+  <p><a href="{% url 'accounts:participant_detail' nickname=profile.nickname %}">So sehen dich andere Angemeldete</a> · <a href="{% url 'accounts:public_profile' nickname=profile.nickname %}">So sieht dein öffentliches Profil aus</a></p>
 
   <form method="post" class="form" novalidate>
     {% csrf_token %}

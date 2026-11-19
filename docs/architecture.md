@@ -9,7 +9,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 |---|---|
 | `config/` | Settings (one module, configured via environment), URLs, WSGI |
 | `core/` | Base layout, home page, private file view (`core/private_files.py`, `/dateien/…`), SEO (`core/seo.py`), noindex middleware, Markdown rendering (`core/markdown.py`, `markdown` template filter), navigation, `/version`, `/robots.txt`, error pages |
-| `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
+| `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), public profiles (`/p/<nickname>/`, `accounts.public`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
 | `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`; points from `submissions.progress`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011), task attempts (`tasks.attempts`), catalogue `/aufgaben/` and task page `/aufgaben/<slug>/` (`tasks.catalogue`) |
 | `hints/` | Hint requests (`HintRequest`, `hints.services`): "Hinweis anfragen" on the task page (POST `/aufgaben/<slug>/hinweis-anfragen/`), granted hints with replies; grant or decline in the coach queue (POST `/warteschlange/hinweis/<id>/`); read-only admin for coaches |
 | `overviews/` | Coach overviews (no models): progress matrix `/fortschritt/` (`overviews.matrix.progress_matrix`, "Fortschritt" in the navigation, coaches only), participant detail `/fortschritt/teilnehmende/<nickname>/` (`overviews.participant`), task detail `/fortschritt/aufgaben/<slug>/` (`overviews.task`) |
@@ -36,6 +36,16 @@ Overview of how the project is built and run. Decisions and their rationale:
   about text, regardless of the switches, which only control the public
   page `/p/<nickname>/`, #46). The email address is shown only to the
   participant and to coaches. Inactive and staff accounts are not listed.
+- Public profiles (#46, brief 4.6, 5.12): `/p/<nickname>/` without login
+  (active participants only, otherwise 404). `accounts.public` builds a
+  `PublicProfile` with nickname, avatar seed and level/points per topic
+  (topics with visible tasks; points as everywhere, ADR 0013); about text,
+  badges (name, description, date – not the task) and titles of solved
+  visible tasks are loaded only when the matching switch is on, so the
+  template cannot show a private part by mistake. Never the real name,
+  email, username, feedback or submission content. Not linked from any
+  public page: participants share the link themselves ("So sieht dein
+  öffentliches Profil aus" on `/profil/`, also on the internal profile).
 - Avatars (ADR 0012): Robohash set1 rendered locally as PNG in 64, 128 or
   256 px, only for seeds of existing profiles, kept in an in-process LRU
   cache and sent with `Cache-Control: public, max-age=1 year, immutable`

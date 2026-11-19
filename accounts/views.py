@@ -15,6 +15,7 @@ from core.seo import SeoMixin
 from .avatars import render_avatar
 from .forms import LoginForm, PasswordResetForm, ProfileForm, SetPasswordForm
 from .models import Profile, new_avatar_seed
+from .public import public_profile
 from .roles import is_coach
 
 
@@ -165,6 +166,29 @@ class ParticipantDetailView(LoginRequiredMixin, SeoMixin, DetailView):
         context["viewer_is_coach"] = is_coach(user)
         context["badges"] = badges_of(self.object.user)
         return context
+
+
+class PublicProfileView(SeoMixin, DetailView):
+    """Public profile `/p/<nickname>/`, no login needed (brief 5.12, #46).
+
+    Shows only what the participant made public (`accounts.public`);
+    staff, inactive or unknown nicknames are 404.
+    """
+
+    template_name = "accounts/public_profile.html"
+    context_object_name = "profile"
+
+    def get_object(self, queryset=None):
+        profile = get_object_or_404(
+            participant_profiles(), nickname__iexact=self.kwargs["nickname"]
+        )
+        return public_profile(profile)
+
+    def get_page_title(self):
+        return self.object.nickname
+
+    def get_meta_description(self):
+        return f"{self.object.nickname} bei Checkermint: Level und Punkte."
 
 
 class RollAvatarView(LoginRequiredMixin, View):

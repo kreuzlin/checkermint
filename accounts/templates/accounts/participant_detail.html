@@ -6,6 +6,7 @@
 
   <p class="help">
     Internes Profil: nur für Angemeldete sichtbar.
+    <a href="{% url 'accounts:public_profile' nickname=profile.nickname %}">Öffentliches Profil</a>
     {% if is_own %}<a href="{% url 'accounts:profile_edit' %}">Profil bearbeiten</a>{% endif %}
   </p>
 

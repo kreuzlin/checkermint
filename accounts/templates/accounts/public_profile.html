@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load avatars markdown %}
+
+{% block content %}
+  <h1 class="with-avatar">{% avatar profile 64 %} {{ profile.nickname }}</h1>
+  <p class="help">Öffentliches Profil bei {{ site_short_name }}, der Trainingsplattform des VRoboT.{% if user.is_authenticated %} <a href="{% url 'accounts:participant_detail' nickname=profile.nickname %}">Internes Profil</a>{% endif %}</p>
+
+  <h2>Level</h2>
+  {% for entry in profile.levels %}
+    <h3>{{ entry.topic.name }}</h3>
+    {% include "tasks/_topic_level.html" with level=entry.progress %}
+  {% empty %}
+    <p class="help">Noch keine Themen.</p>
+  {% endfor %}
+
+  {% if profile.badges is not None %}
+    <h2>Badges</h2>
+    {% if profile.badges %}
+      <ul class="badge-list">
+        {% for award in profile.badges %}
+          <li class="badge-entry">
+            {% include "badges/_icon.html" with badge=award.badge %}
+            <span><strong>{{ award.badge.name }}</strong>{% if award.badge.description %} – {{ award.badge.description }}{% endif %}
+              <span class="help">{{ award.awarded_at|date:"j. F Y" }}</span></span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="help">Noch keine Badges.</p>
+    {% endif %}
+  {% endif %}
+
+  {% if profile.solved_tasks is not None %}
+    <h2>Gelöste Aufgaben</h2>
+    {% if profile.solved_tasks %}
+      <ul class="task-list">
+        {% for task in profile.solved_tasks %}
+          <li class="task-item"><span class="task-title">{{ task.title }}</span> <span class="task-status">{{ task.topic }}</span></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="help">Noch keine gelöste Aufgabe.</p>
+    {% endif %}
+  {% endif %}
+
+  {% if profile.about %}
+    <h2>Über mich</h2>
+    <div class="prose">{{ profile.about|markdown }}</div>
+  {% endif %}
+{% endblock %}
