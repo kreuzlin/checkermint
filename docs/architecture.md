@@ -74,8 +74,8 @@ Overview of how the project is built and run. Decisions and their rationale:
   starts from the last submission's content. `text` is plain text
   (escaped, line breaks kept); `code` is pasted or uploaded as a UTF-8
   text file (max. 200 KB, stored as text with the original file name, no
-  file kept) and highlighted with Pygments (style `xcode`, all colours
-  WCAG AA; CSS generated into `submissions/static/submissions/css/code.css`,
+  file kept) and highlighted with Pygments (style `one-dark` on the site's dark
+  code background, all colours WCAG AA; CSS generated into `submissions/static/submissions/css/code.css`,
   the command is in the file). Requirement `options` for code:
   `language` (Pygments name) and `extensions` (allowed endings). A type
   without a handler is shown as "Kommt bald"; a version that requires one
