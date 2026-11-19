@@ -17,5 +17,6 @@ class NavItem(NamedTuple):
 
 MAIN_NAVIGATION: list[NavItem] = [
     NavItem("Aufgaben", "tasks:catalogue", members_only=True),
+    NavItem("Mein Verlauf", "submissions:history", members_only=True),
     NavItem("Teilnehmende", "accounts:participant_list", members_only=True),
 ]

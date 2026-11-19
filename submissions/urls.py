@@ -5,6 +5,11 @@ from . import views
 app_name = "submissions"
 
 urlpatterns = [
-    path("<slug:slug>/loesung/", views.SubmissionView.as_view(), name="edit"),
-    path("<slug:slug>/wechseln/", views.SwitchVersionView.as_view(), name="switch"),
+    path("aufgaben/<slug:slug>/loesung/", views.SubmissionView.as_view(), name="edit"),
+    path(
+        "aufgaben/<slug:slug>/wechseln/",
+        views.SwitchVersionView.as_view(),
+        name="switch",
+    ),
+    path("verlauf/", views.HistoryView.as_view(), name="history"),
 ]
