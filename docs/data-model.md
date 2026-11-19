@@ -316,6 +316,10 @@ Rules (`hints.services`):
   open request or a request when every hint is granted. The view
   (POST `/aufgaben/<slug>/hinweis-anfragen/`) refuses coaches and locked
   tasks.
+- `decide_request(request, coach, status, reply)` grants or declines an
+  open request (#37): locks the row, sets `coach_reply`, `decided_by`
+  and `decided_at`; a request that is no longer open is refused, so two
+  coaches cannot both decide it.
 - `hint_state(attempt, version)` is what the task page shows: total,
   granted hints with the coach's reply, the open request ("Anfrage wartet
   auf einen Coach") or the reply to the last declined request, and

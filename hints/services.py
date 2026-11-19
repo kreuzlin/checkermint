@@ -9,6 +9,7 @@ switch when the new version has a hint with the same key (#38).
 from dataclasses import dataclass, field
 
 from django.db import IntegrityError, transaction
+from django.utils import timezone
 
 from tasks.attempts import start_attempt
 from tasks.models import Hint, Task, TaskAttempt, TaskVersion
@@ -102,3 +103,26 @@ def request_hint(user, task: Task, message: str = "") -> HintRequest:
             raise HintRequestNotAllowed(
                 "Deine Anfrage wartet noch auf einen Coach."
             ) from error
+
+
+def decide_request(
+    request: HintRequest, coach, status: str, reply: str = ""
+) -> HintRequest:
+    """Grant or decline an open request (brief 5.5, #37).
+
+    Locks the row, so two coaches deciding at the same moment cannot both
+    win; the second gets HintRequestNotAllowed. The caller checks that
+    `coach` is a coach.
+    """
+    if status not in (HintRequest.Status.GRANTED, HintRequest.Status.DECLINED):
+        raise ValueError(f"Not a decision: {status}")
+    with transaction.atomic():
+        request = HintRequest.objects.select_for_update().get(pk=request.pk)
+        if not request.is_open:
+            raise HintRequestNotAllowed("Diese Anfrage ist schon entschieden.")
+        request.status = status
+        request.coach_reply = reply.strip()
+        request.decided_by = coach
+        request.decided_at = timezone.now()
+        request.save()
+    return request

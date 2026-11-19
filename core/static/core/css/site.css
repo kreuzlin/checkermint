@@ -908,3 +908,38 @@ hr {
 .hint-request-form textarea {
   min-height: 4.5rem;
 }
+
+/* Coach queue: kind label and hint requests with their decision form (#37). */
+.queue-kind {
+  display: inline-block;
+  margin-right: 0.4rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--mint-200);
+  font-size: 0.8rem;
+  font-weight: 700;
+  vertical-align: 0.1em;
+}
+
+.queue-hint {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.queue-hint p {
+  margin: 0.25rem 0;
+}
+
+.queue-hint .feedback {
+  margin: 0.5rem 0;
+}
+
+.hint-decision-form {
+  max-width: 40rem;
+  margin-top: 0.75rem;
+}
+
+.hint-decision-form .form-actions {
+  margin: 0.5rem 0 0;
+}

@@ -9,7 +9,7 @@ from django.views.generic import TemplateView
 from accounts.roles import is_coach
 from badges.awards import recent_badges
 from submissions.dashboard import dashboard
-from submissions.queue import queue_entries
+from submissions.queue import SUBMISSION, queue_entries
 
 from . import private_files
 from .seo import SeoMixin
@@ -30,7 +30,10 @@ class HomeView(SeoMixin, TemplateView):
         # Logged-in users only: nicknames are not public (brief 4, 5.9).
         if is_coach(user):
             context["is_coach"] = True
-            context["queue_size"] = len(queue_entries())
+            entries = queue_entries()
+            context["queue_size"] = len(entries)
+            context["queue_submissions"] = sum(e.kind == SUBMISSION for e in entries)
+            context["queue_hints"] = len(entries) - context["queue_submissions"]
             context["recent_badges"] = recent_badges()
         else:
             context["dashboard"] = dashboard(user)

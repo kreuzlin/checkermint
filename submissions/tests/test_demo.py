@@ -11,7 +11,7 @@ from accounts.roles import is_coach
 from badges.models import UserBadge
 from hints.models import HintRequest
 from submissions.models import Submission
-from submissions.queue import queue_entries
+from submissions.queue import submission_entries
 from tasks.models import Task, TaskAttempt, Topic
 
 from .test_uploads import IN_MEMORY
@@ -42,7 +42,7 @@ class SeedDemoTests(TestCase):
             set(Submission.objects.values_list("status", flat=True)),
             {"draft", "submitted", "needs_revision", "approved"},
         )
-        entries = queue_entries()
+        entries = submission_entries()
         self.assertEqual(len(entries), 5)
         self.assertTrue(any(e.is_resubmission for e in entries))
         sensor = Task.objects.get(slug="demo-sensor-auslesen")
@@ -75,7 +75,7 @@ class SeedDemoTests(TestCase):
             seed("--password", "geheim123")
         seed("--reset", "--password", "anderes123")
         self.assertTrue(self.client.login(username="demo-ben", password="anderes123"))
-        self.assertEqual(len(queue_entries()), 5)
+        self.assertEqual(len(submission_entries()), 5)
 
     def test_remove_keeps_other_data(self):
         own = User.objects.create_user("anna", password="geheim123")

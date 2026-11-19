@@ -6,8 +6,13 @@ app_name = "hints"
 
 urlpatterns = [
     path(
-        "<slug:slug>/hinweis-anfragen/",
+        "aufgaben/<slug:slug>/hinweis-anfragen/",
         views.RequestHintView.as_view(),
         name="request",
+    ),
+    path(
+        "warteschlange/hinweis/<int:pk>/",
+        views.DecideHintView.as_view(),
+        name="decide",
     ),
 ]
