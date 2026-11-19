@@ -417,3 +417,27 @@ a.button {
   gap: 1rem;
   margin-top: 1rem;
 }
+
+/* QR code for phone uploads */
+.phone-qr {
+  margin: 1rem 0 1.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.phone-qr h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.qr-code svg {
+  display: block;
+  width: 12rem;
+  height: auto;
+  background: #fff;
+}
+
+.qr-link code {
+  word-break: break-all;
+}

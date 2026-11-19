@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.generic import TemplateView
 
 from accounts.roles import is_coach
@@ -9,16 +9,26 @@ from core.seo import SeoMixin
 from tasks.attempts import visible_version
 from tasks.catalogue import Status, task_for
 
-from .forms import SubmissionForm
+from .forms import PhoneUploadForm, SubmissionForm
+from .handlers import UploadHandler
 from .history import history_events
 from .services import (
     SubmissionNotAllowed,
+    add_to_draft,
     get_draft,
+    items_by_requirement,
     save_draft,
     starting_content,
     submit,
 )
 from .switching import SwitchNotPossible, newer_version, plan_switch, switch_version
+from .upload_links import (
+    LIFETIME_MINUTES,
+    InvalidUploadLink,
+    draft_for_token,
+    qr_svg,
+    upload_url,
+)
 
 SAVE, SUBMIT = "speichern", "einreichen"
 
@@ -69,9 +79,21 @@ class SubmissionView(LoginRequiredMixin, SeoMixin, TemplateView):
             form=form,
             draft=get_draft(self.request.user, self.task),
             newer=newer_version(self.attempt),
+            phone_upload=self.phone_upload(form),
             unsupported_required=form.unsupported_required(),
         )
         return context
+
+    def phone_upload(self, form):
+        """QR code for the phone, if there is a draft with photos or files."""
+        draft = get_draft(self.request.user, self.task)
+        has_uploads = any(isinstance(row.handler, UploadHandler) for row in form.rows)
+        if not has_uploads:
+            return None
+        if draft is None:
+            return {"needs_draft": True}
+        url = upload_url(self.request, draft)
+        return {"url": url, "qr": qr_svg(url), "minutes": LIFETIME_MINUTES}
 
     def post(self, request, *args, **kwargs):
         form = self.make_form(request.POST, request.FILES)
@@ -161,3 +183,56 @@ class HistoryView(LoginRequiredMixin, SeoMixin, TemplateView):
         paginator = Paginator(history_events(self.request.user), self.paginate_by)
         context["page_obj"] = paginator.get_page(self.request.GET.get("seite"))
         return context
+
+
+class PhoneUploadView(SeoMixin, TemplateView):
+    """Upload page behind the QR code: no login, the signed link is the key
+    (brief 5.7). Shows only the task title and the requirement labels."""
+
+    template_name = "submissions/phone_upload.html"
+    page_title = "Fotos hochladen"
+    meta_description = "Fotos und Dateien zu einer Lösung hochladen."
+    http_method_names = ["get", "post"]
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.draft = draft_for_token(kwargs["token"])
+        except InvalidUploadLink as error:
+            return render(
+                request,
+                "submissions/phone_upload_invalid.html",
+                {"page_title": "Link ungültig", "message": error.message},
+                status=410,
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+    def make_form(self, data=None, files=None):
+        return PhoneUploadForm(
+            self.draft.task_version.requirements.all(),
+            items_by_requirement(self.draft),
+            data=data,
+            files=files,
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(draft=self.draft, form=kwargs.get("form") or self.make_form())
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.make_form(request.POST, request.FILES)
+        if not form.is_valid():
+            return self.render_to_response(self.get_context_data(form=form))
+        try:
+            add_to_draft(self.draft, form.items)
+        except SubmissionNotAllowed as error:
+            messages.error(request, str(error))
+        else:
+            count = form.added_count()
+            messages.success(
+                request,
+                "1 Datei ist hochgeladen."
+                if count == 1
+                else f"{count} Dateien sind hochgeladen.",
+            )
+        return redirect(request.path)

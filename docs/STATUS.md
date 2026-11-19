@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Limit upload size in Caddy")_
+_Last updated: 2026-11-19 (PR "Add QR code upload links and mobile upload page")_
 
 ## Live
 
@@ -138,6 +138,10 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   startup check `submissions.W001` keeps it consistent with the per-file
   limits. Tested locally with a Caddy container in front of the dev app.
   Milestone M4 complete.
+- #28: QR code in the submission form (once a draft exists) with a signed
+  link valid 30 minutes; the phone page `/hochladen/<token>/` adds photos
+  and files to the draft without login (same image pipeline). The other
+  device sees them after a reload until #29 adds polling.
 
 ## Open issues
 
@@ -153,10 +157,10 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. Next: M5 QR upload (#28 signed links and mobile upload page, #29 live
-   update of the draft), then #30 coach uploads.
+1. Next: #29 live update of the draft (htmx polling), then #30 coach
+   uploads.
 2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
-   codes), htmx served as a local static file, `robohash` (avatars),
+   codes, added with #28), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +
    `pillow-heif` (image processing incl. HEIC, explicit since #24).
 

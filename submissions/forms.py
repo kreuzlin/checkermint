@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .handlers import handler_for
+from .handlers import UploadHandler, handler_for
 
 
 def field_name(requirement, suffix: str) -> str:
@@ -104,3 +104,52 @@ class SubmissionForm(forms.Form):
                 self.add_error(row.fields[0], "Das fehlt noch.")
                 complete = False
         return complete
+
+
+class PhoneUploadForm(forms.Form):
+    """Only the upload fields (photos, files) of a draft, for the phone page.
+
+    Adds to what is stored; removing happens in the full form.
+    """
+
+    def __init__(self, requirements, previous, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.previous = previous
+        self.items: dict[int, list] = {}
+        self.rows = []
+        for requirement in requirements:
+            handler = handler_for(requirement)
+            if not isinstance(handler, UploadHandler):
+                continue
+            stored = previous.get(requirement.pk, [])
+            field = handler.form_fields(requirement, stored)[""]
+            self.fields[requirement.key] = field
+            self.rows.append((requirement, handler, stored))
+
+    def bound_rows(self):
+        for requirement, _, stored in self.rows:
+            yield requirement, stored, self[requirement.key]
+
+    def clean(self):
+        cleaned = super().clean()
+        uploaded = False
+        for requirement, handler, stored in self.rows:
+            files = cleaned.get(requirement.key) or []
+            if not files:
+                continue
+            uploaded = True
+            try:
+                self.items[requirement.pk] = handler.clean(
+                    requirement, {"": files}, stored
+                )
+            except ValidationError as error:
+                self.add_error(requirement.key, error)
+        if not uploaded and not self.errors:
+            raise ValidationError("Wähle zuerst ein Foto oder eine Datei aus.")
+        return cleaned
+
+    def added_count(self) -> int:
+        return sum(
+            sum(1 for value in values if isinstance(value, dict))
+            for values in self.items.values()
+        )
