@@ -1,0 +1,30 @@
+{% comment %}Public start page for visitors, e.g. parents (brief 5.12, #45). No photos of children; nothing that a participant has not made public.{% endcomment %}
+<section class="landing-hero">
+  <h1>{{ site_short_name }}</h1>
+  <p class="lead">Die Trainingsplattform des Robotikvereins VRoboT: Aufgaben lösen, Rückmeldung von den Coaches erhalten und Level für Level weiterkommen.</p>
+  <p><a class="button" href="{% url 'accounts:login' %}">Anmelden</a></p>
+</section>
+
+<div class="dashboard">
+  <section class="dashboard-block" aria-labelledby="so-gehts">
+    <h2 id="so-gehts">So funktioniert’s</h2>
+    <ol class="landing-steps">
+      <li><strong>Aufgabe wählen.</strong> Die Coaches stellen Aufgaben zu Themen wie Programmieren oder Bauen bereit.</li>
+      <li><strong>Lösung einreichen.</strong> Als Text, Code, Foto oder Datei – Fotos gehen auch direkt vom Handy.</li>
+      <li><strong>Rückmeldung erhalten.</strong> Ein Coach schaut sich die Lösung an und vergibt bis zu drei Sterne – oder gibt Tipps zum Überarbeiten.</li>
+      <li><strong>Weiterkommen.</strong> Sterne bringen Punkte, Punkte bringen Level, und mit jedem Level werden neue Aufgaben frei. Dazu gibt es Badges.</li>
+    </ol>
+  </section>
+
+  <section class="dashboard-block" aria-labelledby="mitmachen">
+    <h2 id="mitmachen">Mitmachen</h2>
+    <p>{{ site_short_name }} ist für die Kinder und Jugendlichen im VRoboT. Die Konten erstellen die Coaches – eine Registrierung gibt es nicht.</p>
+    <p>Mehr über den Verein und wie man dabei sein kann: <a href="https://vrobot.ch">vrobot.ch</a></p>
+  </section>
+
+  <section class="dashboard-block" aria-labelledby="eltern">
+    <h2 id="eltern">Für Eltern</h2>
+    <p>Fotos, Dateien und Lösungen sind nie öffentlich, nur angemeldete Mitglieder sehen sie. Öffentlich sind nur Spitzname, Roboter-Bild, Punkte und Level – und was Ihr Kind selbst freigibt. Der echte Name erscheint nie auf einer öffentlichen Seite.</p>
+    <p>Die Seite wird von keiner Suchmaschine erfasst und lädt nichts von anderen Anbietern.</p>
+  </section>
+</div>

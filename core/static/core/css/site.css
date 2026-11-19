@@ -258,6 +258,19 @@ main {
   color: var(--text-muted);
 }
 
+/* Landing page for visitors (#45). */
+.landing-hero {
+  margin-bottom: 2rem;
+}
+
+.landing-steps {
+  padding-left: 1.25rem;
+}
+
+.landing-steps li + li {
+  margin-top: 0.6rem;
+}
+
 .site-footer {
   border-top: 1px solid var(--line);
   padding: 1.5rem 0;

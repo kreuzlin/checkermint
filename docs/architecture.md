@@ -189,8 +189,10 @@ Overview of how the project is built and run. Decisions and their rationale:
   shows level, points and a progress bar per topic
   (`tasks/_topic_level.html`, text first, the bar only repeats it); the
   task page shows the participant's points for the task.
-- Home page (#35): visitors see the public start page (landing page
-  with #45). Logged-in participants see their dashboard
+- Home page (#35): visitors see the landing page (#45,
+  `core/_landing.html`: what Checkermint is, how it works, who can take
+  part with a link to vrobot.ch, a note for parents on what is public;
+  no images and no participant data). Logged-in participants see their dashboard
   (`submissions.dashboard`, template `submissions/dashboard.html`):
   "Überarbeiten" (tasks whose latest submission needs revision, with the
   feedback), "Als Nächstes" (started tasks first, then open ones with the
