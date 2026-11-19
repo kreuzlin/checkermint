@@ -2,7 +2,8 @@
 
 Visible are tasks that are published for participants and not archived.
 A task is locked until the participant's level in its topic reaches the
-task's minimum level; coaches see every visible task unlocked.
+task's minimum level (levels from `submissions.progress`, ADR 0013);
+coaches see every visible task unlocked. A started task stays unlocked.
 
 The status comes from the participant's submissions (drafts do not count):
 a submission waiting for a coach wins, then "solved" (any approved
@@ -18,9 +19,10 @@ from django.shortcuts import get_object_or_404
 
 from accounts.roles import is_coach
 from submissions.models import Submission
+from submissions.progress import levels_by_topic
 
 from .attempts import get_attempt
-from .levels import level_for_points, thresholds
+from .levels import LevelInfo
 from .models import Task, TaskAttempt, TaskVersion, Topic
 
 
@@ -76,8 +78,12 @@ class CatalogueEntry:
 @dataclass(frozen=True)
 class TopicSection:
     topic: Topic
-    level: int
+    progress: LevelInfo  # the user's level and points in the topic
     entries: list[CatalogueEntry]
+
+    @property
+    def level(self) -> int:
+        return self.progress.level
 
 
 def visible_tasks():
@@ -85,21 +91,6 @@ def visible_tasks():
     return Task.objects.filter(
         is_published=True, is_archived=False, versions__status="published"
     ).distinct()
-
-
-def points_by_topic(user) -> dict[int, int]:
-    """Points per topic id. Computed from approved submissions with #33;
-    until then everybody has 0 points (level 1)."""
-    return {}
-
-
-def levels_by_topic(user, topic_ids) -> dict[int, int]:
-    table = thresholds()
-    points = points_by_topic(user)
-    return {
-        topic_id: level_for_points(points.get(topic_id, 0), table).level
-        for topic_id in topic_ids
-    }
 
 
 def submitted_by_task(user, tasks) -> dict[int, list[tuple[str, int | None]]]:
@@ -138,7 +129,7 @@ def task_for(user, slug):
     task is not visible)."""
     task = get_object_or_404(visible_tasks().select_related("topic"), slug=slug)
     attempt = get_attempt(user, task)
-    level = levels_by_topic(user, [task.topic_id])[task.topic_id]
+    level = levels_by_topic(user, [task.topic_id])[task.topic_id].level
     state = task_state(
         user,
         task,
@@ -178,8 +169,11 @@ def catalogue(user) -> list[TopicSection]:
     sections: list[TopicSection] = []
     for task in tasks:
         if not sections or sections[-1].topic.pk != task.topic_id:
-            level = levels[task.topic_id]
-            sections.append(TopicSection(topic=task.topic, level=level, entries=[]))
+            sections.append(
+                TopicSection(
+                    topic=task.topic, progress=levels[task.topic_id], entries=[]
+                )
+            )
         version = pinned.get(task.pk) or task.published_versions[0]
         state = task_state(
             user,

@@ -10,7 +10,7 @@
   {% for section in sections %}
     <section class="topic" aria-labelledby="thema-{{ section.topic.slug }}">
       <h2 id="thema-{{ section.topic.slug }}">{{ section.topic.name }}</h2>
-      {% if not is_coach %}<p class="help">Dein Level: {{ section.level }}</p>{% endif %}
+      {% if not is_coach %}{% include "tasks/_topic_level.html" with level=section.progress %}{% endif %}
       {% if section.topic.description %}<div class="prose">{{ section.topic.description|markdown }}</div>{% endif %}
       <ul class="task-list">
         {% for entry in section.entries %}

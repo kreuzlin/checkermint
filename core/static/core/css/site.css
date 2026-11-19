@@ -452,3 +452,15 @@ a.button {
   margin: 0 1rem 0.5rem 0;
   white-space: nowrap;
 }
+
+/* Level per topic: text first, the bar only repeats it. */
+.topic-level {
+  margin: 0.25rem 0 0.75rem;
+}
+
+.topic-level progress {
+  display: block;
+  width: 100%;
+  max-width: 16rem;
+  margin-top: 0.25rem;
+}

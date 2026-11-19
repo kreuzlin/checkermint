@@ -10,7 +10,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | `config/` | Settings (one module, configured via environment), URLs, WSGI |
 | `core/` | Base layout, home page, private file view (`core/private_files.py`, `/dateien/…`), SEO (`core/seo.py`), noindex middleware, Markdown rendering (`core/markdown.py`, `markdown` template filter), navigation, `/version`, `/robots.txt`, error pages |
 | `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
-| `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011), task attempts (`tasks.attempts`), catalogue `/aufgaben/` and task page `/aufgaben/<slug>/` (`tasks.catalogue`) |
+| `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`; points from `submissions.progress`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011), task attempts (`tasks.attempts`), catalogue `/aufgaben/` and task page `/aufgaben/<slug>/` (`tasks.catalogue`) |
 | `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder |
 | `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; requirement handlers (`submissions/handlers.py`), submission form `/aufgaben/<slug>/loesung/`, version switch `/aufgaben/<slug>/wechseln/`, history `/verlauf/` (`submissions.history`), coach queue `/warteschlange/` (`submissions.queue`), review form `/warteschlange/<id>/`, phone upload `/hochladen/<token>/` (`submissions.upload_links`); read-only admin for coaches |
 | `<app>/` | One small Django app per topic (added per project) |
@@ -54,8 +54,8 @@ Overview of how the project is built and run. Decisions and their rationale:
   (any approved submission, with the best stars), `ueberarbeiten` (needs
   revision), `begonnen` (attempt exists), `offen` or `gesperrt`
   (participant's level in the topic below `min_level`; coaches see no
-  locks). Levels come
-  from `points_by_topic`, which returns no points until #33. Locked tasks
+  locks; a started task stays unlocked). Levels come from
+  `submissions.progress` (see "Points and levels"). Locked tasks
   are listed without a link; their page shows only the title and the
   required level. The task page shows the version from
   `tasks.attempts.visible_version` and the number of hints (not their
@@ -133,6 +133,17 @@ Overview of how the project is built and run. Decisions and their rationale:
   name), topic, task, version, waiting time and a "erneut eingereicht"
   marker; each entry links to the review form. Hint requests join as a
   second entry kind with #37.
+- Points and levels (#33, ADR 0013): `submissions.progress` computes
+  everything from approved submissions, nothing is stored.
+  `points_by_task` / `task_points`: the best `base_points × stars` per
+  task (base points of the submission's own version), so resubmissions
+  never lower points; archived or hidden tasks keep their points.
+  `points_by_topic` (one query), `levels_by_topic` (plus the threshold
+  table: `tasks.levels.LevelInfo` with level, points and points missing),
+  `topic_progress` (every topic, for the dashboard #35). The catalogue
+  shows level, points and a progress bar per topic
+  (`tasks/_topic_level.html`, text first, the bar only repeats it); the
+  task page shows the participant's points for the task.
 - Review form (#32): `/warteschlange/<id>/` (coaches only; the submission
   is looked up after the permission check, so participants always get
   403). Shows the solution, a link to the admin preview of the exact

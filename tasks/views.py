@@ -5,6 +5,7 @@ from django.views.generic import TemplateView, View
 
 from accounts.roles import is_coach
 from core.seo import SeoMixin
+from submissions.progress import task_points
 from submissions.services import get_draft, submitted_submissions
 from submissions.switching import newer_version
 
@@ -64,6 +65,7 @@ class TaskDetailView(LoginRequiredMixin, SeoMixin, TemplateView):
             draft=get_draft(user, self.task) if participant else None,
             newer=newer_version(self.attempt) if participant else None,
             submissions=submitted_submissions(user, self.task),
+            earned=task_points(user, self.task) if participant else None,
             requirements=self.version.requirements.all(),
             hints=self.version.hints.all(),
         )
