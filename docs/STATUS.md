@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Add public profile pages")_
+_Last updated: 2026-11-19 (PR "Add ranking per topic")_
 
 ## Live
 
@@ -245,6 +245,9 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   tasks only when switched on. Never real name, email, username, feedback
   or submission content (tested). Linked from `/profil/` and the internal
   profile only, not from any public page.
+- #48: ranking per topic `/rangliste/` for logged-in users, linked only
+  at the bottom of the catalogue: rank (ties share), avatar, nickname,
+  level and points; participants without points only counted.
 - 2026-11-19: on the maintainer's one-time instruction, Claude merged #73
   (Caddy upload limit, a server change) itself. The merge exceptions in
   CLAUDE.md stay in force: PRs with migrations or server/deployment
@@ -265,13 +268,13 @@ Overview: `gh issue list`. At the time of writing:
 | 2 | DNS for checkermint.ch (apex and `www` only) | Maintainer |
 | 3 | Outgoing mail `coach@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Badge artwork (logo and colours delivered) | Maintainer |
-| 42–50 (without #45, #46) | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
+| 42–47, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
 | 77 | Show who uploaded a submission item (follow-up to #30; migration) | Claude Code |
 
 ## Next steps
 
-1. M10 public area without server dependencies: #47 privacy page and
-   imprint, #48 ranking per topic.
+1. M10: #47 privacy page and imprint (needs the maintainer's details
+   for the imprint and a review of the text).
    M9 (email): #43 and #44 can be built against the console backend;
    #42 needs SMTP access (#3).
 2. Maintainer: manual test of phone upload and live update

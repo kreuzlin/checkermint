@@ -258,6 +258,35 @@ main {
   color: var(--text-muted);
 }
 
+/* Ranking per topic (#48): a plain list, the own row only outlined. */
+.ranking {
+  padding: 0;
+  list-style: none;
+}
+
+.ranking-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.ranking-rank {
+  min-width: 2rem;
+  font-weight: 700;
+}
+
+.ranking-row .task-status {
+  margin-left: auto;
+}
+
+.ranking-own {
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-small);
+}
+
 /* Landing page for visitors (#45). */
 .landing-hero {
   margin-bottom: 2rem;

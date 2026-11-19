@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load avatars %}
+
+{% block content %}
+  <h1>Rangliste</h1>
+  <p class="help">Nur für Angemeldete. Wer mehr Aufgaben löst und bessere Sterne bekommt, hat mehr Punkte – jede und jeder lernt aber im eigenen Tempo.</p>
+
+  {% if topics %}
+    <form method="get" class="form matrix-filter">
+      <label for="thema">Thema</label>
+      <select id="thema" name="thema">
+        {% for t in topics %}<option value="{{ t.slug }}"{% if t == topic %} selected{% endif %}>{{ t.name }}</option>{% endfor %}
+      </select>
+      <button type="submit" class="button button-secondary">Anzeigen</button>
+    </form>
+
+    <h2>{{ topic.name }}</h2>
+    {% if ranking.rows %}
+      <ol class="ranking">
+        {% for row in ranking.rows %}
+          <li class="ranking-row{% if row.profile.user_id == user.pk %} ranking-own{% endif %}">
+            <span class="ranking-rank">{{ row.rank }}.</span>
+            {% avatar row.profile 32 %}
+            <a href="{% url 'accounts:participant_detail' nickname=row.profile.nickname %}">{{ row.profile.nickname }}</a>{% if row.profile.user_id == user.pk %} <span class="help">(du)</span>{% endif %}
+            <span class="task-status">Level {{ row.level }} · {{ row.points }} Punkt{{ row.points|pluralize:"e" }}</span>
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p class="help">In diesem Thema hat noch niemand Punkte.</p>
+    {% endif %}
+    {% if ranking.without_points and ranking.rows %}
+      <p class="help">{{ ranking.without_points }} weitere Teilnehmende haben hier noch keine Punkte.</p>
+    {% endif %}
+  {% else %}
+    <p>Noch keine Themen mit Aufgaben.</p>
+  {% endif %}
+{% endblock %}
