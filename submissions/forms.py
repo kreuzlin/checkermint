@@ -1,0 +1,94 @@
+from django import forms
+from django.core.exceptions import ValidationError
+
+from .handlers import handler_for
+
+
+def field_name(requirement, suffix: str) -> str:
+    return requirement.key if not suffix else f"{requirement.key}-{suffix}"
+
+
+class RequirementRow:
+    """One requirement in the form, for the template."""
+
+    def __init__(self, requirement, handler, fields):
+        self.requirement = requirement
+        self.handler = handler
+        self.fields = fields  # bound fields, filled by the form
+
+    @property
+    def is_supported(self) -> bool:
+        return self.handler is not None
+
+
+class SubmissionForm(forms.Form):
+    """Fields for all requirements of a version, built by their handlers.
+
+    `previous` maps requirement ids to the items stored so far (the draft,
+    or the last submission when resubmitting). After `is_valid()`,
+    `items` maps requirement ids to the item dicts to store.
+    """
+
+    def __init__(self, requirements, previous=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.requirements = list(requirements)
+        self.previous = previous or {}
+        self.items: dict[int, list[dict]] = {}
+        self.rows: list[RequirementRow] = []
+        for requirement in self.requirements:
+            handler = handler_for(requirement)
+            names = []
+            if handler is not None:
+                stored = self.previous.get(requirement.pk, [])
+                initial = handler.initial(requirement, stored)
+                for suffix, field in handler.form_fields(requirement).items():
+                    name = field_name(requirement, suffix)
+                    self.fields[name] = field
+                    if suffix in initial:
+                        self.initial[name] = initial[suffix]
+                    names.append(name)
+            self.rows.append(RequirementRow(requirement, handler, names))
+
+    def bound_rows(self):
+        for row in self.rows:
+            yield row, [self[name] for name in row.fields]
+
+    def clean(self):
+        cleaned = super().clean()
+        for row in self.rows:
+            if row.handler is None:
+                continue
+            requirement = row.requirement
+            part = {
+                name.removeprefix(requirement.key).removeprefix("-"): cleaned.get(name)
+                for name in row.fields
+            }
+            try:
+                self.items[requirement.pk] = row.handler.clean(
+                    requirement, part, self.previous.get(requirement.pk, [])
+                )
+            except ValidationError as error:
+                self.add_error(
+                    row.fields[-1] if part.get("datei") else row.fields[0], error
+                )
+        return cleaned
+
+    def unsupported_required(self):
+        """Required requirements whose type cannot be submitted yet."""
+        return [
+            row.requirement
+            for row in self.rows
+            if row.handler is None and row.requirement.required
+        ]
+
+    def check_complete(self) -> bool:
+        """For "Einreichen": adds an error to every incomplete requirement."""
+        complete = not self.unsupported_required()
+        for row in self.rows:
+            if row.handler is None:
+                continue
+            items = self.items.get(row.requirement.pk, [])
+            if not row.handler.is_complete(row.requirement, items):
+                self.add_error(row.fields[0], "Das fehlt noch.")
+                complete = False
+        return complete

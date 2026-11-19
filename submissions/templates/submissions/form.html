@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <p><a href="{% url 'tasks:task_detail' slug=task.slug %}">← Zurück zur Aufgabe</a></p>
+  <h1>Lösung: {{ version.title }}</h1>
+  <p class="help">Version {{ version.number }}{% if draft %} · Entwurf zuletzt gespeichert{% endif %}</p>
+
+  <form method="post" enctype="multipart/form-data" class="form submission-form" novalidate>
+    {% csrf_token %}
+    {% include "accounts/_form_errors.html" %}
+    {% for row, fields in form.bound_rows %}
+      <fieldset>
+        <legend>{{ row.requirement.label }}{% if not row.requirement.required %} (freiwillig){% endif %}</legend>
+        {% if row.is_supported %}
+          {% for field in fields %}{% include "accounts/_field.html" %}{% endfor %}
+        {% else %}
+          <p class="message" role="note"><strong>Kommt bald:</strong> {{ row.requirement.get_type_display }} kannst du hier noch nicht hochladen.</p>
+        {% endif %}
+      </fieldset>
+    {% endfor %}
+
+    {% if unsupported_required %}
+      <p class="message" role="note">Diese Aufgabe kannst du noch nicht einreichen, weil {{ unsupported_required|join:", " }} noch nicht hochgeladen werden kann. Deinen Entwurf kannst du speichern.</p>
+    {% endif %}
+    <p class="form-actions">
+      <button type="submit" name="aktion" value="speichern" class="button button-secondary">Entwurf speichern</button>
+      {% if not unsupported_required %}
+        <button type="submit" name="aktion" value="einreichen" class="button">Einreichen</button>
+      {% endif %}
+    </p>
+  </form>
+{% endblock %}

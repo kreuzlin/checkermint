@@ -12,7 +12,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
 | `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011), task attempts (`tasks.attempts`), catalogue `/aufgaben/` and task page `/aufgaben/<slug>/` (`tasks.catalogue`) |
 | `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder |
-| `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; read-only admin for coaches |
+| `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; requirement handlers (`submissions/handlers.py`), submission form `/aufgaben/<slug>/loesung/`; read-only admin for coaches |
 | `<app>/` | One small Django app per topic (added per project) |
 
 - Every public view sets title and meta description via `core.seo.SeoMixin`;
@@ -50,14 +50,36 @@ Overview of how the project is built and run. Decisions and their rationale:
   The pinned count per version follows with task attempts (#19).
 - Task catalogue (#20, logged-in users only): `tasks.catalogue.catalogue`
   groups visible tasks (published, not archived) by topic with a status per
-  task: `offen`, `begonnen` (attempt exists) or `gesperrt` (participant's
-  level in the topic below `min_level`; coaches see no locks). Levels come
+  task: `eingereicht` (latest submission waits for a coach), `geloest`
+  (any approved submission, with the best stars), `ueberarbeiten` (needs
+  revision), `begonnen` (attempt exists), `offen` or `gesperrt`
+  (participant's level in the topic below `min_level`; coaches see no
+  locks). Levels come
   from `points_by_topic`, which returns no points until #33. Locked tasks
   are listed without a link; their page shows only the title and the
   required level. The task page shows the version from
   `tasks.attempts.visible_version` and the number of hints (not their
   text); "Aufgabe starten" (POST `/aufgaben/<slug>/starten/`) calls
   `start_attempt`. Coaches see the latest version and cannot start tasks.
+  Below the instructions the participant sees their own submissions with
+  status, stars, feedback and "Version N".
+- Submissions (#23, ADR 0011): every requirement type has a handler in
+  `submissions.handlers` (form fields, validation into item dicts,
+  completeness, display template); `SubmissionForm` builds its fields from
+  the version's requirements, `submissions.services` saves the draft
+  (starting the task, at most one draft) and submits it. "Entwurf
+  speichern" stores without completeness checks, "Einreichen" saves and
+  then submits only if every required part is there. While a submission
+  waits for a coach there is no new draft; after a review the next draft
+  starts from the last submission's content. `text` is plain text
+  (escaped, line breaks kept); `code` is pasted or uploaded as a UTF-8
+  text file (max. 200 KB, stored as text with the original file name, no
+  file kept) and highlighted with Pygments (style `xcode`, all colours
+  WCAG AA; CSS generated into `submissions/static/submissions/css/code.css`,
+  the command is in the file). Requirement `options` for code:
+  `language` (Pygments name) and `extensions` (allowed endings). Types
+  without a handler (photo, file until #24) are shown as "Kommt bald"; a
+  version that requires one can only be saved as a draft.
 - Private uploads (ADR 0009): models store files with
   `core.private_files.RandomUploadPath` (UUID names) and register a
   `PrivateFileKind` (owner model, file getter, access check, inline or
