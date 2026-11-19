@@ -12,7 +12,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
 | `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011), task attempts (`tasks.attempts`), catalogue `/aufgaben/` and task page `/aufgaben/<slug>/` (`tasks.catalogue`) |
 | `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder |
-| `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; requirement handlers (`submissions/handlers.py`), submission form `/aufgaben/<slug>/loesung/`, version switch `/aufgaben/<slug>/wechseln/`, history `/verlauf/` (`submissions.history`), phone upload `/hochladen/<token>/` (`submissions.upload_links`); read-only admin for coaches |
+| `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; requirement handlers (`submissions/handlers.py`), submission form `/aufgaben/<slug>/loesung/`, version switch `/aufgaben/<slug>/wechseln/`, history `/verlauf/` (`submissions.history`), coach queue `/warteschlange/` (`submissions.queue`), phone upload `/hochladen/<token>/` (`submissions.upload_links`); read-only admin for coaches |
 | `<app>/` | One small Django app per topic (added per project) |
 
 - Every public view sets title and meta description via `core.seo.SeoMixin`;
@@ -126,6 +126,14 @@ Overview of how the project is built and run. Decisions and their rationale:
   refused. The participant submits. Coach views use
   `accounts.mixins.CoachRequiredMixin` (login, then 403 for non-coaches).
   Items do not record who uploaded them.
+- Coach queue (#31): `/warteschlange/` ("Warteschlange" in the
+  navigation, coaches only: `NavItem(coaches_only=True)`) lists
+  `submissions.queue.queue_entries()`: submitted, unreviewed submissions of
+  active participants, oldest first, with participant (nickname and real
+  name), topic, task, version, waiting time and a "erneut eingereicht"
+  marker. Until the review form exists (#32) each entry links to the
+  read-only submission admin. Hint requests join as a second entry kind
+  with #37.
 - Private uploads (ADR 0009): models store files with
   `core.private_files.RandomUploadPath` (UUID names) and register a
   `PrivateFileKind` (owner model, file getter, access check, inline or

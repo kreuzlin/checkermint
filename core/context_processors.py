@@ -3,6 +3,8 @@
 from django.conf import settings
 from django.urls import reverse
 
+from accounts.roles import is_coach
+
 from .navigation import MAIN_NAVIGATION
 
 
@@ -10,6 +12,7 @@ def site(request):
     current = request.resolver_match
     current_name = current.view_name if current else None
     logged_in = request.user.is_authenticated
+    coach = is_coach(request.user)
     nav_items = [
         {
             "label": item.label,
@@ -17,7 +20,7 @@ def site(request):
             "active": item.url_name == current_name,
         }
         for item in MAIN_NAVIGATION
-        if logged_in or not item.members_only
+        if (logged_in or not item.members_only) and (coach or not item.coaches_only)
     ]
     return {
         "site_name": settings.SITE_NAME,
