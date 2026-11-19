@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Notify participants about reviews and hint decisions")_
+_Last updated: 2026-11-19 (PR "Record privacy mailbox in status")_
 
 ## Live
 
@@ -251,7 +251,8 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #47: privacy page `/datenschutz/` and imprint `/impressum/`, linked in
   the footer of every page (and from the landing page). Operator:
   "Verein Robotik Talente (VRoboT)" (name as on vrobot.ch), contact
-  `privacy@checkermint.ch` (maintainer's decision, 2026-11-19), server at
+  `privacy@checkermint.ch` (maintainer's decision, 2026-11-19; mailbox
+  created by the maintainer the same day), server at
   UpCloud in Germany, mail via Hostpoint. Both live in `settings.py`
   (`CLUB_NAME`, `PRIVACY_EMAIL`); the "Stand" date in
   `core.views.PRIVACY_UPDATED`. The imprint has no postal address yet.
@@ -289,7 +290,6 @@ Overview: `gh issue list`. At the time of writing:
 | 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
 | 77 | Show who uploaded a submission item (follow-up to #30; migration) | Claude Code |
 | 97 | Rotate container logs on the server (the privacy page says logs are deleted regularly) | Maintainer (server PR) |
-| – | Create the mailbox or alias `privacy@checkermint.ch` (Hostpoint, with #3) | Maintainer |
 
 ## Next steps
 
