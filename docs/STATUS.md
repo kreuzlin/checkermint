@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Show uploaded photos live in the draft")_
+_Last updated: 2026-11-19 (PR "Let coaches upload on behalf of participants")_
 
 ## Live
 
@@ -145,6 +145,11 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #29: htmx 2.0.4 vendored (`core/static/core/js/`, provenance and SHA-512
   in `docs/vendored-assets.md`); the form polls the stored photos/files
   every 5 s while a draft exists (204 when unchanged).
+- #30: coaches add photos and files to a participant's draft from the
+  participant profile ("Fotos oder Dateien für … hochladen"); the draft is
+  created if needed, the participant submits. Milestone M5 complete.
+  Open point: items do not record whether a coach uploaded them (would
+  need a migration; ask the maintainer if wanted).
 
 ## Open issues
 
@@ -160,8 +165,8 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. Next: #30 coach uploads on behalf of participants (completes M5), then
-   M6 review and progress (#31–#35).
+1. Next: M6 review and progress: #31 coach queue, #32 review form, #33
+   points and levels, #34 badges, #35 participant dashboard.
 2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes, added with #28), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +

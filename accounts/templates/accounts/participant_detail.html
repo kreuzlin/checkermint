@@ -18,6 +18,10 @@
     {% endif %}
   </dl>
 
+  {% if viewer_is_coach %}
+    <p><a href="{% url 'submissions:coach_upload_choose' nickname=profile.nickname %}">Fotos oder Dateien für {{ profile.nickname }} hochladen</a></p>
+  {% endif %}
+
   <h2>Über mich</h2>
   {% if profile.about %}
     <div class="prose">{{ profile.about|markdown }}</div>

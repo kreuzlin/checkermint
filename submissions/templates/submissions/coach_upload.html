@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <p><a href="{% url 'submissions:coach_upload_choose' nickname=participant.profile.nickname %}">← Andere Aufgabe wählen</a></p>
+  <h1>{{ version.title }}</h1>
+  <p>Hochladen für <strong>{{ participant.profile.nickname }}</strong> <span class="help">· Version {{ version.number }}{% if not draft %} · noch kein Entwurf, er entsteht beim ersten Hochladen{% endif %}</span></p>
+  <p class="help">Die Dateien landen im Entwurf; einreichen muss {{ participant.profile.nickname }} selbst.</p>
+
+  <form method="post" enctype="multipart/form-data" class="form" novalidate>
+    {% csrf_token %}
+    {% include "accounts/_form_errors.html" %}
+    {% for requirement, stored, field in form.bound_rows %}
+      <fieldset>
+        <legend>{{ requirement.label }}</legend>
+        {% include "submissions/fields/_stored.html" with items=stored checked="" live=False %}
+        <p class="help">Gespeichert: {{ stored|length }} von höchstens {{ requirement.max_count }}.</p>
+        {% include "accounts/_field.html" %}
+      </fieldset>
+    {% endfor %}
+    <p class="form-actions"><button type="submit" class="button">Hochladen</button></p>
+  </form>
+{% endblock %}

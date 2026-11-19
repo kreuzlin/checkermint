@@ -181,3 +181,22 @@ def add_to_draft(draft: Submission, items: dict[int, list]) -> None:
             raise SubmissionNotAllowed("Dieser Entwurf ist schon eingereicht.")
         for requirement_id, values in items.items():
             store_items(locked.user, locked, requirement_id, values)
+
+
+def ensure_draft(user, task) -> Submission:
+    """The participant's draft, created if needed (e.g. for a coach upload).
+
+    A new draft starts the task and, like the form, starts from the last
+    submission against the same version (copies of all its items).
+    """
+    with transaction.atomic():
+        draft = get_draft(user, task)
+        if draft is not None:
+            return draft
+        if is_waiting(user, task):
+            raise SubmissionNotAllowed("Die Lösung wartet noch auf einen Coach.")
+        version = start_attempt(user, task).task_version
+        previous = starting_content(user, task, version)
+        return save_draft(
+            user, task, {pk: list(items) for pk, items in previous.items()}
+        )

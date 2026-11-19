@@ -18,6 +18,16 @@ urlpatterns = [
     ),
     path("verlauf/", views.HistoryView.as_view(), name="history"),
     path(
+        "teilnehmende/<str:nickname>/hochladen/",
+        views.CoachUploadChooseView.as_view(),
+        name="coach_upload_choose",
+    ),
+    path(
+        "teilnehmende/<str:nickname>/hochladen/<slug:slug>/",
+        views.CoachUploadView.as_view(),
+        name="coach_upload",
+    ),
+    path(
         "hochladen/<str:token>/",
         views.PhoneUploadView.as_view(),
         name="phone_upload",
