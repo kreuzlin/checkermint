@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "submissions",
     "hints",
     "overviews",
+    "notifications",
 ]
 
 MIDDLEWARE = [

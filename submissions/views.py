@@ -8,6 +8,7 @@ from django.views.generic import TemplateView, View
 from accounts.mixins import CoachRequiredMixin
 from accounts.roles import is_coach
 from core.seo import SeoMixin
+from notifications.emails import notify_coaches_of_submission
 from tasks.attempts import visible_version
 from tasks.catalogue import Status, catalogue, task_for, visible_tasks
 from tasks.models import Topic
@@ -136,11 +137,15 @@ class SubmissionView(LoginRequiredMixin, SeoMixin, TemplateView):
                 "Schau dir die markierten Felder an.",
             )
             return self.render_to_response(self.get_context_data(form=form))
+        resubmission = Submission.objects.filter(
+            user=request.user, task=self.task, submitted_at__isnull=False
+        ).exists()
         try:
-            submit(draft)
+            submitted = submit(draft)
         except SubmissionNotAllowed as error:
             messages.error(request, str(error))
         else:
+            notify_coaches_of_submission(request, submitted, resubmission)
             messages.success(
                 request, "Super, deine Lösung ist eingereicht! Ein Coach schaut sie an."
             )

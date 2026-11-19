@@ -1,0 +1,1 @@
+{% autoescape off %}{% if resubmission %}Erneut eingereicht{% else %}Neue Lösung{% endif %}: {{ title }} von {{ nickname }}{% endautoescape %}
