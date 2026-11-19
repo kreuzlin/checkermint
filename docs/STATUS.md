@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Add QR code upload links and mobile upload page")_
+_Last updated: 2026-11-19 (PR "Show uploaded photos live in the draft")_
 
 ## Live
 
@@ -141,7 +141,10 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #28: QR code in the submission form (once a draft exists) with a signed
   link valid 30 minutes; the phone page `/hochladen/<token>/` adds photos
   and files to the draft without login (same image pipeline). The other
-  device sees them after a reload until #29 adds polling.
+  device sees them without a reload since #29.
+- #29: htmx 2.0.4 vendored (`core/static/core/js/`, provenance and SHA-512
+  in `docs/vendored-assets.md`); the form polls the stored photos/files
+  every 5 s while a draft exists (204 when unchanged).
 
 ## Open issues
 
@@ -157,8 +160,8 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. Next: #29 live update of the draft (htmx polling), then #30 coach
-   uploads.
+1. Next: #30 coach uploads on behalf of participants (completes M5), then
+   M6 review and progress (#31–#35).
 2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes, added with #28), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +

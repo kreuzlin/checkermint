@@ -109,6 +109,13 @@ Overview of how the project is built and run. Decisions and their rationale:
   thumbnails), sends `no-referrer`, and only adds photos/files (same
   handlers and image pipeline, `max_count` respected); invalid or expired
   links answer 410.
+- Live update (#29): with a draft, the form loads htmx (vendored, see
+  [`vendored-assets.md`](vendored-assets.md)) and every stored-items block
+  of a photo/file requirement polls
+  `/aufgaben/<slug>/loesung/gespeichert/<key>/?stand=<ids>` every 5 s. The
+  server answers 204 if the item ids are unchanged, the new block (keeping
+  ticked "Entfernen" boxes) if not, and 286 (htmx stops polling) when
+  there is no draft any more or the user may not see it.
 - Private uploads (ADR 0009): models store files with
   `core.private_files.RandomUploadPath` (UUID names) and register a
   `PrivateFileKind` (owner model, file getter, access check, inline or

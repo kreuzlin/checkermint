@@ -1,16 +1,17 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 
 from accounts.roles import is_coach
 from core.seo import SeoMixin
 from tasks.attempts import visible_version
 from tasks.catalogue import Status, task_for
 
-from .forms import PhoneUploadForm, SubmissionForm
-from .handlers import UploadHandler
+from .forms import PhoneUploadForm, SubmissionForm, stored_signature
+from .handlers import UploadHandler, handler_for
 from .history import history_events
 from .services import (
     SubmissionNotAllowed,
@@ -236,3 +237,41 @@ class PhoneUploadView(SeoMixin, TemplateView):
                 else f"{count} Dateien sind hochgeladen.",
             )
         return redirect(request.path)
+
+
+STOP_POLLING = 286  # htmx stops polling on this status
+
+
+class StoredItemsView(LoginRequiredMixin, View):
+    """htmx: the stored photos/files of one requirement of the draft, or 204
+    if nothing changed since `stand` (brief 5.7, #29)."""
+
+    http_method_names = ["get"]
+
+    def get(self, request, slug, key):
+        user = request.user
+        task, _, state = task_for(user, slug)
+        draft = get_draft(user, task)
+        if is_coach(user) or state.is_locked or draft is None:
+            return HttpResponse(status=STOP_POLLING)
+        requirement = draft.task_version.requirements.filter(key=key).first()
+        if requirement is None or not isinstance(
+            handler_for(requirement), UploadHandler
+        ):
+            return HttpResponse(status=STOP_POLLING)
+        items = items_by_requirement(draft).get(requirement.pk, [])
+        signature = stored_signature(items)
+        if request.GET.get("stand") == signature:
+            return HttpResponse(status=204)
+        return render(
+            request,
+            "submissions/fields/_stored.html",
+            {
+                "task": task,
+                "requirement": requirement,
+                "items": items,
+                "checked": request.GET.getlist(f"{key}-entfernen"),
+                "signature": signature,
+                "live": True,
+            },
+        )
