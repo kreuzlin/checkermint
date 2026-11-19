@@ -13,6 +13,7 @@ dependencies = [
     "psycopg[binary]>=3.3.9",
     "pygments>=2.21.0",
     "robohash>=2.0",
+    "segno>=1.6.6",
     "whitenoise>=6.12.0",
 ]
 

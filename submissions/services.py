@@ -171,3 +171,13 @@ def submit(draft: Submission) -> Submission:
         draft.submitted_at = timezone.now()
         draft.save(update_fields=["status", "submitted_at"])
         return draft
+
+
+def add_to_draft(draft: Submission, items: dict[int, list]) -> None:
+    """Store uploads from the phone page in the draft (still a draft?)."""
+    with transaction.atomic():
+        locked = Submission.objects.select_for_update().filter(pk=draft.pk).first()
+        if locked is None or not locked.is_draft:
+            raise SubmissionNotAllowed("Dieser Entwurf ist schon eingereicht.")
+        for requirement_id, values in items.items():
+            store_items(locked.user, locked, requirement_id, values)

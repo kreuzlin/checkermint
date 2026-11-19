@@ -12,7 +12,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
 | `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011), task attempts (`tasks.attempts`), catalogue `/aufgaben/` and task page `/aufgaben/<slug>/` (`tasks.catalogue`) |
 | `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder |
-| `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; requirement handlers (`submissions/handlers.py`), submission form `/aufgaben/<slug>/loesung/`, version switch `/aufgaben/<slug>/wechseln/`, history `/verlauf/` (`submissions.history`); read-only admin for coaches |
+| `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; requirement handlers (`submissions/handlers.py`), submission form `/aufgaben/<slug>/loesung/`, version switch `/aufgaben/<slug>/wechseln/`, history `/verlauf/` (`submissions.history`), phone upload `/hochladen/<token>/` (`submissions.upload_links`); read-only admin for coaches |
 | `<app>/` | One small Django app per topic (added per project) |
 
 - Every public view sets title and meta description via `core.seo.SeoMixin`;
@@ -99,6 +99,16 @@ Overview of how the project is built and run. Decisions and their rationale:
   (`submissions.switching.plan_switch`); the POST switches only to the
   confirmed version (`switch_version`), replacing the draft with one on the
   new version.
+- Phone upload (#28, brief 5.7): with a draft and photo or file
+  requirements, the form shows a QR code (`segno`, inline SVG, generated
+  locally) for `/hochladen/<token>/`. The token is signed with Django's
+  signing (`submissions.upload_links`, salt `submissions.upload-link`),
+  holds submission and user id, is valid 30 minutes and only while that
+  submission is still the participant's draft. The page needs no login,
+  shows only the task title and requirement labels (no names, no
+  thumbnails), sends `no-referrer`, and only adds photos/files (same
+  handlers and image pipeline, `max_count` respected); invalid or expired
+  links answer 410.
 - Private uploads (ADR 0009): models store files with
   `core.private_files.RandomUploadPath` (UUID names) and register a
   `PrivateFileKind` (owner model, file getter, access check, inline or

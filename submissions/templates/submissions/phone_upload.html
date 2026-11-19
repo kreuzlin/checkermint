@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block extra_head %}<meta name="referrer" content="no-referrer">{% endblock %}
+
+{% block content %}
+  <h1>Fotos hochladen</h1>
+  <p>Für die Lösung zu «{{ draft.task_version.title }}». Was du hier hochlädst, landet direkt im Entwurf.</p>
+
+  <form method="post" enctype="multipart/form-data" class="form phone-upload" novalidate>
+    {% csrf_token %}
+    {% include "accounts/_form_errors.html" %}
+    {% for requirement, stored, field in form.bound_rows %}
+      <fieldset>
+        <legend>{{ requirement.label }}</legend>
+        <p class="help">Schon gespeichert: {{ stored|length }} von höchstens {{ requirement.max_count }}.</p>
+        {% include "accounts/_field.html" %}
+      </fieldset>
+    {% empty %}
+      <p>Bei dieser Aufgabe gibt es nichts hochzuladen.</p>
+    {% endfor %}
+    {% if form.rows %}<p class="form-actions"><button type="submit" class="button">Hochladen</button></p>{% endif %}
+  </form>
+  <p class="help">Fertig? Dann mach auf dem anderen Gerät weiter. Dieser Link gilt 30 Minuten ab dem Anzeigen des QR-Codes.</p>
+{% endblock %}

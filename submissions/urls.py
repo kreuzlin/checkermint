@@ -12,4 +12,9 @@ urlpatterns = [
         name="switch",
     ),
     path("verlauf/", views.HistoryView.as_view(), name="history"),
+    path(
+        "hochladen/<str:token>/",
+        views.PhoneUploadView.as_view(),
+        name="phone_upload",
+    ),
 ]
