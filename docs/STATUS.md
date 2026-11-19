@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Add coach queue for submissions")_
+_Last updated: 2026-11-19 (PR "Add demo data command for local development")_
 
 ## Live
 
@@ -41,7 +41,7 @@ _Last updated: 2026-11-19 (PR "Add coach queue for submissions")_
 
 Runbook: [`deployment.md`](deployment.md). Architecture:
 [`architecture.md`](architecture.md). Decisions: [`decisions/`](decisions/)
-(project-specific: 0009–0015).
+(project-specific: 0009–0016).
 
 ## Done (version 1)
 
@@ -159,6 +159,13 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   resubmission marker. Entries link to the read-only submission admin
   until the review form (#32) replaces the link; hint requests join with
   #37.
+- Demo data for local development: `manage.py seed_demo` (only with
+  `DEBUG`; `--reset`, `--remove`, password given or generated, see README).
+  Covers every submission state, a resubmission, a task with two versions,
+  a locked task and an unpublished draft. Extended with each feature
+  (badges #34, hint requests #36). ADR 0016: deleting demo data bypasses
+  the version immutability of ADR 0010 for demo tasks only. The coach queue now shows
+  "Wartezeit: …" (was "wartet seit 2 Tage", wrong case).
 - 2026-11-19: on the maintainer's one-time instruction, Claude merged #73
   (Caddy upload limit, a server change) itself. The merge exceptions in
   CLAUDE.md stay in force: PRs with migrations or server/deployment
