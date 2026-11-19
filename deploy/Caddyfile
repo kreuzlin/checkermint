@@ -22,11 +22,25 @@
 		-Server
 	}
 
+	# Upload limit for a whole request (brief 5.7), e.g. several photos of
+	# one submission. Django limits each file (UPLOAD_MAX_PHOTO_MB,
+	# UPLOAD_MAX_FILE_MB) and warns if this limit is smaller than one file.
+	request_body {
+		max_size {$UPLOAD_MAX_REQUEST_MB:100}MB
+	}
+
 	# Everything, including /static/ (served by WhiteNoise). Uploaded files
 	# are private and only served by Django after an access check
 	# (ADR 0009); Caddy has no access to the media volume.
 	handle {
 		reverse_proxy web:8000
+	}
+
+	# Too large: a short German message instead of an empty page.
+	handle_errors 413 {
+		header Content-Type "text/plain; charset=utf-8"
+		header X-Robots-Tag "noindex, nofollow"
+		respond "Das ist zu viel auf einmal (höchstens {$UPLOAD_MAX_REQUEST_MB:100} MB pro Speichern). Geh zurück und lade weniger oder kleinere Dateien auf einmal hoch." 413
 	}
 
 	log {

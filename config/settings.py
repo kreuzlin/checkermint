@@ -129,6 +129,9 @@ MEDIA_ROOT = env.path("MEDIA_ROOT", default=BASE_DIR / "media")
 # request on top of this (#25).
 UPLOAD_MAX_PHOTO_MB = env.int("UPLOAD_MAX_PHOTO_MB", default=15)
 UPLOAD_MAX_FILE_MB = env.int("UPLOAD_MAX_FILE_MB", default=20)
+# Limit per request, enforced by Caddy (deploy/Caddyfile); known here for
+# the startup check and the help texts.
+UPLOAD_MAX_REQUEST_MB = env.int("UPLOAD_MAX_REQUEST_MB", default=100)
 
 # Static files get hashed names and are pre-compressed at build time, so they
 # can be cached forever. The manifest only exists after collectstatic (image

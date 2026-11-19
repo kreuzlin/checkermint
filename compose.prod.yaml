@@ -47,6 +47,8 @@ services:
       SITE_ADDRESS: ${SITE_ADDRESS}
       # Default: a harmless placeholder, so Caddy starts without redirects.
       REDIRECT_ADDRESSES: ${REDIRECT_ADDRESSES:-http://localhost}
+      # Upload limit per request in MB (deploy/Caddyfile); see .env.example.
+      UPLOAD_MAX_REQUEST_MB: ${UPLOAD_MAX_REQUEST_MB:-100}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       # Optional server-specific snippets (e.g. Basic Auth), not in git.

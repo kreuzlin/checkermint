@@ -151,8 +151,15 @@ affected containers:
 
 ```bash
 docker compose -f compose.prod.yaml up -d --force-recreate web    # Django settings
-docker compose -f compose.prod.yaml up -d --force-recreate caddy  # SITE_ADDRESS, REDIRECT_ADDRESSES
+docker compose -f compose.prod.yaml up -d --force-recreate caddy  # SITE_ADDRESS, REDIRECT_ADDRESSES, UPLOAD_MAX_REQUEST_MB
 ```
+
+Upload limits: `UPLOAD_MAX_PHOTO_MB` and `UPLOAD_MAX_FILE_MB` (per file,
+Django, recreate `web`) and `UPLOAD_MAX_REQUEST_MB` (per request, Caddy,
+recreate `caddy` and `web`, which shows the value in help texts). All have
+defaults (15, 20, 100); `python manage.py check` warns (`submissions.W001`)
+if the request limit is smaller than a file limit. Too large requests get
+a 413 with a short German message from Caddy.
 
 ## 4. Deploying updates
 
