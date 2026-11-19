@@ -16,6 +16,7 @@
     <h2>Deine Lösung</h2>
     {% if is_coach %}
       <p class="help">Als Coach siehst du die neuste veröffentlichte Version. Lösungen bewertest du in der Warteschlange.</p>
+      <p><a href="{% url 'overviews:task' slug=task.slug %}">Auswertung: wer sie gelöst hat, Hinweise, Versionen</a></p>
     {% else %}
       {% if attempt %}<p class="help">Begonnen am {{ attempt.started_at|date:"j. F Y" }}.</p>{% endif %}
       {% if is_waiting %}
