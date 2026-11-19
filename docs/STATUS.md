@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Record privacy mailbox in status")_
+_Last updated: 2026-11-19 (PR "Use mail@checkermint.ch as sender address")_
 
 ## Live
 
@@ -34,7 +34,7 @@ _Last updated: 2026-11-19 (PR "Record privacy mailbox in status")_
 | Deploy | `scripts/deploy.sh` on the server after CI has pushed the image for the merged commit |
 | Backups | cron 02:00 `scripts/backup-db.sh` (14 days in `backups/`), UpCloud backup _daily at …_; must include the `media` volume (ADR 0009) |
 | Cron | _scheduled jobs_ |
-| Mail | Hostpoint SMTP, sender `coach@checkermint.ch` (#3) |
+| Mail | Hostpoint SMTP, sender `mail@checkermint.ch` (mailbox created by the maintainer 2026-11-19, replaces the planned `coach@`; SMTP setup open, #3) |
 | DNS | Hostpoint; only apex and `www` of checkermint.ch are changed (#2) |
 | CI | GitHub Actions: lint + tests, `linux/amd64` image to `ghcr.io/kreuzlin/checkermint` (`latest`, `sha-<commit>`) on `main`; runs on `main` are queued, never cancelled |
 | GitHub | Squash merge only (PR title/body), auto-merge, head branches deleted; ruleset "protect main" active (PR, CI checks, no force push/deletion); labels `ops`, `content`, `bug`, `enhancement` |
@@ -285,7 +285,7 @@ Overview: `gh issue list`. At the time of writing:
 |---|---|---|
 | 1 | Production server (UpCloud), SSH target, backups, GHCR visibility | Maintainer |
 | 2 | DNS for checkermint.ch (apex and `www` only) | Maintainer |
-| 3 | Outgoing mail `coach@checkermint.ch` (Hostpoint SMTP) | Maintainer |
+| 3 | Outgoing mail `mail@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Badge artwork (logo and colours delivered) | Maintainer |
 | 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
 | 77 | Show who uploaded a submission item (follow-up to #30; migration) | Claude Code |
