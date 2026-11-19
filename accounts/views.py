@@ -161,6 +161,7 @@ class ParticipantDetailView(LoginRequiredMixin, SeoMixin, DetailView):
         is_own = self.object.user_id == user.pk
         context["is_own"] = is_own
         context["show_email"] = is_own or is_coach(user)
+        context["viewer_is_coach"] = is_coach(user)
         return context
 
 

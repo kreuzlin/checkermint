@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <p><a href="{% url 'accounts:participant_detail' nickname=participant.profile.nickname %}">← {{ participant.profile.nickname }}</a></p>
+  <h1>Hochladen für {{ participant.profile.nickname }}</h1>
+  <p>Wähle die Aufgabe. Fotos und Dateien landen im Entwurf von {{ participant.profile.nickname }}; einreichen muss {{ participant.profile.nickname }} selbst.</p>
+
+  {% if entries %}
+    <ul class="task-list">
+      {% for entry in entries %}
+        <li class="task-item{% if entry.is_locked %} task-locked{% endif %}">
+          {% if entry.is_locked or entry.status.value == "eingereicht" %}
+            <span class="task-title">{{ entry.version.title }}</span>
+          {% else %}
+            <a class="task-title" href="{% url 'submissions:coach_upload' nickname=participant.profile.nickname slug=entry.task.slug %}">{{ entry.version.title }}</a>
+          {% endif %}
+          <span class="task-status">{{ entry.task.topic }} · {% if entry.is_locked %}Gesperrt – ab Level {{ entry.task.min_level }}{% else %}{{ entry.status.label }}{% endif %}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Keine Aufgabe verlangt Fotos oder Dateien.</p>
+  {% endif %}
+{% endblock %}

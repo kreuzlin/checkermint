@@ -2,13 +2,14 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import TemplateView, View
 
+from accounts.mixins import CoachRequiredMixin
 from accounts.roles import is_coach
 from core.seo import SeoMixin
 from tasks.attempts import visible_version
-from tasks.catalogue import Status, task_for
+from tasks.catalogue import Status, catalogue, task_for
 
 from .forms import PhoneUploadForm, SubmissionForm, stored_signature
 from .handlers import UploadHandler, handler_for
@@ -16,6 +17,7 @@ from .history import history_events
 from .services import (
     SubmissionNotAllowed,
     add_to_draft,
+    ensure_draft,
     get_draft,
     items_by_requirement,
     save_draft,
@@ -275,3 +277,117 @@ class StoredItemsView(LoginRequiredMixin, View):
                 "live": True,
             },
         )
+
+
+def participant_or_404(nickname):
+    from accounts.views import participant_profiles
+
+    return get_object_or_404(participant_profiles(), nickname__iexact=nickname).user
+
+
+def has_uploads(version) -> bool:
+    return any(
+        isinstance(handler_for(r), UploadHandler) for r in version.requirements.all()
+    )
+
+
+class CoachUploadChooseView(CoachRequiredMixin, SeoMixin, TemplateView):
+    """Coach: pick a task to add photos/files for a participant (#30)."""
+
+    template_name = "submissions/coach_upload_choose.html"
+    meta_description = "Fotos und Dateien für Teilnehmende hochladen."
+
+    def get_page_title(self):
+        return f"Hochladen für {self.participant.profile.nickname}"
+
+    def get(self, request, *args, **kwargs):
+        self.participant = participant_or_404(kwargs["nickname"])
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        entries = []
+        for section in catalogue(self.participant):
+            for entry in section.entries:
+                if has_uploads(entry.version):
+                    entries.append(entry)
+        context.update(participant=self.participant, entries=entries)
+        return context
+
+
+class CoachUploadView(CoachRequiredMixin, SeoMixin, TemplateView):
+    """Coach adds photos/files to a participant's draft (brief 5.7, #30).
+
+    Uses the same upload fields and image pipeline as the phone page; the
+    participant submits the solution themselves.
+    """
+
+    template_name = "submissions/coach_upload.html"
+    meta_description = "Fotos und Dateien für Teilnehmende hochladen."
+    http_method_names = ["get", "post"]
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated or not is_coach(request.user):
+            return super().dispatch(request, *args, **kwargs)
+        self.participant = participant_or_404(kwargs["nickname"])
+        self.task, _, state = task_for(self.participant, kwargs["slug"])
+        self.choose = redirect(
+            "submissions:coach_upload_choose",
+            nickname=self.participant.profile.nickname,
+        )
+        if state.is_locked:
+            messages.error(request, "Diese Aufgabe ist für diese Person noch gesperrt.")
+            return self.choose
+        if state.status is Status.SUBMITTED:
+            messages.info(request, "Die Lösung wartet schon auf einen Coach.")
+            return self.choose
+        self.version = visible_version(self.participant, self.task)
+        self.draft = get_draft(self.participant, self.task)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_page_title(self):
+        return f"Hochladen: {self.version.title}"
+
+    def make_form(self, data=None, files=None):
+        previous = (
+            items_by_requirement(self.draft)
+            if self.draft
+            else starting_content(self.participant, self.task, self.version)
+        )
+        return PhoneUploadForm(
+            self.version.requirements.all(), previous, data=data, files=files
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            participant=self.participant,
+            task=self.task,
+            version=self.version,
+            draft=self.draft,
+            form=kwargs.get("form") or self.make_form(),
+        )
+        return context
+
+    def post(self, request, *args, **kwargs):
+        try:
+            self.draft = ensure_draft(self.participant, self.task)
+        except SubmissionNotAllowed as error:
+            messages.error(request, str(error))
+            return self.choose
+        form = self.make_form(request.POST, request.FILES)
+        if not form.is_valid():
+            return self.render_to_response(self.get_context_data(form=form))
+        try:
+            add_to_draft(self.draft, form.items)
+        except SubmissionNotAllowed as error:
+            messages.error(request, str(error))
+            return self.choose
+        count = form.added_count()
+        nickname = self.participant.profile.nickname
+        messages.success(
+            request,
+            f"{count} {'Datei' if count == 1 else 'Dateien'} im Entwurf von "
+            f"{nickname} gespeichert.",
+        )
+        return redirect(request.path)

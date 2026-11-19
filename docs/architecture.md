@@ -116,6 +116,16 @@ Overview of how the project is built and run. Decisions and their rationale:
   server answers 204 if the item ids are unchanged, the new block (keeping
   ticked "Entfernen" boxes) if not, and 286 (htmx stops polling) when
   there is no draft any more or the user may not see it.
+- Coach uploads (#30): the participant profile links coaches to
+  `/teilnehmende/<nickname>/hochladen/` (tasks with photo/file
+  requirements and the participant's status) and
+  `/teilnehmende/<nickname>/hochladen/<slug>/` (same upload fields as the
+  phone page). The first upload creates the participant's draft
+  (`submissions.services.ensure_draft`: starts the task, starts from the
+  last submission like the form); locked tasks and waiting submissions are
+  refused. The participant submits. Coach views use
+  `accounts.mixins.CoachRequiredMixin` (login, then 403 for non-coaches).
+  Items do not record who uploaded them.
 - Private uploads (ADR 0009): models store files with
   `core.private_files.RandomUploadPath` (UUID names) and register a
   `PrivateFileKind` (owner model, file getter, access check, inline or
