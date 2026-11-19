@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Compute points and levels")_
+_Last updated: 2026-11-19 (PR "Let Claude merge migrations until go-live")_
 
 ## Live
 
@@ -181,6 +181,11 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   (Caddy upload limit, a server change) itself. The merge exceptions in
   CLAUDE.md stay in force: PRs with migrations or server/deployment
   changes are merged by the maintainer.
+- 2026-11-19: maintainer's decision: until the go-live (first deploy to
+  the production server, #1) Claude merges PRs with migrations itself –
+  there is no production data yet. Server and deployment PRs stay with
+  the maintainer. From the go-live on, migrations are merged by the
+  maintainer again (CLAUDE.md, Workflow).
 
 ## Open issues
 
@@ -192,17 +197,17 @@ Overview: `gh issue list`. At the time of writing:
 | 2 | DNS for checkermint.ch (apex and `www` only) | Maintainer |
 | 3 | Outgoing mail `coach@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Logo, colours and badge artwork | Maintainer |
-| 34–51 | Version 1, one issue per PR, grouped in milestones M6–M11 (brief, section 10); PRs with migrations or server changes are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
-| 77 | Show who uploaded a submission item (follow-up to #30; migration) | Claude Code, merged by the maintainer |
+| 34–51 | Version 1, one issue per PR, grouped in milestones M6–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
+| 77 | Show who uploaded a submission item (follow-up to #30; migration) | Claude Code |
 
 ## Next steps
 
 1. Next session: M6 review and progress, continuing with #34 badges
-   (migration, merged by the maintainer) and #35 participant dashboard.
+   and #35 participant dashboard.
 2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
 3. Later, not before M6: #77 show who uploaded a submission item
-   (migration, merged by the maintainer).
+   (migration).
 4. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes, added with #28), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +
@@ -214,8 +219,9 @@ Overview: `gh issue list`. At the time of writing:
   content German (Swiss spelling). See CLAUDE.md.
 - Every change via branch + PR. Claude merges its own PRs with
   `gh pr merge <N> --squash --auto` once the checks are green, verifies with
-  `gh pr view` and deploys. PRs with database migrations or server/deployment
-  changes are merged by the maintainer. Never pipe `gh` output.
+  `gh pr view` and deploys. PRs with server/deployment changes are merged
+  by the maintainer; PRs with database migrations too, but only from the
+  go-live on (until then Claude merges them). Never pipe `gh` output.
 - Content on the live site lives only in the production database, not in
   git; local data is a playground.
 - Privacy principles (brief, section 4) are hard rules.
