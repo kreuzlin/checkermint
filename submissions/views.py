@@ -14,6 +14,7 @@ from tasks.catalogue import Status, catalogue, task_for
 from .forms import PhoneUploadForm, SubmissionForm, stored_signature
 from .handlers import UploadHandler, handler_for
 from .history import history_events
+from .queue import queue_entries
 from .services import (
     SubmissionNotAllowed,
     add_to_draft,
@@ -391,3 +392,16 @@ class CoachUploadView(CoachRequiredMixin, SeoMixin, TemplateView):
             f"{nickname} gespeichert.",
         )
         return redirect(request.path)
+
+
+class CoachQueueView(CoachRequiredMixin, SeoMixin, TemplateView):
+    """Coach: everything waiting for a coach, oldest first (brief 5.10.1, #31)."""
+
+    template_name = "submissions/queue.html"
+    page_title = "Warteschlange"
+    meta_description = "Eingereichte Lösungen, die auf einen Coach warten."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["entries"] = queue_entries()
+        return context

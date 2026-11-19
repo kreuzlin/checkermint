@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Document manual test of phone upload and live update")_
+_Last updated: 2026-11-19 (PR "Add coach queue for submissions")_
 
 ## Live
 
@@ -153,6 +153,12 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - Manual test of phone upload and live update (#28, #29) with phone and
   laptop: [`manual-testing.md`](manual-testing.md). Not yet done by the
   maintainer; the htmx behaviour is so far only covered by Django tests.
+- #31: coach queue `/warteschlange/` ("Warteschlange" in the navigation,
+  coaches only): submitted solutions of active participants, oldest
+  first, with participant, topic, task, version, waiting time and a
+  resubmission marker. Entries link to the read-only submission admin
+  until the review form (#32) replaces the link; hint requests join with
+  #37.
 - 2026-11-19: on the maintainer's one-time instruction, Claude merged #73
   (Caddy upload limit, a server change) itself. The merge exceptions in
   CLAUDE.md stay in force: PRs with migrations or server/deployment
@@ -168,13 +174,13 @@ Overview: `gh issue list`. At the time of writing:
 | 2 | DNS for checkermint.ch (apex and `www` only) | Maintainer |
 | 3 | Outgoing mail `coach@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Logo, colours and badge artwork | Maintainer |
-| 6–51 | Version 1, one issue per PR, grouped in milestones M1–M11 (brief, section 10); PRs with migrations or server changes are marked and merged by the maintainer | Claude Code |
+| 32–51 | Version 1, one issue per PR, grouped in milestones M6–M11 (brief, section 10); PRs with migrations or server changes are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
 | 77 | Show who uploaded a submission item (follow-up to #30; migration) | Claude Code, merged by the maintainer |
 
 ## Next steps
 
-1. Next session: M6 review and progress, starting with #31 coach queue,
-   then #32 review form, #33 points and levels, #34 badges (migration,
+1. Next session: M6 review and progress, continuing with #32 review form
+   (replaces the admin link in the coach queue), #33 points and levels, #34 badges (migration,
    merged by the maintainer) and #35 participant dashboard.
 2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).

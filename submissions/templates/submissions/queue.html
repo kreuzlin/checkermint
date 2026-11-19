@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Warteschlange</h1>
+  <p>Alles, was auf einen Coach wartet – das Älteste zuerst.</p>
+
+  {% if entries %}
+    <ol class="task-list queue">
+      {% for entry in entries %}
+        {% with submission=entry.submission %}
+          <li class="task-item">
+            <span>
+              {# Until the review form exists (#32), the read-only admin page shows the solution. #}
+              <a class="task-title" href="{% url 'admin:submissions_submission_change' submission.pk %}">{{ submission.task_version.title }}</a>
+              <span class="help">{{ submission.task.topic }} · Version {{ submission.task_version.number }}{% if entry.is_resubmission %} · erneut eingereicht{% endif %}</span>
+            </span>
+            <span class="task-status">
+              {% if submission.user.profile %}{{ submission.user.profile.nickname }}{% if submission.user.profile.real_name %} ({{ submission.user.profile.real_name }}){% endif %}{% else %}{{ submission.user.get_username }}{% endif %}
+              · <time datetime="{{ entry.waiting_since|date:'c' }}" title="{{ entry.waiting_since|date:'j. F Y, H:i' }}">wartet seit {{ entry.waiting_since|timesince }}</time>
+            </span>
+          </li>
+        {% endwith %}
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p>Nichts zu tun – alle Lösungen sind bewertet.</p>
+  {% endif %}
+{% endblock %}
