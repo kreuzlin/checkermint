@@ -102,3 +102,59 @@ def notify_coaches_of_hint_request(request, hint_request) -> None:
         },
         coach_recipients(),
     )
+
+
+def participant_recipient(user) -> list[str]:
+    """The participant's address, if active, with an address and the
+    switch on (brief 5.11: only participants with an email address)."""
+    profile = getattr(user, "profile", None)
+    if not user.is_active or not user.email:
+        return []
+    if profile is not None and not profile.email_notifications:
+        return []
+    return [user.email]
+
+
+def notify_participant_of_review(request, submission) -> None:
+    """A coach approved the solution or asked for a revision (#44)."""
+    award = submission.badge_awards.select_related("badge").first()
+    send_after_commit(
+        "participant_review",
+        {
+            "nickname": nickname(submission.user),
+            "title": submission.task_version.title,
+            "approved": submission.status == submission.Status.APPROVED,
+            "stars": submission.stars,
+            "points": (
+                submission.task_version.base_points * submission.stars
+                if submission.stars
+                else None
+            ),
+            "feedback": submission.feedback,
+            "badge": award.badge.name if award else "",
+            "url": request.build_absolute_uri(
+                reverse("tasks:task_detail", kwargs={"slug": submission.task.slug})
+            ),
+            "profile_url": request.build_absolute_uri(reverse("accounts:profile_edit")),
+        },
+        participant_recipient(submission.user),
+    )
+
+
+def notify_participant_of_hint_decision(request, hint_request) -> None:
+    """A coach granted or declined the hint request (#44)."""
+    attempt = hint_request.task_attempt
+    send_after_commit(
+        "participant_hint_decision",
+        {
+            "nickname": nickname(attempt.user),
+            "title": hint_request.hint.task_version.title,
+            "granted": hint_request.status == hint_request.Status.GRANTED,
+            "reply": hint_request.coach_reply,
+            "url": request.build_absolute_uri(
+                reverse("tasks:task_detail", kwargs={"slug": attempt.task.slug})
+            ),
+            "profile_url": request.build_absolute_uri(reverse("accounts:profile_edit")),
+        },
+        participant_recipient(attempt.user),
+    )

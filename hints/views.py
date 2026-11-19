@@ -5,7 +5,10 @@ from django.views import View
 
 from accounts.mixins import CoachRequiredMixin
 from accounts.roles import is_coach
-from notifications.emails import notify_coaches_of_hint_request
+from notifications.emails import (
+    notify_coaches_of_hint_request,
+    notify_participant_of_hint_decision,
+)
 from tasks.attempts import TaskNotStartable
 from tasks.catalogue import task_for
 
@@ -84,6 +87,7 @@ class DecideHintView(CoachRequiredMixin, View):
         except HintRequestNotAllowed as error:
             self.hint_request.refresh_from_db()
             return self.respond(error=str(error))
+        notify_participant_of_hint_decision(request, self.hint_request)
         nickname = nickname_of(self.hint_request.task_attempt.user)
         verb = "freigegeben" if status == HintRequest.Status.GRANTED else "abgelehnt"
         return self.respond(done=f"Hinweis-Anfrage von {nickname} {verb}.")

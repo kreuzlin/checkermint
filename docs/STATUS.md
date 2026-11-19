@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Notify coaches about submissions and hint requests")_
+_Last updated: 2026-11-19 (PR "Notify participants about reviews and hint decisions")_
 
 ## Live
 
@@ -262,6 +262,10 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   one message per coach, after commit, errors only logged; coaches turn
   it off on `/profil/`. Goes to the console until SMTP is set up (#3,
   #42).
+- #44: email to participants (only with an address and the switch on)
+  when a solution is approved (stars, points, badge, feedback) or needs
+  revision, and when a hint request is granted or declined (with the
+  coach's reply).
 - 2026-11-19: on the maintainer's one-time instruction, Claude merged #73
   (Caddy upload limit, a server change) itself. The merge exceptions in
   CLAUDE.md stay in force: PRs with migrations or server/deployment
@@ -282,15 +286,17 @@ Overview: `gh issue list`. At the time of writing:
 | 2 | DNS for checkermint.ch (apex and `www` only) | Maintainer |
 | 3 | Outgoing mail `coach@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Badge artwork (logo and colours delivered) | Maintainer |
-| 42, 44, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
+| 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
 | 77 | Show who uploaded a submission item (follow-up to #30; migration) | Claude Code |
 | 97 | Rotate container logs on the server (the privacy page says logs are deleted regularly) | Maintainer (server PR) |
 | – | Create the mailbox or alias `privacy@checkermint.ch` (Hostpoint, with #3) | Maintainer |
 
 ## Next steps
 
-1. M9 (email): #44 participant notifications (console backend until
-   SMTP); #42 needs SMTP access (#3).
+1. Everything left for version 1 needs the server or the mailbox:
+   #1 server, #2 DNS, #3 mail, then #42 SMTP (completes M9), #49 media
+   backup/restore, #50 rollback and go-live, #97 log rotation.
+   Without them: #77 (who uploaded a submission item).
    Maintainer: decide whether the imprint gets a postal address.
 2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
