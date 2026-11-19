@@ -108,8 +108,11 @@ def submitted_by_task(user, tasks) -> dict[int, list[tuple[str, int | None]]]:
     return result
 
 
-def task_state(user, task: Task, level: int, started: bool, submitted=()) -> TaskState:
-    """`submitted`: (status, stars) of non-draft submissions, newest first."""
+def task_state(
+    task: Task, level: int, started: bool, submitted=(), coach: bool = False
+) -> TaskState:
+    """`submitted`: (status, stars) of non-draft submissions, newest first.
+    `coach`: coaches see every task unlocked."""
     if submitted:
         if submitted[0][0] == Submission.Status.SUBMITTED:
             return TaskState(Status.SUBMITTED)
@@ -119,7 +122,7 @@ def task_state(user, task: Task, level: int, started: bool, submitted=()) -> Tas
         return TaskState(Status.NEEDS_REVISION)
     if started:
         return TaskState(Status.STARTED)
-    if not is_coach(user) and level < task.min_level:
+    if not coach and level < task.min_level:
         return TaskState(Status.LOCKED)
     return TaskState(Status.OPEN)
 
@@ -131,11 +134,11 @@ def task_for(user, slug):
     attempt = get_attempt(user, task)
     level = levels_by_topic(user, [task.topic_id])[task.topic_id].level
     state = task_state(
-        user,
         task,
         level,
         started=attempt is not None,
         submitted=submitted_by_task(user, [task]).get(task.pk, ()),
+        coach=is_coach(user),
     )
     return task, attempt, state
 
@@ -165,6 +168,7 @@ def catalogue(user) -> list[TopicSection]:
     }
     submitted = submitted_by_task(user, tasks)
     levels = levels_by_topic(user, {task.topic_id for task in tasks})
+    coach = is_coach(user)
 
     sections: list[TopicSection] = []
     for task in tasks:
@@ -176,11 +180,11 @@ def catalogue(user) -> list[TopicSection]:
             )
         version = pinned.get(task.pk) or task.published_versions[0]
         state = task_state(
-            user,
             task,
             sections[-1].level,
             started=task.pk in pinned,
             submitted=submitted.get(task.pk, ()),
+            coach=coach,
         )
         sections[-1].entries.append(
             CatalogueEntry(task=task, version=version, state=state)

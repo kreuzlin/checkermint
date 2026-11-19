@@ -22,4 +22,5 @@ MAIN_NAVIGATION: list[NavItem] = [
     NavItem("Mein Verlauf", "submissions:history", members_only=True),
     NavItem("Teilnehmende", "accounts:participant_list", members_only=True),
     NavItem("Warteschlange", "submissions:queue", coaches_only=True),
+    NavItem("Fortschritt", "overviews:matrix", coaches_only=True),
 ]

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Fortschritt</h1>
+  <p>Alle Teilnehmenden und Aufgaben auf einen Blick. Jede Zelle zeigt den Stand in Worten; die Sterne stehen für die beste Bewertung.</p>
+
+  <form method="get" class="form matrix-filter">
+    <label for="thema">Thema</label>
+    <select id="thema" name="thema">
+      <option value="">Alle Themen</option>
+      {% for t in topics %}<option value="{{ t.slug }}"{% if t == topic %} selected{% endif %}>{{ t.name }}</option>{% endfor %}
+    </select>
+    <button type="submit" class="button button-secondary">Anzeigen</button>
+  </form>
+
+  {% if not matrix.columns %}
+    <p>Noch keine veröffentlichten Aufgaben{% if topic %} in diesem Thema{% endif %}.</p>
+  {% elif not matrix.rows %}
+    <p>Noch keine Teilnehmenden.</p>
+  {% else %}
+    <div class="matrix-scroll" role="region" aria-label="Fortschritts-Tabelle" tabindex="0">
+      <table class="matrix">
+        <caption class="visually-hidden">Fortschritt {% if topic %}im Thema {{ topic.name }}{% else %}in allen Themen{% endif %}: Teilnehmende in den Zeilen, Aufgaben in den Spalten</caption>
+        <thead>
+          <tr>
+            <th scope="col">Teilnehmer/in</th>
+            {% if topic %}<th scope="col">Level</th>{% endif %}
+            {% for column in matrix.columns %}
+              <th scope="col"><a href="{% url 'tasks:task_detail' slug=column.task.slug %}">{{ column.title }}</a>{% if not topic %}<span class="matrix-topic">{{ column.task.topic }}</span>{% endif %}<span class="matrix-topic">ab Level {{ column.task.min_level }}</span></th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in matrix.rows %}
+            <tr>
+              <th scope="row"><a href="{% url 'accounts:participant_detail' nickname=row.profile.nickname %}">{{ row.profile.nickname }}</a>{% if row.profile.real_name %}<span class="matrix-topic">{{ row.profile.real_name }}</span>{% endif %}</th>
+              {% if topic %}<td>{{ row.level }}</td>{% endif %}
+              {% for state in row.cells %}
+                <td class="matrix-cell matrix-{{ state.status.value }}">{% if state.stars %}<span class="stars" aria-hidden="true">{{ state.star_symbols }}</span> <span class="visually-hidden">{{ state.status.label }}, {{ state.stars }} von 3 Sternen</span>{% else %}{{ state.status.label }}{% endif %}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="help">Gelöst: Sterne der besten Bewertung · Eingereicht: wartet auf einen Coach · Gesperrt: Level im Thema noch zu tief. Entwürfe zählen als «Begonnen».</p>
+  {% endif %}
+{% endblock %}
