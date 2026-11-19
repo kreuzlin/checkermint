@@ -12,6 +12,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
 | `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011), task attempts (`tasks.attempts`), catalogue `/aufgaben/` and task page `/aufgaben/<slug>/` (`tasks.catalogue`) |
 | `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder |
+| `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; read-only admin for coaches |
 | `<app>/` | One small Django app per topic (added per project) |
 
 - Every public view sets title and meta description via `core.seo.SeoMixin`;

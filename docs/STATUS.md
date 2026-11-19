@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Add task catalogue and task page")_
+_Last updated: 2026-11-19 (PR "Add submission models")_
 
 ## Live
 
@@ -104,6 +104,12 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   1 everywhere until points exist (#33); the statuses eingereicht,
   Überarbeitung nötig and gelöst follow with submissions and reviews
   (#22, #32).
+- #22: app `submissions` with `Submission` (fixed published version,
+  statuses Entwurf, Eingereicht, Überarbeitung nötig, Angenommen; one
+  draft per participant and task; stars 1–3 only when approved, enforced
+  by check constraints) and `SubmissionItem` (text, private file, original
+  file name, thumbnail, data; locked once submitted). Read-only admin for
+  coaches (migrations `submissions/0001–0002`).
 
 ## Open issues
 
@@ -119,8 +125,8 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. M3 is complete with #20. Next: M4 submissions, starting with #22
-   submission models (migration, merged by the maintainer).
+1. Maintainer merges the PR for #22 (migration). Next in M4: #23
+   submission form with text and code requirements.
 2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars).
 
