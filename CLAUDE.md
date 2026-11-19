@@ -174,6 +174,8 @@ Rationale lives in `docs/decisions/`. To deviate, write a new ADR first.
   only with the `|markdown` filter (`core.markdown`: allow-list sanitising
   with nh3, no images or raw HTML). Never render user content with `|safe`.
 - Images always have an alt text field; it is required when an image is set.
+  Exception: participants' submission photos get a generated alt text
+  (ADR 0014).
 - Coaches are staff users in the group "Coach" (never superusers);
   participants are plain users without staff status. A new content model
   gets its permissions for the coach group via a data migration.

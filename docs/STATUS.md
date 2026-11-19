@@ -41,7 +41,7 @@ _Last updated: 2026-11-19 (PR "Add photo and file requirements")_
 
 Runbook: [`deployment.md`](deployment.md). Architecture:
 [`architecture.md`](architecture.md). Decisions: [`decisions/`](decisions/)
-(project-specific: 0009–0013).
+(project-specific: 0009–0014).
 
 ## Done (version 1)
 
@@ -123,6 +123,8 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   until removed, copied on resubmission; served privately to the
   participant and coaches. Size limits `UPLOAD_MAX_PHOTO_MB` /
   `UPLOAD_MAX_FILE_MB` (new in `.env.example`, defaults 15 and 20).
+  ADR 0014: code uploads stored as text, every item owns its files,
+  generated alt text for participant photos.
 
 ## Open issues
 
