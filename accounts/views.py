@@ -9,6 +9,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.decorators.http import require_GET
 from django.views.generic import DetailView, ListView, UpdateView, View
 
+from badges.awards import badges_of
 from core.seo import SeoMixin
 
 from .avatars import render_avatar
@@ -162,6 +163,7 @@ class ParticipantDetailView(LoginRequiredMixin, SeoMixin, DetailView):
         context["is_own"] = is_own
         context["show_email"] = is_own or is_coach(user)
         context["viewer_is_coach"] = is_coach(user)
+        context["badges"] = badges_of(self.object.user)
         return context
 
 

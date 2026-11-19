@@ -464,3 +464,37 @@ a.button {
   max-width: 16rem;
   margin-top: 0.25rem;
 }
+
+/* Badges: the icon is decorative, the name is always text. */
+.badge-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.badge-entry {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+}
+
+.badge-icon {
+  flex: none;
+  width: 40px;
+  height: 40px;
+}
+
+.badge-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  color: var(--accent);
+  font-size: 1.25rem;
+}
+
+.recent-badges {
+  margin-top: 2rem;
+}

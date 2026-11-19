@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Let Claude merge migrations until go-live")_
+_Last updated: 2026-11-19 (PR "Award badges and show recent badges")_
 
 ## Live
 
@@ -132,7 +132,7 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #27: history `/verlauf/` ("Mein Verlauf" in the navigation): submitted
   and reviewed events newest first, with task, topic, version, status,
   stars, feedback and the solution; archived tasks stay without a link;
-  30 events per page. Badges join with #34.
+  30 events per page. Badges joined with #34.
 - #25: Caddy limits each request to `UPLOAD_MAX_REQUEST_MB` (default 100,
   new in `.env.example` and `compose.prod.yaml`) with a German 413 message;
   startup check `submissions.W001` keeps it consistent with the per-file
@@ -170,6 +170,12 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   catalogue shows level, points and the points missing to the next level
   per topic; the task page shows the points earned. In the demo data
   RoboAnna is level 2 in Code.
+- #34: badges are awarded on approval (`UserBadge`, migrations
+  `badges/0002–0003`, merged by Claude before go-live): once per user and
+  badge, in the review transaction. "Neue Badges im Club" on the home page
+  (logged-in users only), badges on the internal profile and in the
+  history; coaches can revoke an award in the admin. Demo data: two
+  badges, three awards.
 - Demo data for local development: `manage.py seed_demo` (only with
   `DEBUG`; `--reset`, `--remove`, password given or generated, see README).
   Covers every submission state, a resubmission, a task with two versions,
@@ -197,13 +203,14 @@ Overview: `gh issue list`. At the time of writing:
 | 2 | DNS for checkermint.ch (apex and `www` only) | Maintainer |
 | 3 | Outgoing mail `coach@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Logo, colours and badge artwork | Maintainer |
-| 34–51 | Version 1, one issue per PR, grouped in milestones M6–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
+| 35–51 | Version 1, one issue per PR, grouped in milestones M6–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
 | 77 | Show who uploaded a submission item (follow-up to #30; migration) | Claude Code |
 
 ## Next steps
 
-1. Next session: M6 review and progress, continuing with #34 badges
-   and #35 participant dashboard.
+1. Next session: #35 participant dashboard (levels per topic via
+   `submissions.progress.topic_progress`, open revisions, recent
+   approvals, suggested tasks, the badge feed); then M6 is complete.
 2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
 3. Later, not before M6: #77 show who uploaded a submission item

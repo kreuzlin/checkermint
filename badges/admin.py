@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Badge, available_images
+from .models import Badge, UserBadge, available_images
 
 
 class BadgeForm(forms.ModelForm):
@@ -35,3 +35,30 @@ class BadgeAdmin(admin.ModelAdmin):
                 '<img src="{}" alt="" width="48" height="48">', obj.image_url
             )
         return "Platzhalter"
+
+
+@admin.register(UserBadge)
+class UserBadgeAdmin(admin.ModelAdmin):
+    """Awards come from reviews; coaches can only look and revoke (delete)."""
+
+    list_display = ["badge", "nickname", "task", "awarded_at"]
+    list_filter = ["badge"]
+    search_fields = ["user__profile__nickname", "user__profile__real_name"]
+    list_select_related = ["badge", "user__profile", "submission__task_version"]
+    fields = ["badge", "user", "submission", "awarded_at"]
+    readonly_fields = fields
+
+    @admin.display(description="Spitzname", ordering="user__profile__nickname")
+    def nickname(self, obj):
+        profile = getattr(obj.user, "profile", None)
+        return profile.nickname if profile else obj.user.get_username()
+
+    @admin.display(description="Aufgabe")
+    def task(self, obj):
+        return obj.submission.task_version.title if obj.submission else "–"
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

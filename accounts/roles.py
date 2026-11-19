@@ -29,7 +29,12 @@ COACH_PERMISSIONS = {
         "hint": ["view", "add", "change", "delete"],
         "instructionimage": ["view", "add", "change", "delete"],
     },
-    "badges": {"badge": ["view", "add", "change", "delete"]},
+    # Awards are made by reviews; coaches see them and can revoke one
+    # (delete), never add or edit them by hand (ADR 0013).
+    "badges": {
+        "badge": ["view", "add", "change", "delete"],
+        "userbadge": ["view", "delete"],
+    },
     # View only: submissions are made by participants and reviewed in the
     # coach views (#31, #32), never edited in the admin.
     "submissions": {"submission": ["view"], "submissionitem": ["view"]},

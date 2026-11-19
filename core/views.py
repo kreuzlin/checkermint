@@ -6,6 +6,8 @@ from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.views.decorators.http import require_GET
 from django.views.generic import TemplateView
 
+from badges.awards import recent_badges
+
 from . import private_files
 from .seo import SeoMixin
 
@@ -13,6 +15,13 @@ from .seo import SeoMixin
 class HomeView(SeoMixin, TemplateView):
     template_name = "core/home.html"
     # No page title: the home page uses the plain site title.
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            # Logged-in users only: nicknames are not public (brief 4, 5.9).
+            context["recent_badges"] = recent_badges()
+        return context
 
 
 def version(request):
