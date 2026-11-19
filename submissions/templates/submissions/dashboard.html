@@ -1,0 +1,69 @@
+{% load markdown %}
+{% comment %}Participant dashboard (brief 5.9, #35), included by core/home.html. Needs `dashboard`.{% endcomment %}
+<h1>Hallo {% firstof user.profile.nickname user.get_username %}!</h1>
+{% if dashboard.waiting %}
+  <p class="message" role="status">{{ dashboard.waiting }} Lösung{{ dashboard.waiting|pluralize:"en" }} warte{{ dashboard.waiting|pluralize:"t,n" }} auf einen Coach.</p>
+{% endif %}
+
+<div class="dashboard">
+  {% if dashboard.revisions %}
+    <section class="dashboard-block" aria-labelledby="ueberarbeiten">
+      <h2 id="ueberarbeiten">Überarbeiten</h2>
+      <ul class="task-list">
+        {% for submission in dashboard.revisions %}
+          <li class="dashboard-item">
+            <a class="task-title" href="{% url 'tasks:task_detail' slug=submission.task.slug %}">{{ submission.task_version.title }}</a>
+            <span class="help">{{ submission.task.topic }}{% if submission.reviewed_by.profile %} · Rückmeldung von {{ submission.reviewed_by.profile.nickname }}{% endif %}</span>
+            {% if submission.feedback %}<div class="feedback prose">{{ submission.feedback|markdown }}</div>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  <section class="dashboard-block" aria-labelledby="als-naechstes">
+    <h2 id="als-naechstes">Als Nächstes</h2>
+    {% if dashboard.suggestions %}
+      <ul class="task-list">
+        {% for entry in dashboard.suggestions %}
+          <li class="task-item">
+            <a class="task-title" href="{% url 'tasks:task_detail' slug=entry.task.slug %}">{{ entry.version.title }}</a>
+            <span class="task-status">{{ entry.task.topic }} · {{ entry.status.label }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+      <p><a href="{% url 'tasks:catalogue' %}">Alle Aufgaben</a></p>
+    {% else %}
+      <p>Gerade gibt es keine offene Aufgabe für dich. <a href="{% url 'tasks:catalogue' %}">Alle Aufgaben ansehen</a></p>
+    {% endif %}
+  </section>
+
+  {% if dashboard.sections %}
+    <section class="dashboard-block" aria-labelledby="deine-level">
+      <h2 id="deine-level">Deine Level</h2>
+      {% for section in dashboard.sections %}
+        <h3>{{ section.topic.name }}</h3>
+        {% include "tasks/_topic_level.html" with level=section.progress %}
+      {% endfor %}
+    </section>
+  {% endif %}
+
+  <section class="dashboard-block" aria-labelledby="angenommen">
+    <h2 id="angenommen">Zuletzt angenommen</h2>
+    {% if dashboard.approved %}
+      <ul class="task-list">
+        {% for submission in dashboard.approved %}
+          <li class="task-item">
+            <a class="task-title" href="{% url 'tasks:task_detail' slug=submission.task.slug %}">{{ submission.task_version.title }}</a>
+            <span class="task-status"><span class="stars" aria-label="{{ submission.stars }} von 3 Sternen">{{ submission.star_symbols }}</span> · {{ submission.points }} Punkte · {{ submission.reviewed_at|date:"j. F" }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+      <p><a href="{% url 'submissions:history' %}">Mein Verlauf</a></p>
+    {% else %}
+      <p class="help">Noch keine angenommene Lösung – deine erste kommt bestimmt!</p>
+    {% endif %}
+  </section>
+</div>
+
+{% include "badges/_recent.html" %}

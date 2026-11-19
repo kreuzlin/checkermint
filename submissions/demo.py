@@ -571,6 +571,23 @@ class Seeder:
             self.ago(hours=30),
         )
 
+        # Max: arm sent back for revision (open on his dashboard).
+        self.solution(
+            max_,
+            self.arm,
+            {
+                "fotos": [photo("Mein Greifarm", "#7f6f2f")],
+                "beschreibung": [{"text": "Er greift."}],
+            },
+            self.ago(days=1, hours=6),
+            (
+                Submission.Status.NEEDS_REVISION,
+                None,
+                "Schöner Arm! Beschreibe noch, **wie** der Greifer schliesst.",
+                self.ago(days=1),
+            ),
+        )
+
         # Luna: new, has only started the LED circuit.
         start_attempt(luna, self.led)
 

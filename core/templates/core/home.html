@@ -1,7 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>{{ site_name }}</h1>
-  <p class="lead">{{ site_description }}</p>
-  {% if user.is_authenticated %}{% include "badges/_recent.html" %}{% endif %}
+  {% if dashboard %}
+    {% include "submissions/dashboard.html" %}
+  {% elif is_coach %}
+    <h1>Hallo {% firstof user.profile.nickname user.get_username %}!</h1>
+    <p>
+      {% if queue_size %}<a class="button" href="{% url 'submissions:queue' %}">Warteschlange: {{ queue_size }} Lösung{{ queue_size|pluralize:"en" }} warte{{ queue_size|pluralize:"t,n" }}</a>
+      {% else %}Die Warteschlange ist leer. <a href="{% url 'submissions:queue' %}">Zur Warteschlange</a>{% endif %}
+    </p>
+    {% include "badges/_recent.html" %}
+  {% else %}
+    <h1>{{ site_name }}</h1>
+    <p class="lead">{{ site_description }}</p>
+  {% endif %}
 {% endblock %}

@@ -144,6 +144,16 @@ Overview of how the project is built and run. Decisions and their rationale:
   shows level, points and a progress bar per topic
   (`tasks/_topic_level.html`, text first, the bar only repeats it); the
   task page shows the participant's points for the task.
+- Home page (#35): visitors see the public start page (landing page
+  with #45). Logged-in participants see their dashboard
+  (`submissions.dashboard`, template `submissions/dashboard.html`):
+  "Überarbeiten" (tasks whose latest submission needs revision, with the
+  feedback), "Als Nächstes" (started tasks first, then open ones with the
+  lowest `min_level`, at most 4), levels per topic (the catalogue
+  sections, so statuses and levels agree), "Zuletzt angenommen" (5, with
+  points) and the badge feed; a note when solutions wait for a coach.
+  Coaches see the number of waiting solutions with a link to the queue
+  and the badge feed. 13 queries for a participant (tested).
 - Badges (#34, ADR 0013): approving a submission of a task with a badge
   creates a `UserBadge` (once per user and badge) in the same transaction
   as the review; the review block says "Badge … vergeben". Shown in the

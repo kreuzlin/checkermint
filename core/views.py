@@ -6,21 +6,35 @@ from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.views.decorators.http import require_GET
 from django.views.generic import TemplateView
 
+from accounts.roles import is_coach
 from badges.awards import recent_badges
+from submissions.dashboard import dashboard
+from submissions.queue import queue_entries
 
 from . import private_files
 from .seo import SeoMixin
 
 
 class HomeView(SeoMixin, TemplateView):
+    """Visitors: the public start page (landing page, #45). Participants:
+    their dashboard (brief 5.9). Coaches: the queue and the badge feed."""
+
     template_name = "core/home.html"
     # No page title: the home page uses the plain site title.
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            # Logged-in users only: nicknames are not public (brief 4, 5.9).
+        user = self.request.user
+        if not user.is_authenticated:
+            return context
+        # Logged-in users only: nicknames are not public (brief 4, 5.9).
+        if is_coach(user):
+            context["is_coach"] = True
+            context["queue_size"] = len(queue_entries())
             context["recent_badges"] = recent_badges()
+        else:
+            context["dashboard"] = dashboard(user)
+            context["recent_badges"] = context["dashboard"].recent_badges
         return context
 
 
