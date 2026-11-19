@@ -7,6 +7,10 @@
   <title>{% block title %}{{ full_title }}{% endblock %}</title>
   <meta name="description" content="{{ meta_description|default:site_description }}">
   <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="{% static 'core/brand/icon.svg' %}" type="image/svg+xml">
+  <link rel="icon" href="{% static 'core/brand/favicon-32.png' %}" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="{% static 'core/brand/apple-touch-icon.png' %}">
+  <meta name="theme-color" content="#031b23">
   <link rel="stylesheet" href="{% static 'core/css/site.css' %}">
   {% block extra_head %}{% endblock %}
 </head>
@@ -15,7 +19,7 @@
 
   <header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="{% url 'core:home' %}"{% if request.resolver_match.view_name == "core:home" %} aria-current="page"{% endif %}>{{ site_short_name }}</a>
+      <a class="brand" href="{% url 'core:home' %}"{% if request.resolver_match.view_name == "core:home" %} aria-current="page"{% endif %}><img src="{% static 'core/brand/logo-header.svg' %}" alt="{{ site_short_name }}" width="176" height="44"></a>
       {% if nav_items %}
         <nav class="main-nav" aria-label="Hauptnavigation">
           <ul>
