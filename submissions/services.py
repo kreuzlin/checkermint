@@ -12,6 +12,7 @@ from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
+from badges.awards import award_for
 from tasks.attempts import start_attempt
 
 from .models import Submission, SubmissionItem
@@ -207,8 +208,9 @@ def review_submission(
 ) -> Submission:
     """Submitted → approved (with stars) or needs revision (brief 5.8).
 
-    Locks the row, so two coaches cannot review the same submission. Points,
-    levels and badges follow from the data (#33, #34).
+    Locks the row, so two coaches cannot review the same submission. Points
+    and levels follow from the data (#33); an approval awards the task's
+    badge in the same transaction (#34).
     """
     if status not in Submission.REVIEWED:
         raise ValueError("A review either approves or asks for a revision.")
@@ -223,4 +225,5 @@ def review_submission(
         locked.reviewed_at = timezone.now()
         locked.full_clean()
         locked.save()
+        award_for(locked)
         return locked

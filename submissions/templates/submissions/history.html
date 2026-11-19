@@ -9,6 +9,15 @@
   {% if page_obj.object_list %}
     <ol class="history">
       {% for event in page_obj %}
+        {% if event.is_badge %}
+          <li class="history-event history-badge">
+            <p class="history-head"><time datetime="{{ event.when|date:'c' }}">{{ event.when|date:"j. F Y, H:i" }}</time></p>
+            <p class="badge-entry">
+              {% include "badges/_icon.html" with badge=event.award.badge %}
+              <span><strong>Badge erhalten: {{ event.award.badge.name }}</strong>{% if event.award.submission %} <span class="help">für {{ event.award.submission.task_version.title }}</span>{% endif %}</span>
+            </p>
+          </li>
+        {% else %}
         {% with submission=event.submission %}
           <li class="history-event">
             <p class="history-head">
@@ -31,6 +40,7 @@
             {% endif %}
           </li>
         {% endwith %}
+        {% endif %}
       {% endfor %}
     </ol>
 

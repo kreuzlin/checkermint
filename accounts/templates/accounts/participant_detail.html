@@ -22,6 +22,21 @@
     <p><a href="{% url 'submissions:coach_upload_choose' nickname=profile.nickname %}">Fotos oder Dateien für {{ profile.nickname }} hochladen</a></p>
   {% endif %}
 
+  <h2>Badges</h2>
+  {% if badges %}
+    <ul class="badge-list">
+      {% for award in badges %}
+        <li class="badge-entry">
+          {% include "badges/_icon.html" with badge=award.badge %}
+          <span><strong>{{ award.badge.name }}</strong>{% if award.badge.description %} – {{ award.badge.description }}{% endif %}
+            <span class="help">{% if award.submission %}{{ award.submission.task_version.title }} · {% endif %}{{ award.awarded_at|date:"j. F Y" }}</span></span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="help">Noch keine Badges.</p>
+  {% endif %}
+
   <h2>Über mich</h2>
   {% if profile.about %}
     <div class="prose">{{ profile.about|markdown }}</div>

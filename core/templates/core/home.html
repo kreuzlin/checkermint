@@ -3,4 +3,5 @@
 {% block content %}
   <h1>{{ site_name }}</h1>
   <p class="lead">{{ site_description }}</p>
+  {% if user.is_authenticated %}{% include "badges/_recent.html" %}{% endif %}
 {% endblock %}

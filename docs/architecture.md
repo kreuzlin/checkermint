@@ -11,7 +11,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | `core/` | Base layout, home page, private file view (`core/private_files.py`, `/dateien/…`), SEO (`core/seo.py`), noindex middleware, Markdown rendering (`core/markdown.py`, `markdown` template filter), navigation, `/version`, `/robots.txt`, error pages |
 | `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
 | `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`; points from `submissions.progress`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011), task attempts (`tasks.attempts`), catalogue `/aufgaben/` and task page `/aufgaben/<slug>/` (`tasks.catalogue`) |
-| `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder |
+| `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder; awards (`UserBadge`, `badges.awards`: `award_for`, `recent_badges`, `badges_of`) |
 | `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; requirement handlers (`submissions/handlers.py`), submission form `/aufgaben/<slug>/loesung/`, version switch `/aufgaben/<slug>/wechseln/`, history `/verlauf/` (`submissions.history`), coach queue `/warteschlange/` (`submissions.queue`), review form `/warteschlange/<id>/`, phone upload `/hochladen/<token>/` (`submissions.upload_links`); read-only admin for coaches |
 | `<app>/` | One small Django app per topic (added per project) |
 
@@ -144,6 +144,13 @@ Overview of how the project is built and run. Decisions and their rationale:
   shows level, points and a progress bar per topic
   (`tasks/_topic_level.html`, text first, the bar only repeats it); the
   task page shows the participant's points for the task.
+- Badges (#34, ADR 0013): approving a submission of a task with a badge
+  creates a `UserBadge` (once per user and badge) in the same transaction
+  as the review; the review block says "Badge … vergeben". Shown in the
+  feed "Neue Badges im Club" on the home page (logged-in users only,
+  latest 8, inactive accounts left out), on the internal profile and as
+  an event in the history. The icon is decorative (`alt=""`); the name is
+  always text. Placeholder without artwork: a star in a circle.
 - Review form (#32): `/warteschlange/<id>/` (coaches only; the submission
   is looked up after the permission check, so participants always get
   403). Shows the solution, a link to the admin preview of the exact

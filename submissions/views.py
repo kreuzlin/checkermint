@@ -503,6 +503,9 @@ class ReviewView(CoachRequiredMixin, SeoMixin, TemplateView):
         nickname = self.submission.user.profile.nickname
         if status == Submission.Status.APPROVED:
             done = f"Lösung von {nickname} angenommen ({self.submission.star_symbols})."
+            award = self.submission.badge_awards.select_related("badge").first()
+            if award:
+                done += f" Badge «{award.badge.name}» vergeben."
         else:
             done = f"Lösung von {nickname} zur Überarbeitung zurückgegeben."
         if self.is_htmx:

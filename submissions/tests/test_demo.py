@@ -8,6 +8,7 @@ from django.test import TestCase, override_settings
 
 from accounts.models import Profile
 from accounts.roles import is_coach
+from badges.models import UserBadge
 from submissions.models import Submission
 from submissions.queue import queue_entries
 from tasks.models import Task, TaskAttempt, Topic
@@ -48,6 +49,10 @@ class SeedDemoTests(TestCase):
         pinned = TaskAttempt.objects.get(user__username="demo-max", task=sensor)
         self.assertEqual(pinned.task_version.number, 1)
         self.assertFalse(Task.objects.get(slug="demo-motor-ansteuern").is_published)
+        self.assertEqual(
+            sorted(UserBadge.objects.values_list("user__username", flat=True)),
+            ["demo-anna", "demo-chiara", "demo-chiara"],
+        )
 
     def test_random_password_is_printed(self):
         output = seed()

@@ -1,0 +1,2 @@
+{% comment %}Badge artwork or a neutral placeholder; decorative, the name is always shown as text next to it. Needs `badge`.{% endcomment %}
+{% if badge.image_url %}<img src="{{ badge.image_url }}" alt="" width="40" height="40" class="badge-icon">{% else %}<span class="badge-icon badge-placeholder" aria-hidden="true">★</span>{% endif %}

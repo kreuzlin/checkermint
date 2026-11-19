@@ -1,11 +1,12 @@
 """Demo data for local development (`manage.py seed_demo`).
 
 Creates a coach, participants, topics, levels, tasks (one with two
-versions, one unpublished draft), hints, a badge and submissions in every
+versions, one unpublished draft), hints, badges (awarded on approval) and
+submissions in every
 state, so the coach queue, review and progress views can be tried by hand.
 
 Demo rows are recognised by the `demo-` prefix of usernames, task slugs
-and topic slugs, and by `DEMO_BADGE`; `remove_demo_data` deletes only those.
+and topic slugs, and by `DEMO_BADGES`; `remove_demo_data` deletes only those.
 Names are invented; photos are drawn with Pillow (no image rights, no
 metadata) and go through the normal photo pipeline.
 """
@@ -22,6 +23,7 @@ from PIL import Image, ImageDraw
 
 from accounts.models import Profile
 from accounts.roles import COACH_GROUP_NAME
+from badges.awards import award_for
 from badges.models import Badge
 from core.images import process_photo
 from tasks.attempts import start_attempt
@@ -33,7 +35,9 @@ from .services import save_draft, submit
 User = get_user_model()
 
 PREFIX = "demo-"
-DEMO_BADGE = "Erste Schaltung (Demo)"
+LED_BADGE = "Erste Schaltung (Demo)"
+BLINK_BADGE = "Erstes Programm (Demo)"
+DEMO_BADGES = [LED_BADGE, BLINK_BADGE]
 COACH = ("demo-coach", "CoachCarla", "Carla Coach")
 PARTICIPANTS = [
     ("demo-anna", "RoboAnna", "Anna Muster"),
@@ -121,7 +125,7 @@ def remove_demo_data() -> None:
     demo_users().delete()  # profiles, attempts, submissions and items cascade
     models.QuerySet.delete(TaskVersion.objects.filter(task__in=demo_tasks()))
     demo_tasks().delete()
-    Badge.objects.filter(name=DEMO_BADGE).delete()
+    Badge.objects.filter(name__in=DEMO_BADGES).delete()
     Topic.objects.filter(slug__startswith=PREFIX).delete()
     for name, storage in files:
         transaction.on_commit(lambda n=name, s=storage: s.delete(n))
@@ -218,8 +222,9 @@ class Seeder:
         taken += Topic.objects.filter(name__in=TOPIC_NAMES).values_list(
             "name", flat=True
         )
-        if Badge.objects.filter(name=DEMO_BADGE).exists():
-            taken.append(DEMO_BADGE)
+        taken += Badge.objects.filter(name__in=DEMO_BADGES).values_list(
+            "name", flat=True
+        )
         if taken:
             raise DemoNameTaken(", ".join(taken))
 
@@ -249,7 +254,10 @@ class Seeder:
             description="Schaltungen, Sensoren und Motoren.",
         )
         badge = Badge.objects.create(
-            name=DEMO_BADGE, description="Für die erste eigene LED-Schaltung."
+            name=LED_BADGE, description="Für die erste eigene LED-Schaltung."
+        )
+        blink_badge = Badge.objects.create(
+            name=BLINK_BADGE, description="Für das erste Programm, das läuft."
         )
         text = TaskRequirement.Type.TEXT
         code_type = TaskRequirement.Type.CODE
@@ -275,6 +283,7 @@ class Seeder:
                 ("delay", "Schau dir die Funktion `delay()` an."),
                 ("pin", "Die eingebaute LED heisst `LED_BUILTIN`."),
             ],
+            badge=blink_badge,
         )
         self.sensor = make_task(
             code,
@@ -408,6 +417,8 @@ class Seeder:
                 reviewed_at=reviewed,
             )
         Submission.objects.filter(pk=submission.pk).update(**changes)
+        submission.refresh_from_db()
+        award_for(submission)  # as review_submission does
         return submission
 
     def submissions(self):
@@ -496,7 +507,23 @@ class Seeder:
             self.ago(hours=3),
         )
 
-        # Chiara: blink approved with 2 stars, resubmitted to improve them.
+        # Chiara: LED circuit approved (badge), blink approved with 2 stars
+        # and resubmitted to improve them (badge too).
+        self.solution(
+            self.users["Chipsy"],
+            self.led,
+            {
+                "foto": [photo("Meine LED", "#6f4f8f")],
+                "widerstand": [{"text": "330 Ohm, damit die LED nicht zu hell ist."}],
+            },
+            self.ago(days=2),
+            (
+                Submission.Status.APPROVED,
+                3,
+                "Saubere Verkabelung!",
+                self.ago(days=1, hours=20),
+            ),
+        )
         self.solution(
             chiara,
             self.blink,
