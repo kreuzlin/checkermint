@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-18 (PR "Serve private media through an authenticated view")_
+_Last updated: 2026-11-18 (PR "Add images in task instructions")_
 
 ## Live
 
@@ -89,7 +89,11 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   version follows with #19.
 - #21 (ahead of #18, which needs it): private files only through
   `/dateien/<kind>/<pk>/` with per-object access checks, random storage
-  names and safe headers; no model uses it yet.
+  names and safe headers.
+- #18: images in task instructions: upload in the task admin (re-encoded
+  without metadata), referenced as `![…](bild:<id>)`, served privately,
+  immutable once a published version uses them (migrations
+  `tasks/0005–0006`).
 
 ## Open issues
 
@@ -105,8 +109,8 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. Next in M3: #18 images in task instructions, #19 task attempts that pin
-   the version, #20 task catalogue and task page.
+1. Maintainer merges the PR for #18 (migrations). Next in M3: #19 task
+   attempts that pin the version, #20 task catalogue and task page.
 2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars).
 

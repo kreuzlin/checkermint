@@ -143,6 +143,29 @@ when moving a row out of one).
 |---|---|---|
 | `text` | text | Markdown |
 
+### InstructionImage
+
+Images for the instructions of a task, shared by its versions (ADR 0010),
+stored privately (ADR 0009).
+
+| Field | Type | Rules |
+|---|---|---|
+| `task` | FK → Task, cascade | |
+| `image` | image | `anleitungen/<uuid>.jpg` or `.png`; re-encoded on upload by `core.images.process_image` (no EXIF/GPS, max. 2000 px, JPEG/PNG/WebP in, max. 10 MB) |
+| `width`, `height` | int | set from the stored file |
+| `alt_text` | char 200 | required |
+| `original_filename` | char 200 | shown on download only |
+| `uploaded_by` | FK → User, optional, set null | |
+| `created_at` | datetime | automatic |
+
+Referenced in Markdown as `![…](bild:<id>)` (the admin shows the code to
+copy); only images of the same task are rendered
+(`instructions_markdown` filter), everything else shows "[Bild fehlt]".
+Once saved, the file is never replaced; while a published version
+references an image, it cannot be changed or deleted. Served at
+`/dateien/anleitungsbild/<id>/`: coaches always, other logged-in users
+only if a published version of a visible, not archived task uses it.
+
 ## badges
 
 ### Badge

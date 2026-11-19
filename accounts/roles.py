@@ -27,6 +27,7 @@ COACH_PERMISSIONS = {
         "taskversion": ["view", "add", "change", "delete"],
         "taskrequirement": ["view", "add", "change", "delete"],
         "hint": ["view", "add", "change", "delete"],
+        "instructionimage": ["view", "add", "change", "delete"],
     },
     "badges": {"badge": ["view", "add", "change", "delete"]},
 }

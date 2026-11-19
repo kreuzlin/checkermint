@@ -1,9 +1,9 @@
-{% load markdown %}
+{% load task_markdown %}
 {% comment %}What participants see of a task version (shared by the preview and, later, the task page).{% endcomment %}
 <h1>{{ version.title }}</h1>
 <p class="help">{{ task.topic }} · ab Level {{ task.min_level }} · {{ version.base_points }} Grundpunkte · Version {{ version.number }}</p>
 
-<div class="prose">{{ version.instructions|markdown }}</div>
+<div class="prose">{{ version.instructions|instructions_markdown:task }}</div>
 
 <h2>Was du einreichst</h2>
 <ul>

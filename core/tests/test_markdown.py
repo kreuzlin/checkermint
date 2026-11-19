@@ -77,3 +77,42 @@ class MarkdownFilterTests(SimpleTestCase):
 
     def test_script_never_reaches_output(self):
         self.assertNotIn("<script", self.render("<script>alert(1)</script>"))
+
+
+class MarkdownImageTests(SimpleTestCase):
+    def setUp(self):
+        from core.markdown import ImageRef
+
+        self.images = {
+            12: ImageRef(
+                url="/dateien/anleitungsbild/12/", alt="Sensor", width=40, height=20
+            )
+        }
+
+    def render(self, text, images=None):
+        from core.markdown import render_markdown
+
+        return render_markdown(text, images=images)
+
+    def test_without_images_mapping_images_are_removed(self):
+        html = self.render("![x](bild:12) ![y](https://example.com/a.png)")
+        self.assertNotIn("<img", html)
+
+    def test_own_image_becomes_private_url(self):
+        html = self.render("Schau: ![egal](bild:12)", self.images)
+        self.assertIn(
+            '<img src="/dateien/anleitungsbild/12/" alt="Sensor" width="40" '
+            'height="20" loading="lazy">',
+            html,
+        )
+
+    def test_foreign_external_and_unknown_images_are_dropped(self):
+        html = self.render(
+            "![a](bild:99) ![b](https://example.com/a.png) ![c](/media/x.png) "
+            '<img src="bild:12" onerror="alert(1)">',
+            self.images,
+        )
+        self.assertEqual(html.count("[Bild fehlt]"), 3)
+        self.assertNotIn("example.com", html)
+        self.assertNotIn("/media/", html)
+        self.assertNotIn("onerror", html)
