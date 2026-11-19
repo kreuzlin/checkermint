@@ -199,6 +199,19 @@ h3 {
   color: var(--mint-300);
 }
 
+/* Logo generated from design/logo (design/generate_assets.py). */
+.brand img {
+  display: block;
+  width: auto;
+  height: 3rem;
+}
+
+@media (min-width: 48rem) {
+  .brand img {
+    height: 3.75rem;
+  }
+}
+
 .main-nav ul {
   display: flex;
   flex-wrap: wrap;

@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="660"
+   height="660"
+   viewBox="0 0 660 660"
+   role="img"
+   aria-label="CHECKERMINT – Lernplattform: vernetzte Symbole für Lernen, Programmieren und Robotik"
+   version="1.1"
+   id="svg26"
+   sodipodi:docname="checkermint_icon.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview26"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1" />
+  <defs
+     id="defs10">
+    <linearGradient
+       id="mintEdge"
+       x1=".12"
+       y1=".08"
+       x2=".78"
+       y2="1"
+       objectBoundingBox="true">
+      <stop
+         offset="0"
+         stop-color="#a6fff9"
+         id="stop1" />
+      <stop
+         offset=".35"
+         stop-color="#36f4e4"
+         id="stop2" />
+      <stop
+         offset=".82"
+         stop-color="#00dcad"
+         id="stop3" />
+      <stop
+         offset="1"
+         stop-color="#76fff5"
+         id="stop4" />
+    </linearGradient>
+    <linearGradient
+       id="mintWord"
+       x1="0"
+       y1="0"
+       x2="0.75"
+       y2="1">
+      <stop
+         offset="0"
+         stop-color="#a1fff0"
+         id="stop5" />
+      <stop
+         offset=".55"
+         stop-color="#38f6ce"
+         id="stop6" />
+      <stop
+         offset="1"
+         stop-color="#00dda8"
+         id="stop7" />
+    </linearGradient>
+    <radialGradient
+       id="darkBg"
+       cx="50%"
+       cy="50%"
+       r="85%">
+      <stop
+         offset="0"
+         stop-color="#092e35"
+         id="stop8" />
+      <stop
+         offset=".52"
+         stop-color="#031b25"
+         id="stop9" />
+      <stop
+         offset="1"
+         stop-color="#020d16"
+         id="stop10" />
+    </radialGradient>
+    <filter
+       id="softGlow"
+       x="-40%"
+       y="-40%"
+       width="180%"
+       height="180%">
+      <feGaussianBlur
+         stdDeviation="10"
+         id="feGaussianBlur10" />
+    </filter>
+  </defs>
+  <g
+     transform="translate(0 55)"
+     id="g26">
+    <g
+       id="checker-mark">
+      <!-- Nested hexagons: learn / code / robotics -->
+      <g
+         fill="#031b23"
+         stroke="url(#mintEdge)"
+         stroke-width="11"
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         id="g12">
+        <path
+           d="M330 19 L458 93 L458 242 L330 316 L202 242 L202 93 Z"
+           id="path10" />
+        <path
+           d="M202 242 L330 316 L330 464 L202 539 L74 465 L74 317 Z"
+           id="path11" />
+        <path
+           d="M458 242 L586 317 L586 465 L458 539 L330 464 L330 316 Z"
+           id="path12" />
+      </g>
+      <!-- White book / learning -->
+      <g
+         stroke="#f5ffff"
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         id="g16">
+        <path
+           d="M259 133 C284 124 310 129 329 144 L330 237 C306 221 283 217 258 220 Z"
+           fill="#f5ffff"
+           stroke-width="3"
+           id="path13" />
+        <path
+           d="M401 133 C375 124 350 129 331 144 L330 237 C354 221 376 217 402 220 Z"
+           fill="#f5ffff"
+           stroke-width="3"
+           id="path14" />
+        <path
+           d="M242 145 V239 Q288 229 330 253 Q371 229 418 239 V145"
+           fill="none"
+           stroke-width="12"
+           id="path15" />
+        <path
+           d="M330 147 V238"
+           fill="none"
+           stroke="#031b23"
+           stroke-width="6"
+           id="path16" />
+      </g>
+      <!-- Code symbols -->
+      <g
+         fill="none"
+         stroke="#f5ffff"
+         stroke-width="17"
+         stroke-linecap="square"
+         stroke-linejoin="miter"
+         id="g19">
+        <path
+           d="M168 360 L132 391 L168 421"
+           id="path17" />
+        <path
+           d="M240 360 L276 391 L240 421"
+           id="path18" />
+        <path
+           d="M222 345 L186 438"
+           id="path19" />
+      </g>
+      <!-- Robot icon with two eyes -->
+      <g
+         stroke="#f5ffff"
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         id="g22">
+        <path
+           d="M458 355 V319"
+           fill="none"
+           stroke-width="10"
+           id="path20" />
+        <circle
+           cx="458"
+           cy="311"
+           r="10"
+           fill="#f5ffff"
+           id="circle20" />
+        <rect
+           x="389"
+           y="360"
+           width="138"
+           height="92"
+           rx="33"
+           fill="none"
+           stroke-width="14"
+           id="rect20" />
+        <path
+           d="M387 389 H378 V420 H387 M528 389 H537 V420 H528"
+           fill="none"
+           stroke-width="12"
+           id="path21" />
+        <rect
+           x="407"
+           y="383"
+           width="102"
+           height="47"
+           rx="22"
+           fill="#031b23"
+           stroke="none"
+           id="rect21" />
+        <circle
+           cx="435"
+           cy="405"
+           r="10"
+           fill="#f5ffff"
+           stroke="none"
+           id="circle21" />
+        <circle
+           cx="481"
+           cy="405"
+           r="10"
+           fill="#f5ffff"
+           stroke="none"
+           id="circle22" />
+      </g>
+      <!-- network joints -->
+      <g
+         fill="#031b23"
+         stroke="#82fff0"
+         stroke-width="11"
+         id="g25">
+        <circle
+           cx="202"
+           cy="242"
+           r="25"
+           id="circle23" />
+        <circle
+           cx="458"
+           cy="242"
+           r="25"
+           id="circle24" />
+        <circle
+           cx="330"
+           cy="464"
+           r="25"
+           id="circle25" />
+      </g>
+    </g>
+  </g>
+</svg>

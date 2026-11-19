@@ -1,6 +1,9 @@
 """Tests for the base layout and SEO tags."""
 
+from pathlib import Path
+
 from django.conf import settings
+from django.contrib.staticfiles import finders
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 from django.views.generic import TemplateView
@@ -58,6 +61,39 @@ class HomePageTests(TestCase):
             self.response,
             f'<a class="brand" href="{reverse("core:home")}" aria-current="page">',
         )
+
+    def test_header_shows_logo_with_alt_text(self):
+        self.assertContains(self.response, "core/brand/logo-header.svg")
+        self.assertContains(self.response, f'alt="{settings.SITE_SHORT_NAME}"')
+
+    def test_favicons_are_linked(self):
+        self.assertContains(
+            self.response, 'rel="icon" href="/static/core/brand/icon.svg"'
+        )
+        self.assertContains(self.response, "core/brand/favicon-32.png")
+        self.assertContains(self.response, 'rel="apple-touch-icon"')
+
+
+class BrandAssetTests(SimpleTestCase):
+    """The generated logo files exist (design/generate_assets.py)."""
+
+    def test_generated_files_exist(self):
+        for name in (
+            "logo-header.svg",
+            "icon.svg",
+            "favicon-32.png",
+            "apple-touch-icon.png",
+        ):
+            with self.subTest(name=name):
+                self.assertIsNotNone(finders.find(f"core/brand/{name}"))
+
+    def test_svgs_contain_no_editor_metadata_or_scripts(self):
+        for name in ("logo-header.svg", "icon.svg"):
+            with self.subTest(name=name):
+                content = Path(finders.find(f"core/brand/{name}")).read_text()
+                self.assertNotIn("inkscape", content)
+                self.assertNotIn("sodipodi", content)
+                self.assertNotIn("<script", content)
 
 
 class ErrorPageTests(TestCase):

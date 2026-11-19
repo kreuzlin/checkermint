@@ -246,7 +246,7 @@ Claude Code may proceed with these defaults; kreuzlin can override them at any t
 | Session length | Long sessions (for example 30 days) on personal devices, "remember me" checkbox |
 | QR link lifetime | 30 minutes |
 | Level thresholds | Same table for all topics, set in the admin |
-| Badge and logo artwork | Placeholders until kreuzlin delivers original files; never generated or recreated by AI |
+| Badge and logo artwork | Placeholders until kreuzlin delivers original files. Claude Code never generates or recreates artwork itself. Artwork that kreuzlin delivers may have been made with AI tools (decision 2026-11-19, first case: the logo); source and tool are recorded in `design/README.md` |
 | Notifications to coaches | Immediate email per submission, can be turned off per coach |
 | Coach forcing a version switch | Not possible; only the participant switches. A coach can recommend it in the feedback |
 | Draft task versions | Visible only to coaches, with a preview of how participants will see them |
