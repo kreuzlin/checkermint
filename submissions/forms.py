@@ -8,6 +8,11 @@ def field_name(requirement, suffix: str) -> str:
     return requirement.key if not suffix else f"{requirement.key}-{suffix}"
 
 
+def stored_signature(items) -> str:
+    """Changes whenever stored items are added or removed (polling)."""
+    return "-".join(str(item.pk) for item in items) or "0"
+
+
 class RequirementRow:
     """One requirement in the form, for the template."""
 
@@ -16,6 +21,10 @@ class RequirementRow:
         self.handler = handler
         self.fields = fields  # field names
         self.previous = previous  # stored items shown in the form
+
+    @property
+    def signature(self) -> str:
+        return stored_signature(self.previous)
 
     @property
     def template(self) -> str:

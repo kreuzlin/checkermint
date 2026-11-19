@@ -7,6 +7,11 @@ app_name = "submissions"
 urlpatterns = [
     path("aufgaben/<slug:slug>/loesung/", views.SubmissionView.as_view(), name="edit"),
     path(
+        "aufgaben/<slug:slug>/loesung/gespeichert/<slug:key>/",
+        views.StoredItemsView.as_view(),
+        name="stored",
+    ),
+    path(
         "aufgaben/<slug:slug>/wechseln/",
         views.SwitchVersionView.as_view(),
         name="switch",

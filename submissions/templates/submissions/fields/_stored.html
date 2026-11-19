@@ -1,0 +1,16 @@
+{% load submission_items %}
+{% comment %}Stored photos/files of one requirement with "Entfernen". With `live`, htmx asks every 5 s whether the phone added something (brief 5.7); the server answers 204 if nothing changed.{% endcomment %}
+<div id="gespeichert-{{ requirement.key }}" class="stored-items"{% if live %} hx-get="{% url 'submissions:stored' slug=task.slug key=requirement.key %}?stand={{ signature }}" hx-trigger="every 5s" hx-include="[name='{{ requirement.key }}-entfernen']" hx-swap="outerHTML"{% endif %}>
+  {% if items %}
+    <ul class="upload-list">
+      {% for item in items %}
+        <li>
+          {% submission_item item %}
+          {% if item.original_filename and requirement.type == "photo" %}<span class="help">{{ item.original_filename }}</span>{% endif %}
+          <label class="upload-remove"><input type="checkbox" name="{{ requirement.key }}-entfernen" value="{{ item.pk }}"{% if item.pk|stringformat:"s" in checked %} checked{% endif %}> Entfernen</label>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  {% if live %}<p class="help" aria-live="polite">{% if items %}Gespeichert: {{ items|length }}.{% endif %} Fotos vom Handy erscheinen hier automatisch.</p>{% endif %}
+</div>
