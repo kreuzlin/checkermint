@@ -3,6 +3,7 @@ from django.contrib.auth import forms as auth_forms
 from django.core.validators import MaxLengthValidator
 
 from .models import Profile
+from .roles import is_coach
 
 
 class LoginForm(auth_forms.AuthenticationForm):
@@ -108,6 +109,11 @@ class ProfileForm(forms.ModelForm):
             MaxLengthValidator(self.ABOUT_MAX_LENGTH)
         )
         self.fields["email"].initial = self.instance.user.email
+        if is_coach(self.instance.user):
+            self.fields["email_notifications"].help_text = (
+                "Wenn eine E-Mail-Adresse hinterlegt ist: Nachricht bei jeder "
+                "neuen oder überarbeiteten Lösung und jeder Hinweis-Anfrage."
+            )
         # Email first, then the text, then the switches.
         self.order_fields(["email", "about"])
 

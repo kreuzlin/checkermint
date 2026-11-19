@@ -13,6 +13,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`; points from `submissions.progress`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011), task attempts (`tasks.attempts`), catalogue `/aufgaben/` and task page `/aufgaben/<slug>/` (`tasks.catalogue`) |
 | `hints/` | Hint requests (`HintRequest`, `hints.services`): "Hinweis anfragen" on the task page (POST `/aufgaben/<slug>/hinweis-anfragen/`), granted hints with replies; grant or decline in the coach queue (POST `/warteschlange/hinweis/<id>/`); read-only admin for coaches |
 | `overviews/` | Coach overviews (no models): progress matrix `/fortschritt/` (`overviews.matrix.progress_matrix`, "Fortschritt" in the navigation, coaches only), participant detail `/fortschritt/teilnehmende/<nickname>/` (`overviews.participant`), task detail `/fortschritt/aufgaben/<slug>/` (`overviews.task`) |
+| `notifications/` | Email notifications (no models): `notifications.emails` with templates in `notifications/templates/notifications/email/` |
 | `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder; awards (`UserBadge`, `badges.awards`: `award_for`, `recent_badges`, `badges_of`) |
 | `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; requirement handlers (`submissions/handlers.py`), submission form `/aufgaben/<slug>/loesung/`, version switch `/aufgaben/<slug>/wechseln/`, history `/verlauf/` (`submissions.history`), coach queue `/warteschlange/` (`submissions.queue`), review form `/warteschlange/<id>/`, phone upload `/hochladen/<token>/` (`submissions.upload_links`); read-only admin for coaches |
 | `<app>/` | One small Django app per topic (added per project) |
@@ -265,6 +266,15 @@ Overview of how the project is built and run. Decisions and their rationale:
   the confirmation page looks the same for unknown addresses. Without an
   email address a coach sets a new password in the admin. Emails go to the
   console until SMTP is configured (#3, M9).
+- Email notifications (#43, brief 5.11): `notifications.emails`. Coaches
+  get a mail on every submission ("Neue Lösung" / "Erneut eingereicht",
+  with a link to the review page) and every hint request (with the
+  message, link to the queue). Recipients (`coach_recipients`): active
+  coaches and superusers with an email address, unless their profile
+  turns `email_notifications` off (no profile: on). Sent after the
+  transaction commits, one message per recipient, links built from the
+  triggering request (no site-address setting); a mail server error is
+  logged and never breaks the action. Only nicknames, never real names.
 - `/version` returns the Git commit of the running image as JSON
   (`APP_COMMIT`, set by CI); local builds report `dev`.
 

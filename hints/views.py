@@ -5,6 +5,7 @@ from django.views import View
 
 from accounts.mixins import CoachRequiredMixin
 from accounts.roles import is_coach
+from notifications.emails import notify_coaches_of_hint_request
 from tasks.attempts import TaskNotStartable
 from tasks.catalogue import task_for
 
@@ -33,10 +34,13 @@ class RequestHintView(LoginRequiredMixin, View):
             )
             return back
         try:
-            request_hint(request.user, task, form.cleaned_data["message"])
+            hint_request = request_hint(
+                request.user, task, form.cleaned_data["message"]
+            )
         except (HintRequestNotAllowed, TaskNotStartable) as error:
             messages.error(request, f"Fehler: {error}")
         else:
+            notify_coaches_of_hint_request(request, hint_request)
             messages.success(
                 request, "Deine Anfrage ist unterwegs. Ein Coach meldet sich."
             )
