@@ -308,6 +308,7 @@ a.user-name {
 
 .topic,
 .dashboard-block,
+.hints,
 .submission,
 .phone-qr,
 .review,
@@ -873,4 +874,37 @@ hr {
   .button:hover {
     transform: none;
   }
+}
+
+/* Hints on the task page (#36) */
+.hints {
+  margin: 2rem 0 1.5rem;
+  padding: 0.25rem 1.25rem 1rem;
+}
+
+.hints > h2 {
+  margin-top: 1rem;
+}
+
+.hint-list {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.hint-list > li {
+  margin-bottom: 1rem;
+  padding-left: 0.25rem;
+}
+
+.hint-list > li::marker {
+  color: var(--mint-300);
+  font-weight: 800;
+}
+
+.hint-list .prose > :first-child {
+  margin-top: 0;
+}
+
+.hint-request-form textarea {
+  min-height: 4.5rem;
 }

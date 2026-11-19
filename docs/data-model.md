@@ -21,7 +21,7 @@ profiles view/add/change; topics, level thresholds and badges
 view/add/change/delete; tasks, versions, requirements, hints and
 instruction images view/add/change/delete (published versions stay
 immutable through the model guards); submissions and their items view
-only (`submissions/0002`).
+only (`submissions/0002`); hint requests view only (`hints/0002`).
 No delete: accounts are deactivated (`is_active`). The user admin
 (`accounts.admin.UserAdmin`) restricts coaches to participant accounts:
 
@@ -282,3 +282,41 @@ most 2000 px), `thumbnail` (at most 400 px) and `data` (`width`,
 `/dateien/einreichungsdatei/<id>/` (always a download), only to the
 participant who owns the submission and to coaches; everyone else gets
 404.
+
+## hints
+
+### HintRequest
+
+A participant asks for the next hint of a task (brief 5.5, #36). Hints are
+not self-service: a coach grants or declines (#37). Requests and
+decisions are never edited or deleted by hand (read-only admin; they
+disappear only with the participant's account).
+
+| Field | Type | Rules |
+|---|---|---|
+| `task_attempt` | FK → TaskAttempt, cascade | who asked, for which task |
+| `hint` | FK → Hint, protect | the hint asked for (of the version pinned at request time) |
+| `message` | char 300, optional | the participant's note to the coach |
+| `status` | `open` / `granted` / `declined` | at most one `open` request per attempt (partial unique constraint) |
+| `coach_reply` | char 300, optional | shown to the participant |
+| `decided_by` | FK → User, optional, set null | the coach |
+| `requested_at` | datetime | default now |
+| `decided_at` | datetime, optional | set if and only if the status is not `open` (check constraint) |
+
+Rules (`hints.services`):
+
+- **Next hint:** the first hint (by `order`) of the attempt's pinned
+  version whose key is not granted yet. Declined hints can be requested
+  again.
+- **Granted by key:** a hint counts as granted for the attempt if a
+  granted request exists for a hint with the same `key`. So granted hints
+  stay granted after a switch to a newer version (brief 5.5, #38).
+- `request_hint(user, task, message)` starts the task if needed
+  (`start_attempt`, brief 5.4), locks the attempt row and refuses a second
+  open request or a request when every hint is granted. The view
+  (POST `/aufgaben/<slug>/hinweis-anfragen/`) refuses coaches and locked
+  tasks.
+- `hint_state(attempt, version)` is what the task page shows: total,
+  granted hints with the coach's reply, the open request ("Anfrage wartet
+  auf einen Coach") or the reply to the last declined request, and
+  whether the form is offered.

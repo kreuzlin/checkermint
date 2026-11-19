@@ -9,6 +9,7 @@ from django.test import TestCase, override_settings
 from accounts.models import Profile
 from accounts.roles import is_coach
 from badges.models import UserBadge
+from hints.models import HintRequest
 from submissions.models import Submission
 from submissions.queue import queue_entries
 from tasks.models import Task, TaskAttempt, Topic
@@ -53,6 +54,15 @@ class SeedDemoTests(TestCase):
             sorted(UserBadge.objects.values_list("user__username", flat=True)),
             ["demo-anna", "demo-chiara", "demo-chiara"],
         )
+
+    def test_creates_hint_requests_in_every_state(self):
+        seed("--password", "geheim123")
+        self.assertEqual(
+            sorted(HintRequest.objects.values_list("status", flat=True)),
+            ["declined", "granted", "open"],
+        )
+        seed("--remove")
+        self.assertFalse(HintRequest.objects.exists())
 
     def test_random_password_is_printed(self):
         output = seed()

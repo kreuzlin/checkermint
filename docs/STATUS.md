@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Add logo and favicons")_
+_Last updated: 2026-11-19 (PR "Let participants request hints")_
 
 ## Live
 
@@ -203,6 +203,14 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   `core/static/core/brand/`. Maintainer's decision 2026-11-19: artwork
   made by the maintainer with AI tools may be used; Claude Code still
   never generates artwork (brief, section 11).
+- #36: app `hints` with `HintRequest` (migrations `hints/0001–0002`,
+  merged by Claude before go-live). "Hinweis anfragen" on the task page
+  for the next hint with an optional message; one open request per task;
+  starts the task; "Anfrage wartet auf einen Coach", granted hints with
+  the coach's reply, reply to a declined request. Granted is decided by
+  the hint key, so it already carries over on a version switch (#38 adds
+  the notice in the switch confirmation). Read-only admin for coaches.
+  Demo data: one granted, one declined, one open request.
 - 2026-11-19: on the maintainer's one-time instruction, Claude merged #73
   (Caddy upload limit, a server change) itself. The merge exceptions in
   CLAUDE.md stay in force: PRs with migrations or server/deployment
@@ -228,9 +236,9 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. M7 hint requests, starting with #36 (participants
-   request hints; migration), then #37 grant or decline in the coach
-   queue, #38 carry-over on version switch.
+1. M7 hint requests: #37 grant or decline in the coach queue (htmx),
+   then #38 carry-over on version switch (list granted hints in the
+   switch confirmation).
 2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
 3. #77 show who uploaded a submission item (migration; M6 is done, so

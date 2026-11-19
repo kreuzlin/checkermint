@@ -11,6 +11,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | `core/` | Base layout, home page, private file view (`core/private_files.py`, `/dateien/…`), SEO (`core/seo.py`), noindex middleware, Markdown rendering (`core/markdown.py`, `markdown` template filter), navigation, `/version`, `/robots.txt`, error pages |
 | `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
 | `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`; points from `submissions.progress`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011), task attempts (`tasks.attempts`), catalogue `/aufgaben/` and task page `/aufgaben/<slug>/` (`tasks.catalogue`) |
+| `hints/` | Hint requests (`HintRequest`, `hints.services`): "Hinweis anfragen" on the task page (POST `/aufgaben/<slug>/hinweis-anfragen/`), granted hints with replies; read-only admin for coaches |
 | `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder; awards (`UserBadge`, `badges.awards`: `award_for`, `recent_badges`, `badges_of`) |
 | `submissions/` | Submissions against a pinned task version and their items (ADR 0010/0011); items locked once submitted; requirement handlers (`submissions/handlers.py`), submission form `/aufgaben/<slug>/loesung/`, version switch `/aufgaben/<slug>/wechseln/`, history `/verlauf/` (`submissions.history`), coach queue `/warteschlange/` (`submissions.queue`), review form `/warteschlange/<id>/`, phone upload `/hochladen/<token>/` (`submissions.upload_links`); read-only admin for coaches |
 | `<app>/` | One small Django app per topic (added per project) |
@@ -59,7 +60,8 @@ Overview of how the project is built and run. Decisions and their rationale:
   are listed without a link; their page shows only the title and the
   required level. The task page shows the version from
   `tasks.attempts.visible_version` and the number of hints (not their
-  text); "Aufgabe starten" (POST `/aufgaben/<slug>/starten/`) calls
+  text; participants see the hints granted to them and can request the
+  next one, see `docs/data-model.md`, hints); "Aufgabe starten" (POST `/aufgaben/<slug>/starten/`) calls
   `start_attempt`. Coaches see the latest version and cannot start tasks.
   Below the instructions the participant sees their own submissions with
   status, stars, feedback and "Version N".

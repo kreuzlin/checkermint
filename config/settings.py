@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "tasks",
     "badges",
     "submissions",
+    "hints",
 ]
 
 MIDDLEWARE = [
