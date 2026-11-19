@@ -26,7 +26,7 @@
             <th scope="col">Teilnehmer/in</th>
             {% if topic %}<th scope="col">Level</th>{% endif %}
             {% for column in matrix.columns %}
-              <th scope="col"><a href="{% url 'tasks:task_detail' slug=column.task.slug %}">{{ column.title }}</a>{% if not topic %}<span class="matrix-topic">{{ column.task.topic }}</span>{% endif %}<span class="matrix-topic">ab Level {{ column.task.min_level }}</span></th>
+              <th scope="col"><a href="{% url 'overviews:task' slug=column.task.slug %}">{{ column.title }}</a>{% if not topic %}<span class="matrix-topic">{{ column.task.topic }}</span>{% endif %}<span class="matrix-topic">ab Level {{ column.task.min_level }}</span></th>
             {% endfor %}
           </tr>
         </thead>

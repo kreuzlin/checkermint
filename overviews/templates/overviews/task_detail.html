@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load markdown %}
+
+{% block content %}
+{% with task=detail.task %}
+  <h1>{{ detail.title }}</h1>
+  <p class="help">Auswertung, nur für Coaches sichtbar. <a href="{% url 'overviews:matrix' %}?thema={{ task.topic.slug }}">Zurück zum Fortschritt</a>{% if task.is_published and not task.is_archived %} · <a href="{% url 'tasks:task_detail' slug=task.slug %}">Aufgabe ansehen</a>{% endif %}</p>
+
+  <dl class="facts">
+    <dt>Thema</dt>
+    <dd>{{ task.topic }}</dd>
+    <dt>Freigeschaltet ab</dt>
+    <dd>Level {{ task.min_level }}</dd>
+    {% if task.is_archived or not task.is_published %}
+      <dt>Sichtbarkeit</dt>
+      <dd>{% if task.is_archived %}archiviert{% else %}nicht veröffentlicht{% endif %} – Teilnehmende sehen die Aufgabe nicht</dd>
+    {% endif %}
+    <dt>Gelöst von</dt>
+    <dd>{{ detail.solvers|length }} Teilnehmende{% if detail.average_stars is not None %} · im Schnitt {{ detail.average_stars|floatformat:1 }} von 3 Sternen{% endif %}</dd>
+  </dl>
+
+  <h2 id="geloest">Wer sie gelöst hat</h2>
+  {% if detail.solvers %}
+    <div class="matrix-scroll" role="region" aria-labelledby="geloest" tabindex="0">
+      <table class="matrix">
+        <thead>
+          <tr><th scope="col">Teilnehmer/in</th><th scope="col">Beste Bewertung</th><th scope="col">Version</th><th scope="col">Angenommen am</th></tr>
+        </thead>
+        <tbody>
+          {% for solver in detail.solvers %}
+            <tr>
+              <th scope="row"><a href="{% url 'overviews:participant' nickname=solver.profile.nickname %}">{{ solver.profile.nickname }}</a>{% if solver.profile.real_name %}<span class="matrix-topic">{{ solver.profile.real_name }}</span>{% endif %}</th>
+              <td><span class="stars" aria-hidden="true">{{ solver.submission.star_symbols }}</span> {{ solver.submission.stars }} von 3</td>
+              <td><a href="{% url 'submissions:review' pk=solver.submission.pk %}">Version {{ solver.submission.task_version.number }}</a></td>
+              <td>{{ solver.submission.reviewed_at|date:"j. F Y" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="help">Pro Person zählt die beste angenommene Lösung (wie bei den Punkten). Der Durchschnitt nimmt diese besten Sterne.</p>
+  {% else %}
+    <p class="help">Noch niemand hat diese Aufgabe gelöst.</p>
+  {% endif %}
+
+  <h2 id="hinweise">Hinweise</h2>
+  {% if detail.hints %}
+    <div class="matrix-scroll" role="region" aria-labelledby="hinweise" tabindex="0">
+      <table class="matrix">
+        <thead>
+          <tr><th scope="col">Hinweis</th><th scope="col">Angefragt</th><th scope="col">Freigegeben</th><th scope="col">Abgelehnt</th><th scope="col">Offen</th></tr>
+        </thead>
+        <tbody>
+          {% for stats in detail.hints %}
+            <tr>
+              <th scope="row" class="matrix-text">
+                <details>
+                  <summary>{{ stats.hint.key }} <span class="matrix-topic">zuletzt in Version {{ stats.hint.task_version.number }}</span></summary>
+                  <div class="prose">{{ stats.hint.text|markdown }}</div>
+                </details>
+              </th>
+              <td>{{ stats.requested }}</td>
+              <td>{{ stats.granted }}</td>
+              <td>{{ stats.declined }}</td>
+              <td>{% if stats.open %}<a href="{% url 'submissions:queue' %}">{{ stats.open }}</a>{% else %}0{% endif %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="help">Hinweise mit demselben Schlüssel zählen über alle Versionen zusammen.</p>
+  {% else %}
+    <p class="help">Diese Aufgabe hat keine Hinweise.</p>
+  {% endif %}
+
+  <h2 id="versionen">Versionen</h2>
+  {% if detail.versions %}
+    <div class="matrix-scroll" role="region" aria-labelledby="versionen" tabindex="0">
+      <table class="matrix">
+        <thead>
+          <tr><th scope="col">Version</th><th scope="col">Status</th><th scope="col">Veröffentlicht</th><th scope="col">Teilnehmende auf dieser Version</th><th scope="col">Änderungen</th></tr>
+        </thead>
+        <tbody>
+          {% for version in detail.versions %}
+            <tr>
+              <th scope="row">Version {{ version.number }}<span class="matrix-topic">{{ version.title }}</span></th>
+              <td>{{ version.get_status_display }}</td>
+              <td>{{ version.published_at|date:"j. F Y"|default:"–" }}</td>
+              <td>{{ version.pinned }}</td>
+              <td class="matrix-text">{{ version.change_note|default:"–" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="help">Versionen bearbeiten und veröffentlichen: <a href="{% url 'admin:tasks_task_change' task.pk %}">Aufgabe im Admin</a>.</p>
+  {% else %}
+    <p class="help">Noch keine Version.</p>
+  {% endif %}
+{% endwith %}
+{% endblock %}

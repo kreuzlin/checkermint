@@ -4,9 +4,11 @@ from django.views.generic import TemplateView
 from accounts.mixins import CoachRequiredMixin
 from accounts.views import participant_profiles
 from core.seo import SeoMixin
+from tasks.models import Task
 
 from .matrix import progress_matrix, topics_with_tasks
 from .participant import participant_detail
+from .task import task_detail
 
 
 class ProgressMatrixView(CoachRequiredMixin, SeoMixin, TemplateView):
@@ -45,4 +47,29 @@ class ParticipantDetailView(CoachRequiredMixin, SeoMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["detail"] = participant_detail(self.profile)
+        return context
+
+
+class TaskDetailView(CoachRequiredMixin, SeoMixin, TemplateView):
+    """Coach: who solved a task, average stars, hint statistics and the
+    versions with pinned participants (brief 5.10.4, #41). Also for
+    archived and unpublished tasks."""
+
+    template_name = "overviews/task_detail.html"
+    meta_description = "Wer eine Aufgabe gelöst hat, Hinweise und Versionen."
+
+    def get(self, request, *args, **kwargs):
+        # After CoachRequiredMixin.dispatch: participants get 403, not 404.
+        task = get_object_or_404(
+            Task.objects.select_related("topic"), slug=kwargs["slug"]
+        )
+        self.detail = task_detail(task)
+        return super().get(request, *args, **kwargs)
+
+    def get_page_title(self):
+        return f"Auswertung: {self.detail.title}"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["detail"] = self.detail
         return context

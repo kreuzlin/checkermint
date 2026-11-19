@@ -11,4 +11,9 @@ urlpatterns = [
         views.ParticipantDetailView.as_view(),
         name="participant",
     ),
+    path(
+        "fortschritt/aufgaben/<slug:slug>/",
+        views.TaskDetailView.as_view(),
+        name="task",
+    ),
 ]

@@ -1030,6 +1030,12 @@ hr {
   color: var(--text-muted);
 }
 
+/* Longer text in an overview table (e.g. change notes, #41) may wrap. */
+.matrix .matrix-text {
+  min-width: 16rem;
+  white-space: normal;
+}
+
 .matrix-geloest {
   background: rgba(0, 220, 173, 0.14);
 }
