@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
@@ -9,6 +10,7 @@ from tasks.attempts import visible_version
 from tasks.catalogue import Status, task_for
 
 from .forms import SubmissionForm
+from .history import history_events
 from .services import (
     SubmissionNotAllowed,
     get_draft,
@@ -144,3 +146,18 @@ class SwitchVersionView(LoginRequiredMixin, SeoMixin, TemplateView):
             request, f"Du arbeitest jetzt mit Version {self.plan.target.number}."
         )
         return self.detail
+
+
+class HistoryView(LoginRequiredMixin, SeoMixin, TemplateView):
+    """Everything the participant has submitted and achieved (brief 5.9)."""
+
+    template_name = "submissions/history.html"
+    page_title = "Mein Verlauf"
+    meta_description = "Alle deine Einreichungen und Bewertungen."
+    paginate_by = 30
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        paginator = Paginator(history_events(self.request.user), self.paginate_by)
+        context["page_obj"] = paginator.get_page(self.request.GET.get("seite"))
+        return context

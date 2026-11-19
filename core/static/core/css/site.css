@@ -390,3 +390,30 @@ a.button {
 .message-warning {
   border-left-color: var(--error);
 }
+
+/* History */
+.history {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history-event {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.history-event p {
+  margin: 0.25rem 0;
+}
+
+.history-head {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.pagination {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}

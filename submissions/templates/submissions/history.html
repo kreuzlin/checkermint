@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static markdown %}
+
+{% block extra_head %}<link rel="stylesheet" href="{% static 'submissions/css/code.css' %}">{% endblock %}
+
+{% block content %}
+  <h1>Mein Verlauf</h1>
+
+  {% if page_obj.object_list %}
+    <ol class="history">
+      {% for event in page_obj %}
+        {% with submission=event.submission %}
+          <li class="history-event">
+            <p class="history-head">
+              <time datetime="{{ event.when|date:'c' }}">{{ event.when|date:"j. F Y, H:i" }}</time>
+              · {{ submission.task.topic }}
+            </p>
+            <p>
+              {% if event.task_visible %}<a href="{% url 'tasks:task_detail' slug=submission.task.slug %}">{{ submission.task_version.title }}</a>{% else %}{{ submission.task_version.title }}{% endif %}
+              <span class="help">Version {{ submission.task_version.number }}</span>
+            </p>
+            {% if event.is_review %}
+              <p><strong>{{ submission.get_status_display }}</strong>{% if submission.stars %} <span class="stars" aria-label="{{ submission.stars }} von 3 Sternen">{{ submission.star_symbols }}</span>{% endif %}{% if submission.reviewed_by.profile %} <span class="help">von {{ submission.reviewed_by.profile.nickname }}</span>{% endif %}</p>
+              {% if submission.feedback %}<div class="feedback prose">{{ submission.feedback|markdown }}</div>{% endif %}
+            {% else %}
+              <p><strong>Eingereicht</strong>{% if submission.status == "submitted" %} <span class="help">– wartet auf einen Coach</span>{% endif %}</p>
+              <details>
+                <summary>Deine Lösung ansehen</summary>
+                {% include "submissions/_submission.html" %}
+              </details>
+            {% endif %}
+          </li>
+        {% endwith %}
+      {% endfor %}
+    </ol>
+
+    {% if page_obj.has_other_pages %}
+      <nav class="pagination" aria-label="Seiten">
+        {% if page_obj.has_previous %}<a href="?seite={{ page_obj.previous_page_number }}">← Neuere</a>{% endif %}
+        <span>Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a href="?seite={{ page_obj.next_page_number }}">Ältere →</a>{% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <p>Hier erscheint alles, was du einreichst und was die Coaches dazu sagen. <a href="{% url 'tasks:catalogue' %}">Zu den Aufgaben</a></p>
+  {% endif %}
+{% endblock %}
