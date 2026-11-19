@@ -26,6 +26,7 @@ class SubmissionsConfig(AppConfig):
     def ready(self):
         from core import private_files
 
+        from . import checks  # noqa: F401 (registers the startup check)
         from .models import SubmissionItem
 
         private_files.register(

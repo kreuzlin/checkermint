@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Add participant history")_
+_Last updated: 2026-11-19 (PR "Limit upload size in Caddy")_
 
 ## Live
 
@@ -133,6 +133,11 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   and reviewed events newest first, with task, topic, version, status,
   stars, feedback and the solution; archived tasks stay without a link;
   30 events per page. Badges join with #34.
+- #25: Caddy limits each request to `UPLOAD_MAX_REQUEST_MB` (default 100,
+  new in `.env.example` and `compose.prod.yaml`) with a German 413 message;
+  startup check `submissions.W001` keeps it consistent with the per-file
+  limits. Tested locally with a Caddy container in front of the dev app.
+  Milestone M4 complete.
 
 ## Open issues
 
@@ -148,8 +153,8 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. M4 left: #25 upload limit in Caddy (server change). Then M5 QR upload
-   (#28, #29) and #30 coach uploads.
+1. Next: M5 QR upload (#28 signed links and mobile upload page, #29 live
+   update of the draft), then #30 coach uploads.
 2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +

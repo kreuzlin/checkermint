@@ -234,6 +234,11 @@ class UploadHandler(RequirementHandler):
         help_text = self.upload_help(requirement)
         if requirement.help_text:
             help_text = f"{requirement.help_text} {help_text}"
+        if requirement.max_count > 1:
+            help_text += (
+                f" Pro Speichern zusammen höchstens "
+                f"{settings.UPLOAD_MAX_REQUEST_MB} MB."
+            )
         fields = {
             "": MultipleFileField(
                 label=requirement.label,

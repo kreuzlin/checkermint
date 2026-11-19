@@ -87,8 +87,10 @@ Overview of how the project is built and run. Decisions and their rationale:
   auto-rotate, metadata dropped, 2000 px plus a 400 px thumbnail). Files
   are kept as uploaded, optionally limited by `options.extensions`. Size
   limits per file: `UPLOAD_MAX_PHOTO_MB` (15) and `UPLOAD_MAX_FILE_MB`
-  (20) from `.env`; the request limit in Caddy follows with #25 and must
-  allow several photos per request.
+  (20) from `.env`. Caddy limits the whole request
+  (`UPLOAD_MAX_REQUEST_MB`, default 100, `request_body` in
+  `deploy/Caddyfile`, German 413 message); the startup check
+  `submissions.W001` warns if it is smaller than a file limit.
 - Version switch (#26, ADR 0015): if the attempt pins an older version than
   the latest published one, the task page and the form show "Es gibt eine
   neuere Version dieser Aufgabe" with the change note.
