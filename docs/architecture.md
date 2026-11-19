@@ -10,7 +10,7 @@ Overview of how the project is built and run. Decisions and their rationale:
 | `config/` | Settings (one module, configured via environment), URLs, WSGI |
 | `core/` | Base layout, home page, private file view (`core/private_files.py`, `/dateien/…`), SEO (`core/seo.py`), noindex middleware, Markdown rendering (`core/markdown.py`, `markdown` template filter), navigation, `/version`, `/robots.txt`, error pages |
 | `accounts/` | Profiles, roles (`is_coach`, group "Coach"), login/logout (`/anmelden/`, `/abmelden/`), password reset by email (`/passwort-vergessen/`), own profile (`/profil/`), internal profiles (`/teilnehmende/`), robot avatars (`accounts/avatars.py`, `/avatar/<seed>-<size>.png`), password rules |
-| `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011) |
+| `tasks/` | Topics, shared level table (`LevelThreshold`, `tasks.levels.level_for_points`), tasks with immutable versions, requirements and hints (guards in the model layer, ADR 0010/0011), task attempts (`tasks.attempts`), catalogue `/aufgaben/` and task page `/aufgaben/<slug>/` (`tasks.catalogue`) |
 | `badges/` | Badges with static artwork (`badges/static/badges/img/`) or a placeholder |
 | `<app>/` | One small Django app per topic (added per project) |
 
@@ -44,9 +44,19 @@ Overview of how the project is built and run. Decisions and their rationale:
   published version with requirements and hints, keys kept; at most one
   draft). Drafts are edited with requirement and hint inlines, checked with
   "Vorschau" (site layout, `tasks/_version_content.html`, shared with the
-  later task page) and published after a confirmation step. Published
+  task page) and published after a confirmation step. Published
   versions are view-only; versions are not listed on the admin index.
   The pinned count per version follows with task attempts (#19).
+- Task catalogue (#20, logged-in users only): `tasks.catalogue.catalogue`
+  groups visible tasks (published, not archived) by topic with a status per
+  task: `offen`, `begonnen` (attempt exists) or `gesperrt` (participant's
+  level in the topic below `min_level`; coaches see no locks). Levels come
+  from `points_by_topic`, which returns no points until #33. Locked tasks
+  are listed without a link; their page shows only the title and the
+  required level. The task page shows the version from
+  `tasks.attempts.visible_version` and the number of hints (not their
+  text); "Aufgabe starten" (POST `/aufgaben/<slug>/starten/`) calls
+  `start_attempt`. Coaches see the latest version and cannot start tasks.
 - Private uploads (ADR 0009): models store files with
   `core.private_files.RandomUploadPath` (UUID names) and register a
   `PrivateFileKind` (owner model, file getter, access check, inline or

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load markdown %}
+
+{% block content %}
+  <h1>Aufgaben</h1>
+  {% if is_coach %}
+    <p class="help">Als Coach siehst du alle Aufgaben ohne Sperre. Entwürfe und archivierte Aufgaben findest du in der Verwaltung.</p>
+  {% endif %}
+
+  {% for section in sections %}
+    <section class="topic" aria-labelledby="thema-{{ section.topic.slug }}">
+      <h2 id="thema-{{ section.topic.slug }}">{{ section.topic.name }}</h2>
+      {% if not is_coach %}<p class="help">Dein Level: {{ section.level }}</p>{% endif %}
+      {% if section.topic.description %}<div class="prose">{{ section.topic.description|markdown }}</div>{% endif %}
+      <ul class="task-list">
+        {% for entry in section.entries %}
+          <li class="task-item{% if entry.is_locked %} task-locked{% endif %}">
+            {% if entry.is_locked %}
+              <span class="task-title">{{ entry.version.title }}</span>
+              <span class="task-status">Gesperrt – ab Level {{ entry.task.min_level }}</span>
+            {% else %}
+              <a class="task-title" href="{% url 'tasks:task_detail' slug=entry.task.slug %}">{{ entry.version.title }}</a>
+              <span class="task-status">{{ entry.status.label }}</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% empty %}
+    <p>Noch keine Aufgaben.</p>
+  {% endfor %}
+{% endblock %}

@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Add task attempts that pin the version")_
+_Last updated: 2026-11-19 (PR "Add task catalogue and task page")_
 
 ## Live
 
@@ -96,8 +96,14 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #19: `TaskAttempt` pins the version per participant and task
   (`tasks.attempts.start_attempt`, `visible_version`); the version list on
   a task shows how many participants are pinned to each version
-  (migration `tasks/0007`). The "Aufgabe starten" button comes with the
-  task page (#20).
+  (migration `tasks/0007`).
+- #20: task catalogue `/aufgaben/` grouped by topic (status offen,
+  begonnen, gesperrt with the required level; archived and unpublished
+  tasks hidden) and task page `/aufgaben/<slug>/` with the pinned or latest
+  version, requirements, number of hints and "Aufgabe starten". Levels are
+  1 everywhere until points exist (#33); the statuses eingereicht,
+  Überarbeitung nötig and gelöst follow with submissions and reviews
+  (#22, #32).
 
 ## Open issues
 
@@ -113,8 +119,8 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Next steps
 
-1. Maintainer merges the PR for #19 (migration). Next in M3: #20 task
-   catalogue and task page (incl. "Aufgabe starten").
+1. M3 is complete with #20. Next: M4 submissions, starting with #22
+   submission models (migration, merged by the maintainer).
 2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes), htmx served as a local static file, `robohash` (avatars).
 
