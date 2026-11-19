@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Let coaches upload on behalf of participants")_
+_Last updated: 2026-11-19 (PR "Document manual test of phone upload and live update")_
 
 ## Live
 
@@ -148,8 +148,15 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #30: coaches add photos and files to a participant's draft from the
   participant profile ("Fotos oder Dateien für … hochladen"); the draft is
   created if needed, the participant submits. Milestone M5 complete.
-  Open point: items do not record whether a coach uploaded them (would
-  need a migration; ask the maintainer if wanted).
+  Who uploaded an item is not recorded yet: #77 (migration, merged by the
+  maintainer, not needed before M6).
+- Manual test of phone upload and live update (#28, #29) with phone and
+  laptop: [`manual-testing.md`](manual-testing.md). Not yet done by the
+  maintainer; the htmx behaviour is so far only covered by Django tests.
+- 2026-11-19: on the maintainer's one-time instruction, Claude merged #73
+  (Caddy upload limit, a server change) itself. The merge exceptions in
+  CLAUDE.md stay in force: PRs with migrations or server/deployment
+  changes are merged by the maintainer.
 
 ## Open issues
 
@@ -162,12 +169,18 @@ Overview: `gh issue list`. At the time of writing:
 | 3 | Outgoing mail `coach@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Logo, colours and badge artwork | Maintainer |
 | 6–51 | Version 1, one issue per PR, grouped in milestones M1–M11 (brief, section 10); PRs with migrations or server changes are marked and merged by the maintainer | Claude Code |
+| 77 | Show who uploaded a submission item (follow-up to #30; migration) | Claude Code, merged by the maintainer |
 
 ## Next steps
 
-1. Next: M6 review and progress: #31 coach queue, #32 review form, #33
-   points and levels, #34 badges, #35 participant dashboard.
-2. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
+1. Next session: M6 review and progress, starting with #31 coach queue,
+   then #32 review form, #33 points and levels, #34 badges (migration,
+   merged by the maintainer) and #35 participant dashboard.
+2. Maintainer: manual test of phone upload and live update
+   ([`manual-testing.md`](manual-testing.md)).
+3. Later, not before M6: #77 show who uploaded a submission item
+   (migration, merged by the maintainer).
+4. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes, added with #28), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +
    `pillow-heif` (image processing incl. HEIC, explicit since #24).

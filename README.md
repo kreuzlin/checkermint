@@ -76,4 +76,5 @@ directly (not `uv run`).
 - [`docs/architecture.md`](docs/architecture.md) – structure, runtime, delivery
 - [`docs/deployment.md`](docs/deployment.md) – server setup, deployments, backups
 - [`docs/data-model.md`](docs/data-model.md) – data model
+- [`docs/manual-testing.md`](docs/manual-testing.md) – manual checks, e.g. phone upload with live update
 - [`docs/decisions/`](docs/decisions/) – Architecture Decision Records (ADRs)
