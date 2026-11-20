@@ -177,9 +177,35 @@ The script pulls the repo and images, runs migrations, restarts the
 containers and removes old images. The commit is baked into the image by CI
 (`GIT_COMMIT` build arg → `APP_COMMIT`); locally built images report `dev`.
 
-**Rollback** to an earlier build: set `IMAGE_TAG=sha-<commit>` in `.env` and
-run `scripts/deploy.sh` again (set it back to `latest` afterwards). Migrations
-are not rolled back automatically.
+**Rollback** to an earlier build (tested 2026-11-20, #50: about 10 seconds,
+`/version` shows the old commit):
+
+```bash
+sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=sha-<full commit>|" .env
+scripts/deploy.sh
+curl -s https://checkermint.ch/version
+# later, once the fix is merged and its image pushed:
+sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=latest|" .env
+scripts/deploy.sh
+```
+
+Every merge to `main` has an image `sha-<full commit>` on GHCR (docs-only
+merges too). `scripts/deploy.sh` also pulls the repo, so scripts and
+`compose.prod.yaml` stay at `main` – only the app image goes back.
+
+Migrations are **not** rolled back. The old code then runs against the newer
+schema, which is fine for reading, but it can break writing: a column added
+as `NOT NULL` without a database default makes the old code's inserts fail.
+Example: rolling back to before #77 (`submissions/0003`, `via_phone`) would
+break new uploads. Before rolling back across a migration:
+
+1. List the migrations in between:
+   `git diff --stat <old>..<new> -- '*/migrations/*'`.
+2. Only data and nullable columns added → rollback is safe.
+3. Otherwise prefer a fix forward (new PR), or restore the database dump
+   taken before the deploy (section 6) and accept losing what happened
+   since. Take a backup (`scripts/backup.sh`) before deploying a PR with
+   migrations once the site is productive.
 
 ## 5. Scheduled jobs
 
@@ -218,7 +244,10 @@ docker compose -f compose.prod.yaml logs --tail 100 web    # Django/Gunicorn
 docker compose -f compose.prod.yaml logs --tail 100 caddy  # access log, TLS
 ```
 
-## 8. Go-live
+## 8. Domain switch
+
+Done for checkermint.ch on 2026-11-20 (first deploy). The site then runs
+but is not productive yet – that is section 9.
 
 1. DNS: point the main domain (and e.g. `www`) to the server; remove old
    `AAAA` records that point elsewhere. Do not touch mail records. If the
@@ -243,5 +272,51 @@ docker compose -f compose.prod.yaml logs --tail 100 caddy  # access log, TLS
    the site is never indexed), `https://<domain>/media/…` is not served
    (404), redirects
    (301 to the main address), admin login, forms and email.
-5. Record the go-live in `docs/STATUS.md`. Caddy sends HSTS for one year
+5. Record the deploy in `docs/STATUS.md`. Caddy sends HSTS for one year
    (without subdomains) – from now on the domain must stay on HTTPS.
+
+## 9. Go-live checklist
+
+The app is **productive** once the maintainer says so: real participants
+get accounts and their data must be kept. Before that, go through this
+list (brief, sections 8.3 and 10, milestone 11). Items marked with the
+issue are tracked there.
+
+**Operations**
+
+- [ ] Server set up (section 1), domain switched (section 8), checks of
+  section 8 step 4 pass.
+- [ ] Email works (#3, #42): `sendtestemail` to an outside address
+  arrives; a password reset email arrives and its link works; a
+  notification about a submission reaches a coach. Not in spam.
+- [ ] Backups: cron runs `scripts/backup.sh` at 02:00, UpCloud backup after
+  it (02:15); `scripts/backup.sh && scripts/test-restore.sh` passes (#49).
+  After the first night: today's files in `backups/`.
+- [ ] Rollback tested (section 4, #50).
+- [ ] Container log retention matches the privacy page (#97).
+- [ ] Disk: `df -h /` well below 80 %.
+
+**Accounts and content** (in the admin, by the maintainer and coaches)
+
+- [ ] Maintainer's superuser exists; coaches have staff accounts in the
+  group "Coach" (no superusers).
+- [ ] Topics, level table, first tasks with published versions and hints.
+- [ ] Badges with artwork (#4) or the placeholder accepted.
+- [ ] No demo or test data on the server (`seed_demo` only runs with
+  `DEBUG`, so there should be none – check the admin lists).
+
+**Pages and privacy**
+
+- [ ] Landing page wording, privacy page and imprint reviewed; decision
+  on a postal address in the imprint.
+- [ ] Manual test of phone upload and live update
+  ([`manual-testing.md`](manual-testing.md)) on the live site.
+- [ ] Public profile of a test participant shows nothing private (no real
+  name, no email, no feedback).
+
+**Switch to productive**
+
+- [ ] `docs/STATUS.md`: the app is productive (date).
+- [ ] `CLAUDE.md`, Workflow: migration PRs are merged by the maintainer
+  again (remove the "only once the app is productive" clause).
+- [ ] Participants get their accounts.
