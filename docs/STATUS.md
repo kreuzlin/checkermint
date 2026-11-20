@@ -7,13 +7,14 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-20 (PR "Record who uploaded a submission item")_
+_Last updated: 2026-11-20 (PR "Record production server setup")_
 
 ## Live
 
-- **https://checkermint.ch** – not live yet. The apex does not point to a
-  server of this project yet (certificate mismatch, 2026-11-18). Planned:
-  apex only, `www` redirects to the apex (#2).
+- **https://checkermint.ch** – not live yet. Since 2026-11-20 the apex and
+  `www` (A and AAAA, checked at Hostpoint's name servers) point to the new
+  server; the app is not deployed yet, so ports 80/443 do not answer. `www`
+  will redirect to the apex (`REDIRECT_ADDRESSES`, #2).
 - Deployed commit: `curl -s https://checkermint.ch/version`, compare with
   `git rev-parse origin/main`. Last deploy: `—`. Docs- or CI-only changes
   need no deploy (the live commit then lags behind `main`).
@@ -27,15 +28,16 @@ _Last updated: 2026-11-20 (PR "Record who uploaded a submission item")_
 
 | What | Where |
 |---|---|
-| Server | Not set up yet (#1). Planned: UpCloud, Ubuntu 26.04, 2 cores / 2 GB / 30 GB, time zone Europe/Zurich |
-| Access | `ssh {{SSH_TARGET}}` (key only, no root login, passwordless sudo) – placeholder until #1 is done |
+| Server | UpCloud `de-fra1` (Frankfurt), `85.9.202.23` / `2a04:3542:1000:910:9010:e8ff:fe50:74f8`, Ubuntu 26.04.1, 2 cores / 2 GB / 30 GB, 2 GB swap, time zone Europe/Zurich, `ufw` (22, 80, 443 tcp/udp), unattended upgrades. Set up 2026-11-20 by Claude (deployment.md, section 1) |
+| Access | `ssh deploy@85.9.202.23` (key only, root login and passwords disabled, passwordless sudo, member of `docker`) |
+| Docker | Docker Engine 29.10 with Compose 5.8 from Docker's apt repository; `/etc/docker/daemon.json` limits container logs to 5 × 10 MB (size-based; time-based retention still open, #97) |
 | App | `/srv/checkermint` (git checkout), `compose.prod.yaml`: `db` (PostgreSQL 18), `web` (GHCR image, Gunicorn), `caddy` (HTTPS) |
 | Secrets | `/srv/checkermint/.env` on the server only |
 | Deploy | `scripts/deploy.sh` on the server after CI has pushed the image for the merged commit |
 | Backups | cron 02:00 `scripts/backup-db.sh` (14 days in `backups/`), UpCloud backup _daily at …_; must include the `media` volume (ADR 0009) |
 | Cron | _scheduled jobs_ |
 | Mail | Hostpoint SMTP, sender `mail@checkermint.ch` (mailbox created by the maintainer 2026-11-19, replaces the planned `coach@`; SMTP setup open, #3) |
-| DNS | Hostpoint; only apex and `www` of checkermint.ch are changed (#2) |
+| DNS | Hostpoint; only apex and `www` of checkermint.ch are changed (#2). Both point to the server (A and AAAA) since 2026-11-20; MX records unchanged |
 | CI | GitHub Actions: lint + tests, `linux/amd64` image to `ghcr.io/kreuzlin/checkermint` (`latest`, `sha-<commit>`) on `main`; runs on `main` are queued, never cancelled |
 | GitHub | Squash merge only (PR title/body), auto-merge, head branches deleted; ruleset "protect main" active (PR, CI checks, no force push/deletion); labels `ops`, `content`, `bug`, `enhancement` |
 
@@ -46,7 +48,7 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 ## Done (version 1)
 
 - Milestone 1 (setup), partly: GitHub settings, placeholders replaced
-  (except `{{SSH_TARGET}}`), project brief added, ADRs 0009–0013 (private
+  (`{{SSH_TARGET}}` last, 2026-11-20), project brief added, ADRs 0009–0013 (private
   media, task versioning, submission requirements, avatars with Robohash
   set1, points and levels).
 - #6: search engines blocked in the app (middleware, robots.txt, meta tag).
@@ -281,6 +283,17 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   there is no production data yet. Server and deployment PRs stay with
   the maintainer. From the go-live on, migrations are merged by the
   maintainer again (CLAUDE.md, Workflow).
+- 2026-11-20: production server set up by Claude on the maintainer's
+  instruction (#1, deployment.md section 1): updates and reboot, time
+  zone, swap, firewall, user `deploy`, root login disabled, Docker with log
+  limits. Repo cloned to `/srv/checkermint` (`main` at `3380288`), cron
+  restarted after the time zone change. `.env` created from `.env.example`
+  with the non-secret production values (`DEBUG=false`, `ALLOWED_HOSTS`,
+  `CSRF_TRUSTED_ORIGINS`, `SITE_ADDRESS=checkermint.ch`,
+  `REDIRECT_ADDRESSES=www.checkermint.ch`,
+  `DEFAULT_FROM_EMAIL=mail@checkermint.ch`); `SECRET_KEY` and the database
+  password are still `change-me` and are set by the maintainer. The GHCR
+  image is public (anonymous pull works). Not deployed yet.
 
 ## Open issues
 
@@ -288,22 +301,26 @@ Overview: `gh issue list`. At the time of writing:
 
 | # | Topic | Who |
 |---|---|---|
-| 1 | Production server (UpCloud), SSH target, backups, GHCR visibility | Maintainer |
-| 2 | DNS for checkermint.ch (apex and `www` only) | Maintainer |
+| 1 | Production server (UpCloud): set up and image pullable; left: secrets in `.env`, UpCloud backups (check in the control panel), first deploy, cron | Maintainer |
+| 2 | DNS for checkermint.ch: records set; close after the certificate and the `www` redirect work | Maintainer |
 | 3 | Outgoing mail `mail@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Badge artwork (logo and colours delivered) | Maintainer |
 | 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
-| 97 | Rotate container logs on the server (the privacy page says logs are deleted regularly) | Maintainer (server PR) |
+| 97 | Rotate container logs on the server (the privacy page says logs are deleted regularly). Size limit set in the Docker daemon; decide whether a time-based limit is needed | Maintainer (server PR) |
 
 ## Next steps
 
-1. Everything left for version 1 needs the server or the mailbox:
-   #1 server, #2 DNS, #3 mail, then #42 SMTP (completes M9), #49 media
-   backup/restore, #50 rollback and go-live, #97 log rotation.
+1. Maintainer: set `SECRET_KEY`, `POSTGRES_PASSWORD` and the password in
+   `DATABASE_URL` in `/srv/checkermint/.env`, check the UpCloud backups;
+   then the first deploy (`scripts/deploy.sh`, `createsuperuser`). Until
+   SMTP (#42) is set up, `EMAIL_BACKEND` is unset and emails (incl.
+   password reset links) go to the `web` container log.
+2. Then: #3 mail, #42 SMTP (completes M9), #49 media backup/restore, #50
+   rollback and go-live, #97 log retention.
    Maintainer: decide whether the imprint gets a postal address.
-2. Maintainer: manual test of phone upload and live update
+3. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
-3. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
+4. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes, added with #28), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +
    `pillow-heif` (image processing incl. HEIC, explicit since #24).
