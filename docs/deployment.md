@@ -335,7 +335,8 @@ issue are tracked there.
   it (02:15); `scripts/backup.sh && scripts/test-restore.sh` passes (#49).
   After the first night: today's files in `backups/`.
 - [ ] Rollback tested (section 4, #50).
-- [ ] Container log retention matches the privacy page (#97).
+- [x] Container log retention matches the privacy page: 50 MB per
+  container (`/etc/docker/daemon.json`, section 1; #97).
 - [ ] Disk: `df -h /` well below 80 %.
 
 **Accounts and content** (in the admin, by the maintainer and coaches)
@@ -350,7 +351,8 @@ issue are tracked there.
 **Pages and privacy**
 
 - [ ] Landing page wording, privacy page and imprint reviewed; decision
-  on a postal address in the imprint.
+  on a postal address in the imprint (2026-11-20: none, contact
+  `privacy@checkermint.ch`).
 - [ ] Manual test of phone upload and live update
   ([`manual-testing.md`](manual-testing.md)) on the live site.
 - [ ] Public profile of a test participant shows nothing private (no real

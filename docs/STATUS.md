@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-20 (PR "Record SMTP setup")_
+_Last updated: 2026-11-20 (PR "Record mail, log and imprint decisions")_
 
 ## Live
 
@@ -34,13 +34,13 @@ _Last updated: 2026-11-20 (PR "Record SMTP setup")_
 |---|---|
 | Server | UpCloud `de-fra1` (Frankfurt), `85.9.202.23` / `2a04:3542:1000:910:9010:e8ff:fe50:74f8`, Ubuntu 26.04.1, 2 cores / 2 GB / 30 GB, 2 GB swap, time zone Europe/Zurich, `ufw` (22, 80, 443 tcp/udp), unattended upgrades. Set up 2026-11-20 by Claude (deployment.md, section 1) |
 | Access | `ssh deploy@85.9.202.23` (key only, root login and passwords disabled, passwordless sudo, member of `docker`) |
-| Docker | Docker Engine 29.10 with Compose 5.8 from Docker's apt repository; `/etc/docker/daemon.json` limits container logs to 5 × 10 MB (size-based; time-based retention still open, #97) |
+| Docker | Docker Engine 29.10 with Compose 5.8 from Docker's apt repository; `/etc/docker/daemon.json` limits container logs to 5 × 10 MB = 50 MB per container (maintainer's decision 2026-11-20, #97); logs also go when a container is recreated |
 | App | `/srv/checkermint` (git checkout), `compose.prod.yaml`: `db` (PostgreSQL 18), `web` (GHCR image, Gunicorn), `caddy` (HTTPS) |
 | Secrets | `/srv/checkermint/.env` on the server only |
 | Deploy | `scripts/deploy.sh` on the server after CI has pushed the image for the merged commit |
 | Backups | cron 02:00 `scripts/backup.sh`: database dump (14 days) and `media.tar` (latest only) in `backups/` (ADR 0017); restore test `scripts/test-restore.sh`; UpCloud backup daily at 02:15 (set by the maintainer 2026-11-20, after the dump); must include the `media` volume (ADR 0009) |
 | Cron | `deploy`'s crontab: `0 2 * * * cd /srv/checkermint && scripts/backup.sh` (switched from `backup-db.sh` after #107, 2026-11-20) |
-| Mail | Hostpoint SMTP `asmtp.mail.hostpoint.ch:465` (SSL), login and sender `mail@checkermint.ch` (mailbox created by the maintainer 2026-11-19). Outbound 465/587 not blocked by UpCloud. SPF: `redirect=spf-permissive.mail.hostpoint.ch`; DKIM not checked; no DMARC record yet (#3) |
+| Mail | Hostpoint SMTP `asmtp.mail.hostpoint.ch:465` (SSL), login and sender `mail@checkermint.ch` (mailbox created by the maintainer 2026-11-19). Outbound 465/587 not blocked by UpCloud. SPF: `redirect=spf-permissive.mail.hostpoint.ch`; DKIM not found; no DMARC record yet. First test email arrived in spam (#3) |
 | DNS | Hostpoint; only apex and `www` of checkermint.ch are changed (#2). Both point to the server (A and AAAA) since 2026-11-20; MX records unchanged |
 | CI | GitHub Actions: lint + tests, `linux/amd64` image to `ghcr.io/kreuzlin/checkermint` (`latest`, `sha-<commit>`) on `main`; runs on `main` are queued, never cancelled |
 | GitHub | Squash merge only (PR title/body), auto-merge, head branches deleted; ruleset "protect main" active (PR, CI checks, no force push/deletion); labels `ops`, `content`, `bug`, `enhancement` |
@@ -336,6 +336,11 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   came with the notifications PRs. The maintainer passed the mailbox
   password through the chat; it should be changed at Hostpoint and
   entered on the server without echo (deployment.md, section 3).
+  Maintainer's decision 2026-11-20: the password stays as it is.
+- 2026-11-20, maintainer's decisions: container logs stay limited by size,
+  50 MB per container (#97; "regelmässig gelöscht" on the privacy page
+  holds); the imprint gets no postal address, the contact is
+  `privacy@checkermint.ch` (already shown).
 
 ## Open issues
 
@@ -344,16 +349,13 @@ Overview: `gh issue list`. At the time of writing:
 | # | Topic | Who |
 |---|---|---|
 | 1 | Production server (UpCloud): set up, deployed, backups scheduled; left: the maintainer's admin account (`createsuperuser`) | Maintainer |
-| 3 | Outgoing mail: check that the test email arrived and its headers (SPF/DKIM `pass`), enable DKIM, add a DMARC record (`p=none`), change the mailbox password (it went through the chat) | Maintainer |
+| 3 | Outgoing mail: the test email arrives but lands in spam – enable DKIM at Hostpoint, add a DMARC record (`p=none`), then test again and check the headers (SPF/DKIM `pass`) | Maintainer |
 | 4 | Badge artwork (logo and colours delivered) | Maintainer |
 | 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, once the app is productive, migrations) are marked and merged by the maintainer. #42, #49 and #50 done | Claude Code |
-| 97 | Rotate container logs on the server (the privacy page says logs are deleted regularly). Size limit set in the Docker daemon; decide whether a time-based limit is needed | Maintainer (server PR) |
 
 ## Next steps
 
-1. Maintainer: #3 (test email headers, DKIM, DMARC, new mailbox
-   password), #97 (log retention: keep the size limit or a fixed period),
-   postal address in the imprint.
+1. Maintainer: #3 (DKIM, DMARC – the test email landed in spam).
 2. Then the go-live checklist (deployment.md, section 9) until the
    maintainer declares the app productive.
 3. Maintainer: manual test of phone upload and live update
