@@ -7,17 +7,19 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-20 (PR "Record production server setup")_
+_Last updated: 2026-11-20 (PR "Record first production deploy")_
 
 ## Live
 
-- **https://checkermint.ch** – not live yet. Since 2026-11-20 the apex and
-  `www` (A and AAAA, checked at Hostpoint's name servers) point to the new
-  server; the app is not deployed yet, so ports 80/443 do not answer. `www`
-  will redirect to the apex (`REDIRECT_ADDRESSES`, #2).
+- **https://checkermint.ch** – live since 2026-11-20 (first deploy). Apex
+  and `www` (A and AAAA) point to the server; Let's Encrypt certificate via
+  Caddy; `http://` and `www` redirect to `https://checkermint.ch/`; IPv4 and
+  IPv6 answer. No accounts yet except the maintainer's admin account (to be
+  created). Emails go to the `web` container log until SMTP (#42).
 - Deployed commit: `curl -s https://checkermint.ch/version`, compare with
-  `git rev-parse origin/main`. Last deploy: `—`. Docs- or CI-only changes
-  need no deploy (the live commit then lags behind `main`).
+  `git rev-parse origin/main`. Last deploy: 2026-11-20, `3380288` (#104 and
+  this PR are docs only). Docs- or CI-only changes need no deploy (the live
+  commit then lags behind `main`).
 - Search engines: never indexed (brief, section 4). Django sends
   `X-Robots-Tag: noindex, nofollow` on every response, `/robots.txt`
   disallows everything, `<meta name="robots">` in the layout, no sitemap,
@@ -34,8 +36,8 @@ _Last updated: 2026-11-20 (PR "Record production server setup")_
 | App | `/srv/checkermint` (git checkout), `compose.prod.yaml`: `db` (PostgreSQL 18), `web` (GHCR image, Gunicorn), `caddy` (HTTPS) |
 | Secrets | `/srv/checkermint/.env` on the server only |
 | Deploy | `scripts/deploy.sh` on the server after CI has pushed the image for the merged commit |
-| Backups | cron 02:00 `scripts/backup-db.sh` (14 days in `backups/`), UpCloud backup _daily at …_; must include the `media` volume (ADR 0009) |
-| Cron | _scheduled jobs_ |
+| Backups | cron 02:00 `scripts/backup-db.sh` (14 days in `backups/`, first manual run 2026-11-20 OK), UpCloud backup daily at 02:15 (set by the maintainer 2026-11-20, after the dump); must include the `media` volume (ADR 0009) |
+| Cron | `deploy`'s crontab: `0 2 * * * cd /srv/checkermint && scripts/backup-db.sh` |
 | Mail | Hostpoint SMTP, sender `mail@checkermint.ch` (mailbox created by the maintainer 2026-11-19, replaces the planned `coach@`; SMTP setup open, #3) |
 | DNS | Hostpoint; only apex and `www` of checkermint.ch are changed (#2). Both point to the server (A and AAAA) since 2026-11-20; MX records unchanged |
 | CI | GitHub Actions: lint + tests, `linux/amd64` image to `ghcr.io/kreuzlin/checkermint` (`latest`, `sha-<commit>`) on `main`; runs on `main` are queued, never cancelled |
@@ -292,8 +294,19 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   `CSRF_TRUSTED_ORIGINS`, `SITE_ADDRESS=checkermint.ch`,
   `REDIRECT_ADDRESSES=www.checkermint.ch`,
   `DEFAULT_FROM_EMAIL=mail@checkermint.ch`); `SECRET_KEY` and the database
-  password are still `change-me` and are set by the maintainer. The GHCR
-  image is public (anonymous pull works). Not deployed yet.
+  password were generated on the server (never shown) on the maintainer's
+  instruction to do as much as possible. The GHCR image is public
+  (anonymous pull works).
+- 2026-11-20: **first production deploy** (`scripts/deploy.sh`, image
+  `3380288`, all migrations applied). Checked from outside: `/`,
+  `/anmelden/`, `/admin/login/`, `/datenschutz/`, `/robots.txt` 200;
+  `/media/…` 404; `X-Robots-Tag: noindex, nofollow`, HSTS (Caddy); HTTP and
+  `www` redirect to the apex; IPv4 and IPv6. `check --deploy` only warns
+  about `SECURE_HSTS_SECONDS` and `SECURE_SSL_REDIRECT`, both handled by
+  Caddy. Backup cron set up, first dump OK. Memory after start: about
+  770 MB used of 1.8 GB, swap unused. Scanners (leakix etc.) probed the
+  site within a minute of the certificate being issued; all got 404.
+  From now on PRs with migrations are merged by the maintainer again.
 
 ## Open issues
 
@@ -301,22 +314,21 @@ Overview: `gh issue list`. At the time of writing:
 
 | # | Topic | Who |
 |---|---|---|
-| 1 | Production server (UpCloud): set up and image pullable; left: secrets in `.env`, UpCloud backups (check in the control panel), first deploy, cron | Maintainer |
-| 2 | DNS for checkermint.ch: records set; close after the certificate and the `www` redirect work | Maintainer |
+| 1 | Production server (UpCloud): set up, deployed, backups scheduled; left: the maintainer's admin account (`createsuperuser`) | Maintainer |
 | 3 | Outgoing mail `mail@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Badge artwork (logo and colours delivered) | Maintainer |
-| 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
+| 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes or migrations are marked and merged by the maintainer. #42 (SMTP) needs SMTP access (#3); #49 (media backup/restore) and #50 (rollback, go-live checklist) can start now | Claude Code |
 | 97 | Rotate container logs on the server (the privacy page says logs are deleted regularly). Size limit set in the Docker daemon; decide whether a time-based limit is needed | Maintainer (server PR) |
 
 ## Next steps
 
-1. Maintainer: set `SECRET_KEY`, `POSTGRES_PASSWORD` and the password in
-   `DATABASE_URL` in `/srv/checkermint/.env`, check the UpCloud backups;
-   then the first deploy (`scripts/deploy.sh`, `createsuperuser`). Until
-   SMTP (#42) is set up, `EMAIL_BACKEND` is unset and emails (incl.
-   password reset links) go to the `web` container log.
+1. Maintainer: create the admin account (`docker compose -f
+   compose.prod.yaml exec web python manage.py createsuperuser` in
+   `/srv/checkermint`). Until SMTP (#42) is set up, `EMAIL_BACKEND` is
+   unset and emails (incl. password reset links) go to the `web` container
+   log – invite participants only after #42.
 2. Then: #3 mail, #42 SMTP (completes M9), #49 media backup/restore, #50
-   rollback and go-live, #97 log retention.
+   rollback and go-live checklist, #97 log retention.
    Maintainer: decide whether the imprint gets a postal address.
 3. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
@@ -332,8 +344,8 @@ Overview: `gh issue list`. At the time of writing:
 - Every change via branch + PR. Claude merges its own PRs with
   `gh pr merge <N> --squash --auto` once the checks are green, verifies with
   `gh pr view` and deploys. PRs with server/deployment changes are merged
-  by the maintainer; PRs with database migrations too, but only from the
-  go-live on (until then Claude merges them). Never pipe `gh` output.
+  by the maintainer; PRs with database migrations too (since the first
+  production deploy, 2026-11-20). Never pipe `gh` output.
 - Content on the live site lives only in the production database, not in
   git; local data is a playground.
 - Privacy principles (brief, section 4) are hard rules.
