@@ -144,6 +144,19 @@ Check `https://<domain>/`, log in to `/admin/`. Test email sending:
 docker compose -f compose.prod.yaml exec -T web python manage.py sendtestemail <address>
 ```
 
+Hostpoint: `EMAIL_HOST=asmtp.mail.hostpoint.ch`, `EMAIL_PORT=465`,
+`EMAIL_USE_SSL=true`, user = the full mailbox address. To change the
+mailbox password later without it showing up anywhere (the value stays out
+of the shell history and the screen):
+
+```bash
+read -rsp "Neues Passwort: " PW && echo && \
+  sed -i "s|^EMAIL_HOST_PASSWORD=.*|EMAIL_HOST_PASSWORD='$PW'|" .env && unset PW && \
+  docker compose -f compose.prod.yaml up -d --force-recreate web
+```
+
+The password must not contain `'` or `|`.
+
 ### Changing `.env`
 
 `docker compose up -d` does not notice changes inside `.env`. Recreate the

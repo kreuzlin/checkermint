@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-20 (PR "Back up media and add a restore test")_
+_Last updated: 2026-11-20 (PR "Record SMTP setup")_
 
 ## Live
 
@@ -16,11 +16,11 @@ _Last updated: 2026-11-20 (PR "Back up media and add a restore test")_
   productive). Apex
   and `www` (A and AAAA) point to the server; Let's Encrypt certificate via
   Caddy; `http://` and `www` redirect to `https://checkermint.ch/`; IPv4 and
-  IPv6 answer. No accounts yet except the maintainer's admin account (to be
-  created). Emails go to the `web` container log until SMTP (#42).
+  IPv6 answer. The maintainer's admin account exists (2026-11-20). Email
+  goes out via Hostpoint SMTP since 2026-11-20 (#42).
 - Deployed commit: `curl -s https://checkermint.ch/version`, compare with
-  `git rev-parse origin/main`. Last deploy: 2026-11-20, `3380288` (#104 and
-  this PR are docs only). Docs- or CI-only changes need no deploy (the live
+  `git rev-parse origin/main`. Last deploy: 2026-11-20, `22a0f91` (after the
+  rollback test; app code as `3380288`). Docs- or CI-only changes need no deploy (the live
   commit then lags behind `main`).
 - Search engines: never indexed (brief, section 4). Django sends
   `X-Robots-Tag: noindex, nofollow` on every response, `/robots.txt`
@@ -39,8 +39,8 @@ _Last updated: 2026-11-20 (PR "Back up media and add a restore test")_
 | Secrets | `/srv/checkermint/.env` on the server only |
 | Deploy | `scripts/deploy.sh` on the server after CI has pushed the image for the merged commit |
 | Backups | cron 02:00 `scripts/backup.sh`: database dump (14 days) and `media.tar` (latest only) in `backups/` (ADR 0017); restore test `scripts/test-restore.sh`; UpCloud backup daily at 02:15 (set by the maintainer 2026-11-20, after the dump); must include the `media` volume (ADR 0009) |
-| Cron | `deploy`'s crontab: `0 2 * * * cd /srv/checkermint && scripts/backup.sh` (was `backup-db.sh`; switch the crontab right after merging #49's PR) |
-| Mail | Hostpoint SMTP, sender `mail@checkermint.ch` (mailbox created by the maintainer 2026-11-19, replaces the planned `coach@`; SMTP setup open, #3) |
+| Cron | `deploy`'s crontab: `0 2 * * * cd /srv/checkermint && scripts/backup.sh` (switched from `backup-db.sh` after #107, 2026-11-20) |
+| Mail | Hostpoint SMTP `asmtp.mail.hostpoint.ch:465` (SSL), login and sender `mail@checkermint.ch` (mailbox created by the maintainer 2026-11-19). Outbound 465/587 not blocked by UpCloud. SPF: `redirect=spf-permissive.mail.hostpoint.ch`; DKIM not checked; no DMARC record yet (#3) |
 | DNS | Hostpoint; only apex and `www` of checkermint.ch are changed (#2). Both point to the server (A and AAAA) since 2026-11-20; MX records unchanged |
 | CI | GitHub Actions: lint + tests, `linux/amd64` image to `ghcr.io/kreuzlin/checkermint` (`latest`, `sha-<commit>`) on `main`; runs on `main` are queued, never cancelled |
 | GitHub | Squash merge only (PR title/body), auto-merge, head branches deleted; ruleset "protect main" active (PR, CI checks, no force push/deletion); labels `ops`, `content`, `bug`, `enhancement` |
@@ -329,6 +329,14 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   and an added file; a real restore of database and media (runbook section
   6) brought the files back identical. Sample data removed afterwards.
 
+- #42: SMTP live on 2026-11-20: Hostpoint credentials in the server
+  `.env` (`EMAIL_BACKEND` smtp, `asmtp.mail.hostpoint.ch`, 465, SSL),
+  `web` recreated, `sendtestemail mail@checkermint.ch` accepted by
+  Hostpoint. No code change was needed: the settings and `.env.example`
+  came with the notifications PRs. The maintainer passed the mailbox
+  password through the chat; it should be changed at Hostpoint and
+  entered on the server without echo (deployment.md, section 3).
+
 ## Open issues
 
 Overview: `gh issue list`. At the time of writing:
@@ -336,27 +344,21 @@ Overview: `gh issue list`. At the time of writing:
 | # | Topic | Who |
 |---|---|---|
 | 1 | Production server (UpCloud): set up, deployed, backups scheduled; left: the maintainer's admin account (`createsuperuser`) | Maintainer |
-| 3 | Outgoing mail `mail@checkermint.ch` (Hostpoint SMTP) | Maintainer |
+| 3 | Outgoing mail: check that the test email arrived and its headers (SPF/DKIM `pass`), enable DKIM, add a DMARC record (`p=none`), change the mailbox password (it went through the chat) | Maintainer |
 | 4 | Badge artwork (logo and colours delivered) | Maintainer |
-| 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, once the app is productive, migrations) are marked and merged by the maintainer. #42 (SMTP) needs SMTP access (#3); #49 (media backup/restore) has a PR waiting for the maintainer; #50 done | Claude Code |
+| 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, once the app is productive, migrations) are marked and merged by the maintainer. #42, #49 and #50 done | Claude Code |
 | 97 | Rotate container logs on the server (the privacy page says logs are deleted regularly). Size limit set in the Docker daemon; decide whether a time-based limit is needed | Maintainer (server PR) |
 
 ## Next steps
 
-1. Maintainer: create the admin account (`docker compose -f
-   compose.prod.yaml exec web python manage.py createsuperuser` in
-   `/srv/checkermint`). Until SMTP (#42) is set up, `EMAIL_BACKEND` is
-   unset and emails (incl. password reset links) go to the `web` container
-   log – invite participants only after #42.
-2. Maintainer: merge the #49 PR (scripts); then switch the cron line to
-   `scripts/backup.sh`.
-3. Then: #3 mail, #42 SMTP (completes M9), #97 log retention; then the
-   go-live checklist (deployment.md, section 9) until the maintainer
-   declares the app productive.
-   Maintainer: decide whether the imprint gets a postal address.
-4. Maintainer: manual test of phone upload and live update
+1. Maintainer: #3 (test email headers, DKIM, DMARC, new mailbox
+   password), #97 (log retention: keep the size limit or a fixed period),
+   postal address in the imprint.
+2. Then the go-live checklist (deployment.md, section 9) until the
+   maintainer declares the app productive.
+3. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
-5. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
+4. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes, added with #28), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +
    `pillow-heif` (image processing incl. HEIC, explicit since #24).
