@@ -122,7 +122,7 @@ Then by hand:
 - [ ] `MX`, `SPF`, `DKIM`, `DMARC` untouched
 - [ ] Check at the authoritative name servers with `dig`, then set
       `SITE_ADDRESS` (Caddy gets the certificate automatically)
-- [ ] Go-live: deployment.md, section 8
+- [ ] Go-live: deployment.md, sections 8 and 9
 
 ## 6. Mail
 

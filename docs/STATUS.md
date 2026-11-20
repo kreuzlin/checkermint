@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-20 (PR "Keep merging migrations until the app is productive")_
+_Last updated: 2026-11-20 (PR "Test rollback and add go-live checklist")_
 
 ## Live
 
@@ -313,6 +313,15 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   Claude keeps merging PRs with migrations itself. Server and deployment
   PRs stay with the maintainer.
 
+- #50: rollback tested on the server 2026-11-20: `IMAGE_TAG=sha-f0adf44…`
+  and `scripts/deploy.sh` (7 s), `/version` showed `f0adf44`, pages 200;
+  back to `latest` (`22a0f91`). Finding: the old image does not know
+  `submissions/0003`, and `via_phone` is `NOT NULL` without a database
+  default, so the old code could not save uploads – rollbacks across
+  migrations need a check first (deployment.md, section 4). Go-live
+  checklist in deployment.md, section 9 (section 8 renamed "Domain
+  switch").
+
 ## Open issues
 
 Overview: `gh issue list`. At the time of writing:
@@ -322,7 +331,7 @@ Overview: `gh issue list`. At the time of writing:
 | 1 | Production server (UpCloud): set up, deployed, backups scheduled; left: the maintainer's admin account (`createsuperuser`) | Maintainer |
 | 3 | Outgoing mail `mail@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Badge artwork (logo and colours delivered) | Maintainer |
-| 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, once the app is productive, migrations) are marked and merged by the maintainer. #42 (SMTP) needs SMTP access (#3); #49 (media backup/restore) and #50 (rollback, go-live checklist) can start now | Claude Code |
+| 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, once the app is productive, migrations) are marked and merged by the maintainer. #42 (SMTP) needs SMTP access (#3); #49 (media backup/restore) has a PR waiting for the maintainer; #50 done | Claude Code |
 | 97 | Rotate container logs on the server (the privacy page says logs are deleted regularly). Size limit set in the Docker daemon; decide whether a time-based limit is needed | Maintainer (server PR) |
 
 ## Next steps
@@ -332,8 +341,10 @@ Overview: `gh issue list`. At the time of writing:
    `/srv/checkermint`). Until SMTP (#42) is set up, `EMAIL_BACKEND` is
    unset and emails (incl. password reset links) go to the `web` container
    log – invite participants only after #42.
-2. Then: #3 mail, #42 SMTP (completes M9), #49 media backup/restore, #50
-   rollback and go-live checklist, #97 log retention.
+2. Then: #3 mail, #42 SMTP (completes M9), #49 (PR waiting for the
+   maintainer), #97 log retention; then the go-live checklist
+   (deployment.md, section 9) until the maintainer declares the app
+   productive.
    Maintainer: decide whether the imprint gets a postal address.
 3. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
