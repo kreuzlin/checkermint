@@ -169,7 +169,7 @@ Wait until the CI run for the merge commit has pushed it
 previous build. Then:
 
 ```bash
-ssh {{SSH_TARGET}} 'cd /srv/checkermint && scripts/deploy.sh'
+ssh deploy@85.9.202.23 'cd /srv/checkermint && scripts/deploy.sh'
 curl -s https://checkermint.ch/version   # {"commit": "<sha>", "short": "<sha7>"}
 ```
 

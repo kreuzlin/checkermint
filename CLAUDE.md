@@ -123,7 +123,7 @@ Rationale lives in `docs/decisions/`. To deviate, write a new ADR first.
 - **Deploying** (after Claude's own merge, if the PR changes the app):
   1. Wait until CI on `main` has pushed the image for the merge commit:
      `gh run list --branch main --limit 1`, then `gh run watch <run-id>`.
-  2. `ssh {{SSH_TARGET}} 'cd /srv/checkermint && scripts/deploy.sh'`
+  2. `ssh deploy@85.9.202.23 'cd /srv/checkermint && scripts/deploy.sh'`
   3. `curl -s https://checkermint.ch/version` must show the merge commit;
      `curl -s -o /dev/null -w "%{http_code}\n" https://checkermint.ch/` must be `200`.
   - Docs- or CI-only changes need no deploy (the live commit then lags behind
