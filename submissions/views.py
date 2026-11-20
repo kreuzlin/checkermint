@@ -278,7 +278,7 @@ class PhoneUploadView(SeoMixin, TemplateView):
         if not form.is_valid():
             return self.render_to_response(self.get_context_data(form=form))
         try:
-            add_to_draft(self.draft, form.items)
+            add_to_draft(self.draft, form.items, via_phone=True)
         except SubmissionNotAllowed as error:
             messages.error(request, str(error))
         else:
@@ -430,7 +430,7 @@ class CoachUploadView(CoachRequiredMixin, SeoMixin, TemplateView):
         if not form.is_valid():
             return self.render_to_response(self.get_context_data(form=form))
         try:
-            add_to_draft(self.draft, form.items)
+            add_to_draft(self.draft, form.items, uploaded_by=request.user)
         except SubmissionNotAllowed as error:
             messages.error(request, str(error))
             return self.choose

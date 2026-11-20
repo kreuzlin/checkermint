@@ -264,8 +264,11 @@ One value of a submission: a text, a code snippet, one photo, one file.
 | `original_filename` | char 200 | for display and download |
 | `thumbnail` | file, optional | `einreichungen/vorschau/<uuid>.<ext>` |
 | `data` | JSON | structured values of future types only |
+| `uploaded_by` | FK → User, optional, set null | who added the item: the participant (form) or a coach (coach upload page); empty for phone uploads and items from before #77 |
+| `via_phone` | bool | added on the phone page behind the QR code (no login) |
 | `created_at` | datetime | automatic |
 
+Copies (resubmission, version switch) keep `uploaded_by` and `via_phone`.
 Items can only be added, changed or deleted while the submission is a
 draft (`save`, `delete` and QuerySet guards raise
 `SubmissionLockedError`); afterwards only the review fields of the

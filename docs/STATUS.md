@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-19 (PR "Use mail@checkermint.ch as sender address")_
+_Last updated: 2026-11-20 (PR "Record who uploaded a submission item")_
 
 ## Live
 
@@ -148,8 +148,7 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - #30: coaches add photos and files to a participant's draft from the
   participant profile ("Fotos oder Dateien für … hochladen"); the draft is
   created if needed, the participant submits. Milestone M5 complete.
-  Who uploaded an item is not recorded yet: #77 (migration; merged by
-  Claude until the go-live).
+  Since #77 every item records who added it (see below).
 - Manual test of phone upload and live update (#28, #29) with phone and
   laptop: [`manual-testing.md`](manual-testing.md). Not yet done by the
   maintainer; the htmx behaviour is so far only covered by Django tests.
@@ -267,6 +266,12 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   when a solution is approved (stars, points, badge, feedback) or needs
   revision, and when a hint request is granted or declined (with the
   coach's reply).
+- #77: `SubmissionItem.uploaded_by` and `via_phone` (migration
+  `submissions/0003`, merged by Claude before go-live): set by the form
+  (participant), the coach upload page (coach) and the phone page ("per
+  Handy", no login); copies on resubmission and version switch keep them.
+  Shown as "hochgeladen von Coach …" / "per Handy hochgeladen" in the
+  form, on the task page, in the history and the review; never public.
 - 2026-11-19: on the maintainer's one-time instruction, Claude merged #73
   (Caddy upload limit, a server change) itself. The merge exceptions in
   CLAUDE.md stay in force: PRs with migrations or server/deployment
@@ -288,7 +293,6 @@ Overview: `gh issue list`. At the time of writing:
 | 3 | Outgoing mail `mail@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Badge artwork (logo and colours delivered) | Maintainer |
 | 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, from the go-live on, migrations) are marked and merged by the maintainer. #42 (SMTP), #49 (media backup/restore) and #50 (rollback, go-live) need the server (#1) and SMTP access (#3) first | Claude Code |
-| 77 | Show who uploaded a submission item (follow-up to #30; migration) | Claude Code |
 | 97 | Rotate container logs on the server (the privacy page says logs are deleted regularly) | Maintainer (server PR) |
 
 ## Next steps
@@ -296,13 +300,10 @@ Overview: `gh issue list`. At the time of writing:
 1. Everything left for version 1 needs the server or the mailbox:
    #1 server, #2 DNS, #3 mail, then #42 SMTP (completes M9), #49 media
    backup/restore, #50 rollback and go-live, #97 log rotation.
-   Without them: #77 (who uploaded a submission item).
    Maintainer: decide whether the imprint gets a postal address.
 2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
-3. #77 show who uploaded a submission item (migration; M6 is done, so
-   it can be picked up any time).
-4. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
+3. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes, added with #28), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +
    `pillow-heif` (image processing incl. HEIC, explicit since #24).

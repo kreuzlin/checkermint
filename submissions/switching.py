@@ -148,6 +148,8 @@ def switch_version(user, task, target_id: int) -> TaskAttempt:
                     "data": item.data,
                     "file": copy_file(item.file) or "",
                     "thumbnail": copy_file(item.thumbnail) or "",
+                    "uploaded_by_id": item.uploaded_by_id,
+                    "via_phone": item.via_phone,
                 }
                 for item, new_requirement in plan.carried
             ]

@@ -7,6 +7,7 @@
         <li>
           {% submission_item item %}
           {% if item.original_filename and requirement.type == "photo" %}<span class="help">{{ item.original_filename }}</span>{% endif %}
+          {% item_origin item %}
           <label class="upload-remove"><input type="checkbox" name="{{ requirement.key }}-entfernen" value="{{ item.pk }}"{% if item.pk|stringformat:"s" in checked %} checked{% endif %}> Entfernen</label>
         </li>
       {% endfor %}
