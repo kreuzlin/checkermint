@@ -7,11 +7,13 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-20 (PR "Record first production deploy")_
+_Last updated: 2026-11-20 (PR "Keep merging migrations until the app is productive")_
 
 ## Live
 
-- **https://checkermint.ch** – live since 2026-11-20 (first deploy). Apex
+- **https://checkermint.ch** – deployed since 2026-11-20, **not productive
+  yet** (no real participants or data; the maintainer declares it
+  productive). Apex
   and `www` (A and AAAA) point to the server; Let's Encrypt certificate via
   Caddy; `http://` and `www` redirect to `https://checkermint.ch/`; IPv4 and
   IPv6 answer. No accounts yet except the maintainer's admin account (to be
@@ -306,7 +308,10 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   Caddy. Backup cron set up, first dump OK. Memory after start: about
   770 MB used of 1.8 GB, swap unused. Scanners (leakix etc.) probed the
   site within a minute of the certificate being issued; all got 404.
-  From now on PRs with migrations are merged by the maintainer again.
+- 2026-11-20: maintainer's decision: the deploy is not the go-live. Until
+  the maintainer declares the app productive (real participants and data),
+  Claude keeps merging PRs with migrations itself. Server and deployment
+  PRs stay with the maintainer.
 
 ## Open issues
 
@@ -317,7 +322,7 @@ Overview: `gh issue list`. At the time of writing:
 | 1 | Production server (UpCloud): set up, deployed, backups scheduled; left: the maintainer's admin account (`createsuperuser`) | Maintainer |
 | 3 | Outgoing mail `mail@checkermint.ch` (Hostpoint SMTP) | Maintainer |
 | 4 | Badge artwork (logo and colours delivered) | Maintainer |
-| 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes or migrations are marked and merged by the maintainer. #42 (SMTP) needs SMTP access (#3); #49 (media backup/restore) and #50 (rollback, go-live checklist) can start now | Claude Code |
+| 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, once the app is productive, migrations) are marked and merged by the maintainer. #42 (SMTP) needs SMTP access (#3); #49 (media backup/restore) and #50 (rollback, go-live checklist) can start now | Claude Code |
 | 97 | Rotate container logs on the server (the privacy page says logs are deleted regularly). Size limit set in the Docker daemon; decide whether a time-based limit is needed | Maintainer (server PR) |
 
 ## Next steps
@@ -344,8 +349,9 @@ Overview: `gh issue list`. At the time of writing:
 - Every change via branch + PR. Claude merges its own PRs with
   `gh pr merge <N> --squash --auto` once the checks are green, verifies with
   `gh pr view` and deploys. PRs with server/deployment changes are merged
-  by the maintainer; PRs with database migrations too (since the first
-  production deploy, 2026-11-20). Never pipe `gh` output.
+  by the maintainer; PRs with database migrations too, but only once the
+  maintainer has declared the app productive (until then Claude merges
+  them). Never pipe `gh` output.
 - Content on the live site lives only in the production database, not in
   git; local data is a playground.
 - Privacy principles (brief, section 4) are hard rules.

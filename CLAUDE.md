@@ -110,9 +110,11 @@ Rationale lives in `docs/decisions/`. To deviate, write a new ADR first.
   - **Exceptions – the maintainer merges these PRs.** Open the PR, say in the
     PR description and in the chat why it is an exception, and stop:
     - the PR contains a **database migration** (any file in a `migrations/`
-      directory). (Before the first production deploy on 2026-11-20 Claude
-      merged migration PRs itself; since then the production database
-      exists and this exception applies.) Or:
+      directory) – **only once the app is productive**: the server runs
+      since 2026-11-20, but until the maintainer declares the app productive
+      (real participants and data) Claude merges migration PRs itself
+      (maintainer's decision, 2026-11-20). Update this line when the
+      maintainer declares it productive. Or:
     - the PR changes the **server or the deployment**: `compose.prod.yaml`,
       `Dockerfile`, `deploy/`, `scripts/`, `.github/workflows/`, new or
       changed variables in `.env.example`, or anything that needs manual
