@@ -345,8 +345,12 @@ issue are tracked there.
   group "Coach" (no superusers).
 - [ ] Topics, level table, first tasks with published versions and hints.
 - [ ] Badges with artwork (#4) or the placeholder accepted.
-- [ ] No demo or test data on the server (`seed_demo` only runs with
-  `DEBUG`, so there should be none – check the admin lists).
+- [ ] No demo or test data on the server. Demo data was loaded for
+  testing on 2026-11-20; remove it (same one-off container, the site
+  keeps `DEBUG=false`):
+  `docker compose -f compose.prod.yaml run --rm -e DEBUG=true web python manage.py seed_demo --remove`.
+  If a real account has submitted to a demo task, the command refuses
+  and removes nothing. Then check the admin lists.
 
 **Pages and privacy**
 
