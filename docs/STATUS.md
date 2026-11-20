@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-20 (PR "Record mail, log and imprint decisions")_
+_Last updated: 2026-11-20 (PR "Record demo data on the server")_
 
 ## Live
 
@@ -16,7 +16,9 @@ _Last updated: 2026-11-20 (PR "Record mail, log and imprint decisions")_
   productive). Apex
   and `www` (A and AAAA) point to the server; Let's Encrypt certificate via
   Caddy; `http://` and `www` redirect to `https://checkermint.ch/`; IPv4 and
-  IPv6 answer. The maintainer's admin account exists (2026-11-20). Email
+  IPv6 answer. The maintainer's admin account exists (2026-11-20).
+  **Demo data** is loaded for testing (accounts `demo-coach`,
+  `demo-anna` … `demo-luna`; must be removed before the go-live). Email
   goes out via Hostpoint SMTP since 2026-11-20 (#42).
 - Deployed commit: `curl -s https://checkermint.ch/version`, compare with
   `git rev-parse origin/main`. Last deploy: 2026-11-20, `22a0f91` (after the
@@ -341,6 +343,17 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   50 MB per container (#97; "regelmässig gelöscht" on the privacy page
   holds); the imprint gets no postal address, the contact is
   `privacy@checkermint.ch` (already shown).
+
+- 2026-11-20: on the maintainer's request, demo data (`seed_demo`) loaded
+  on the server for testing, in a one-off container with `DEBUG=true`
+  (the site itself keeps `DEBUG=false`):
+  `docker compose -f compose.prod.yaml run --rm -e DEBUG=true web python manage.py seed_demo`.
+  ADR 0016 meant the command for local development; this is a temporary
+  exception while the app is not productive. The demo accounts have no
+  email address, so no emails were sent. The password was generated and
+  given to the maintainer in the chat, not stored anywhere. Checked: demo
+  coach login, home, catalogue, queue, progress, ranking, directory and
+  admin answer 200; 11 files in the media volume.
 
 ## Open issues
 
