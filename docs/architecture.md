@@ -143,7 +143,15 @@ Overview of how the project is built and run. Decisions and their rationale:
   last submission like the form); locked tasks and waiting submissions are
   refused. The participant submits. Coach views use
   `accounts.mixins.CoachRequiredMixin` (login, then 403 for non-coaches).
-  Items do not record who uploaded them.
+- Who added an item (#77): `save_draft` records the participant,
+  `add_to_draft(…, uploaded_by=coach)` the coach and
+  `add_to_draft(…, via_phone=True)` the phone page (the signed link has
+  no user). `copy_item` and the version switch keep both values. The tag
+  `{% item_origin item %}` (`submissions/templatetags/submission_items.py`)
+  shows "hochgeladen von Coach …" or "per Handy hochgeladen" next to an
+  item in `fields/_stored.html` and `_submission.html`, nothing for the
+  participant's own uploads; these templates are only used on internal
+  pages.
 - Coach queue (#31): `/warteschlange/` ("Warteschlange" in the
   navigation, coaches only: `NavItem(coaches_only=True)`) lists
   `submissions.queue.queue_entries()`: two kinds of entries of active

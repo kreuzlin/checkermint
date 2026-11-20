@@ -216,6 +216,18 @@ class SubmissionItem(models.Model):
         blank=True,
     )
     data = models.JSONField("Daten", default=dict, blank=True)
+    # Who added the item (#77): the participant in the form, a coach on the
+    # coach upload page. Phone uploads have no login, so they are marked
+    # with `via_phone` instead. Copies keep both values.
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name="Hochgeladen von",
+    )
+    via_phone = models.BooleanField("Per Handy hochgeladen", default=False)
     created_at = models.DateTimeField("Erstellt", auto_now_add=True)
 
     objects = SubmissionItemQuerySet.as_manager()
@@ -251,6 +263,14 @@ class SubmissionItem(models.Model):
             # Only once the deletion is committed: a rollback keeps the file.
             transaction.on_commit(lambda n=name, s=storage: s.delete(n))
         return result
+
+    @property
+    def added_by_someone_else(self) -> bool:
+        """True if a coach (or anyone but the participant) added the item."""
+        return (
+            self.uploaded_by_id is not None
+            and self.uploaded_by_id != self.submission.user_id
+        )
 
     def _stored_submission_is_draft(self) -> bool:
         """The submission this row is stored under (it could be moved in memory)."""

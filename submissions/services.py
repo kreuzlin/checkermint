@@ -68,11 +68,14 @@ class SubmissionNotAllowed(Exception):
     pass
 
 
-def save_draft(user, task, items: dict[int, list[dict]]) -> Submission:
+def save_draft(
+    user, task, items: dict[int, list[dict]], uploaded_by=None
+) -> Submission:
     """Create or update the draft with the items per requirement id.
 
     Requirements missing from `items` (types without a handler) keep their
-    stored items. Starts the task if needed.
+    stored items. Starts the task if needed. New items are recorded as
+    added by `uploaded_by` (default: the participant).
     """
     with transaction.atomic():
         if is_waiting(user, task):
@@ -104,11 +107,15 @@ def save_draft(user, task, items: dict[int, list[dict]]) -> Submission:
         for requirement_id, values in items.items():
             if requirement_id not in requirement_ids:
                 raise ValueError("Requirement of another version.")
-            store_items(user, draft, requirement_id, values)
+            store_items(
+                user, draft, requirement_id, values, uploaded_by=uploaded_by or user
+            )
         return draft
 
 
-def store_items(user, draft, requirement_id, values) -> None:
+def store_items(
+    user, draft, requirement_id, values, uploaded_by=None, via_phone=False
+) -> None:
     """Make the draft's items for one requirement match `values`.
 
     Kept items of the draft stay (only their order changes), kept items of an
@@ -126,7 +133,12 @@ def store_items(user, draft, requirement_id, values) -> None:
     for order, value in enumerate(values):
         if not isinstance(value, SubmissionItem):
             SubmissionItem.objects.create(
-                submission=draft, requirement_id=requirement_id, order=order, **value
+                submission=draft,
+                requirement_id=requirement_id,
+                order=order,
+                uploaded_by=uploaded_by,
+                via_phone=via_phone,
+                **value,
             )
         elif value.submission_id == draft.pk:
             if value.order != order:
@@ -159,6 +171,8 @@ def copy_item(item, draft, order) -> SubmissionItem:
         data=item.data,
         file=copy_file(item.file) or "",
         thumbnail=copy_file(item.thumbnail) or "",
+        uploaded_by_id=item.uploaded_by_id,
+        via_phone=item.via_phone,
     )
 
 
@@ -174,14 +188,24 @@ def submit(draft: Submission) -> Submission:
         return draft
 
 
-def add_to_draft(draft: Submission, items: dict[int, list]) -> None:
-    """Store uploads from the phone page in the draft (still a draft?)."""
+def add_to_draft(
+    draft: Submission, items: dict[int, list], uploaded_by=None, via_phone=False
+) -> None:
+    """Store uploads from the phone page or a coach in the draft (still a
+    draft?). `uploaded_by` / `via_phone` record who added them (#77)."""
     with transaction.atomic():
         locked = Submission.objects.select_for_update().filter(pk=draft.pk).first()
         if locked is None or not locked.is_draft:
             raise SubmissionNotAllowed("Dieser Entwurf ist schon eingereicht.")
         for requirement_id, values in items.items():
-            store_items(locked.user, locked, requirement_id, values)
+            store_items(
+                locked.user,
+                locked,
+                requirement_id,
+                values,
+                uploaded_by=uploaded_by,
+                via_phone=via_phone,
+            )
 
 
 def ensure_draft(user, task) -> Submission:
