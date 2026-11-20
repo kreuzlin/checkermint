@@ -321,5 +321,6 @@ Browser ──HTTPS──▶ caddy ──▶ web (Gunicorn + Django, WhiteNoise 
 
 ## Backups
 
-Nightly `pg_dump` (`scripts/backup-db.sh`) followed by the UpCloud disk
-backup (ADR 0008).
+Nightly `pg_dump` and a tar copy of the media volume (`scripts/backup.sh`,
+ADR 0017) followed by the UpCloud disk backup (ADR 0008).
+`scripts/test-restore.sh` checks that both can be restored.

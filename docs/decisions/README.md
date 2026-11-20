@@ -26,3 +26,4 @@ to Checkermint.
 | 0014 | [Files in submissions: code as text, own files per item, generated alt text](0014-submission-files.md) | accepted |
 | 0015 | [A version switch replaces the draft](0015-version-switch-replaces-draft.md) | accepted |
 | 0016 | [Demo data for local development, removable despite ADR 0010](0016-demo-data-command.md) | accepted |
+| 0017 | [File copy of the media volume in the nightly backup](0017-file-copy-of-media-in-nightly-backup.md) | accepted |

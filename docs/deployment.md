@@ -212,8 +212,8 @@ break new uploads. Before rolling back across a migration:
 `crontab -e` as `deploy`:
 
 ```cron
-# Database dump before the UpCloud backup, nightly 02:00
-0 2 * * * cd /srv/checkermint && scripts/backup-db.sh
+# Database dump and media copy before the UpCloud backup, nightly 02:00
+0 2 * * * cd /srv/checkermint && scripts/backup.sh
 ```
 
 Add project-specific jobs (e.g. deleting old form submissions) here and in
@@ -222,19 +222,48 @@ Schedule the UpCloud backup after the dump (ADR 0008).
 
 ## 6. Backups and restore
 
-- `scripts/backup-db.sh` writes `backups/db-YYYY-MM-DD.dump`
-  (`pg_dump` custom format) and keeps 14 days (`KEEP_DAYS`).
-- Uploaded files live in the Docker volume `<project>_media`, mounted only
-  into `web` (private, ADR 0009); the UpCloud backup of the disk covers
-  them.
+`scripts/backup.sh` (cron, nightly, ADR 0017) writes to `backups/`
+(mode `600`, not in git):
 
-Restore a dump into the running database:
+- `db-YYYY-MM-DD.dump` – `pg_dump` custom format, the last 14 days
+  (`KEEP_DAYS`).
+- `media.tar` – copy of the uploaded files from the Docker volume
+  `<project>_media` (mounted only into `web`, private, ADR 0009); only the
+  latest. Older states are in the UpCloud backups of the disk.
+
+**Restore test** (changes nothing on the live site):
 
 ```bash
+scripts/backup.sh && scripts/test-restore.sh
+```
+
+It restores the latest dump into a throwaway PostgreSQL container and
+extracts `media.tar` into a temporary directory, then compares rows per
+table and the SHA-256 sum of every file with the running site. The last
+lines must read `Database matches the live site: yes` and
+`Media matches the live site: yes` (exit code 0); differences are printed
+above them. Run it after changes to the backup and before the go-live.
+
+**Restore for real** (overwrites the live data – stop and think first,
+take a fresh `scripts/backup.sh` of the current state if it is worth
+keeping):
+
+```bash
+# Database
 docker compose -f compose.prod.yaml exec -T db \
   sh -c 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --clean --if-exists' \
   < backups/db-YYYY-MM-DD.dump
+
+# Uploaded files: empty the volume, then unpack the copy
+docker compose -f compose.prod.yaml exec -T web \
+  sh -c 'find /app/media -mindepth 1 -delete'
+docker compose -f compose.prod.yaml exec -T web tar -C /app/media -xf - \
+  < backups/media.tar
 ```
+
+From an UpCloud backup: restore the disk (whole server) in the control
+panel, or attach the backup as an extra disk to a server and copy
+`/srv/checkermint/backups/` from it, then restore as above.
 
 ## 7. Logs and status
 

@@ -34,7 +34,7 @@ Rationale: see [`docs/decisions/`](docs/decisions/).
 - Settings from environment variables (`.env.example`), WhiteNoise for static
   files, secure cookies in production
 - `compose.yaml` (development), `compose.prod.yaml` + `deploy/Caddyfile`
-  (production), `scripts/deploy.sh`, `scripts/backup-db.sh`
+  (production), `scripts/deploy.sh`, `scripts/backup.sh`, `scripts/test-restore.sh`
 - CI: Ruff, Django checks, missing migrations, tests on PostgreSQL, image
   build; push to GHCR from `main` (not from the template repository itself)
 

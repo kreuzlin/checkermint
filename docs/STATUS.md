@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-20 (PR "Test rollback and add go-live checklist")_
+_Last updated: 2026-11-20 (PR "Back up media and add a restore test")_
 
 ## Live
 
@@ -38,8 +38,8 @@ _Last updated: 2026-11-20 (PR "Test rollback and add go-live checklist")_
 | App | `/srv/checkermint` (git checkout), `compose.prod.yaml`: `db` (PostgreSQL 18), `web` (GHCR image, Gunicorn), `caddy` (HTTPS) |
 | Secrets | `/srv/checkermint/.env` on the server only |
 | Deploy | `scripts/deploy.sh` on the server after CI has pushed the image for the merged commit |
-| Backups | cron 02:00 `scripts/backup-db.sh` (14 days in `backups/`, first manual run 2026-11-20 OK), UpCloud backup daily at 02:15 (set by the maintainer 2026-11-20, after the dump); must include the `media` volume (ADR 0009) |
-| Cron | `deploy`'s crontab: `0 2 * * * cd /srv/checkermint && scripts/backup-db.sh` |
+| Backups | cron 02:00 `scripts/backup.sh`: database dump (14 days) and `media.tar` (latest only) in `backups/` (ADR 0017); restore test `scripts/test-restore.sh`; UpCloud backup daily at 02:15 (set by the maintainer 2026-11-20, after the dump); must include the `media` volume (ADR 0009) |
+| Cron | `deploy`'s crontab: `0 2 * * * cd /srv/checkermint && scripts/backup.sh` (was `backup-db.sh`; switch the crontab right after merging #49's PR) |
 | Mail | Hostpoint SMTP, sender `mail@checkermint.ch` (mailbox created by the maintainer 2026-11-19, replaces the planned `coach@`; SMTP setup open, #3) |
 | DNS | Hostpoint; only apex and `www` of checkermint.ch are changed (#2). Both point to the server (A and AAAA) since 2026-11-20; MX records unchanged |
 | CI | GitHub Actions: lint + tests, `linux/amd64` image to `ghcr.io/kreuzlin/checkermint` (`latest`, `sha-<commit>`) on `main`; runs on `main` are queued, never cancelled |
@@ -321,6 +321,13 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   migrations need a check first (deployment.md, section 4). Go-live
   checklist in deployment.md, section 9 (section 8 renamed "Domain
   switch").
+- #49: `scripts/backup.sh` (renamed from `backup-db.sh`) also copies the
+  media volume to `backups/media.tar`; `scripts/test-restore.sh` restores
+  the latest backup into throwaway containers and compares rows per table
+  and file checksums with the live site (ADR 0017). Tested on the server
+  2026-11-20 with sample files: restore test passes, detects an added row
+  and an added file; a real restore of database and media (runbook section
+  6) brought the files back identical. Sample data removed afterwards.
 
 ## Open issues
 
@@ -341,14 +348,15 @@ Overview: `gh issue list`. At the time of writing:
    `/srv/checkermint`). Until SMTP (#42) is set up, `EMAIL_BACKEND` is
    unset and emails (incl. password reset links) go to the `web` container
    log – invite participants only after #42.
-2. Then: #3 mail, #42 SMTP (completes M9), #49 (PR waiting for the
-   maintainer), #97 log retention; then the go-live checklist
-   (deployment.md, section 9) until the maintainer declares the app
-   productive.
+2. Maintainer: merge the #49 PR (scripts); then switch the cron line to
+   `scripts/backup.sh`.
+3. Then: #3 mail, #42 SMTP (completes M9), #97 log retention; then the
+   go-live checklist (deployment.md, section 9) until the maintainer
+   declares the app productive.
    Maintainer: decide whether the imprint gets a postal address.
-3. Maintainer: manual test of phone upload and live update
+4. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
-4. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
+5. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes, added with #28), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +
    `pillow-heif` (image processing incl. HEIC, explicit since #24).
