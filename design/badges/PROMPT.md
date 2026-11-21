@@ -3,7 +3,8 @@
 The badge images in this folder were created by the maintainer
 (kreuzlin) with **ChatGPT** (image generation) and delivered on
 2026-11-21: six in a first set, two more (07, 08) the same day for tasks
-that had no matching badge. Claude Code did not draw or edit them (brief, section 11); it
+that had no matching badge, and seven (09–15) the same day for the GearsBot
+challenge groups. Claude Code did not draw or edit them (brief, section 11); it
 only wrote the prompt below and generates the web versions with
 `design/generate_assets.py`.
 
@@ -17,14 +18,47 @@ only wrote the prompt below and generates the web versions with
 | `06_Durchhalter.png` | Durchhalter/in | `durchhalter.png` |
 | `07_Linienfolger.png` | Linienfolger | `linienfolger.png` |
 | `08_Motor.png` | Motor | `motor.png` |
+| `09_Erste_Fahrt.png` | Erste Fahrt | – (upload only) |
+| `10_Timing.png` | Timing | – (upload only) |
+| `11_Labyrinth.png` | Labyrinth | – (upload only) |
+| `12_Verlies.png` | Verlies | – (upload only) |
+| `13_Schleifen.png` | Schleifen | – (upload only) |
+| `14_Entscheidungen.png` | Entscheidungen | – (upload only) |
+| `15_Funktionen.png` | Funktionen | – (upload only) |
 
-All originals: PNG with a transparent background, no metadata; 01–06 at
-1024 × 1024 px, 07–08 at 1254 × 1254 px with a larger motif. Since #120
+All originals: PNG with a transparent background, no metadata; 01–06 and
+09–15 at 1024 × 1024 px, 07–08 at 1254 × 1254 px with a larger motif.
+Badges 10–15 have a slightly finer double outline than the others; checked
+side by side and accepted (2026-11-21). Since #120
 (ADR 0018) the images live as uploads in the badge admin (moved there by
 migration `badges/0005`); the upload crops every badge to its visible motif
 and centres it at the same size (85 % of the height), so all badges look
 equally large. This folder is the archive of the originals. Checked at 40 and 48 px on
 the site's dark background (#020d16): every symbol stays recognisable.
+
+## Prompt for badges 09–15 (GearsBot)
+
+One badge per GearsBot challenge group, awarded with the last challenge of
+the group (Grundlagen 5, Warten 2, Labyrinth 6, Verlies 6, Schleifen 7,
+Bedingungen 12, Funktionen 11); points and levels reward every single
+challenge. Written by Claude Code on 2026-11-21 for the same ChatGPT
+conversation:
+
+```text
+Bitte erstelle sieben weitere Badges für das gleiche Set, im exakt gleichen Stil wie die bisherigen acht: gleiche Sechseck-Grundform, gleiche Strichstärke, gleiche Leuchtwirkung, gleiche Mint- und Petrol-Farben. Wieder 1024 × 1024 px, PNG mit echtem transparentem Hintergrund, kein Text, keine Buchstaben und keine Zahlen im Bild, ein einziges gut erkennbares Symbol, das auch bei 40 × 40 px noch erkennbar ist.
+
+Die Badges gehören zu Programmier-Challenges in einem Roboter-Simulator. Die Kinder steuern dort einen kleinen Roboter auf Rädern mit Programmblöcken. Die Symbole sollen sich klar voneinander und von den bisherigen Badges unterscheiden (es gibt schon: </>-Klammern, Linienfolger-Roboter, Motor).
+
+9. Erste Fahrt – ein kleiner Roboter auf Rädern, darum herum ein Pfeil nach vorne und ein gebogener Pfeil für eine Drehung
+10. Timing – eine Sanduhr
+11. Labyrinth – ein einfaches, grobes Labyrinth von oben gesehen, mit einem leuchtenden Weg hindurch (nur wenige, dicke Wände)
+12. Verlies – ein grosser alter Schlüssel
+13. Schleifen – zwei Pfeile, die einen geschlossenen Kreis bilden (Wiederholen-Symbol)
+14. Entscheidungen – eine Weggabelung: ein Pfeil, der sich in zwei Richtungen teilt
+15. Funktionen – zwei Puzzleteile, die ineinandergreifen
+
+Liefere jedes Badge als einzelnes PNG. Zeig mir zuerst Badge 9, damit ich prüfen kann, ob der Stil noch passt.
+```
 
 ## Prompt for badges 07 and 08
 

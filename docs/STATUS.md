@@ -10,7 +10,7 @@ Next project, approved by the maintainer 2026-11-21:
 [`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md) (GearsBot simulator; see
 "GearsBot" below).
 
-_Last updated: 2026-11-21 (PR "Add the GearsBot guide for coaches", #147)_
+_Last updated: 2026-11-21 (PR "Add the badge originals for the GearsBot groups")_
 
 ## Live
 
@@ -603,6 +603,13 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   `deployment.md` describes re-running the import after an update PR and
   has a GearsBot item in the go-live checklist; `architecture.md` links
   the guide. All GearsBot issues of the brief are done.
+- Seven badges for the GearsBot groups from the maintainer (ChatGPT,
+  prompt in `design/badges/PROMPT.md`): Erste Fahrt, Timing, Labyrinth,
+  Verlies, Schleifen, Entscheidungen, Funktionen – one per group, awarded
+  with its last challenge (maintainer's decision 2026-11-21: points reward
+  every challenge, badges mark finishing a group). Originals in
+  `design/badges/` (09–15). Creating them on the server and attaching them
+  to the tasks needs the maintainer's OK.
 - Needs the maintainer and coaches: testing the simulator on the club's
   devices, reviewing and publishing the challenges (guide, section 1),
   merging the GearsBot update PRs; after an update with changed challenges,
