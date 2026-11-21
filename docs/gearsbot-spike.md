@@ -49,8 +49,9 @@ With `useDefaultRobot` (default `true`) the world loads its own robot
   `renderIntersectMulti(delta, meshes, stopRequired, CODE, effect, interacts, blocksLimit)`.
 - A parser that reads the option list (title, file, `?v=` hash) and the
   render chain with the code and the optional block limit finds all 61
-  challenges, each with a code. The spike's parser becomes the CI check of
-  ADR 0020. The codes are not listed in this repository.
+  challenges, each with a code. The spike's parser became `sim/gears/check.py`
+  (ADR 0020); its bundle `sim/gears/challenges_basic/challenges.json`
+  contains the codes, as public as upstream's source.
 - Codes are mostly upper case but not all (some are mixed case, one has a
   space). The comparison in the review form must ignore case and extra
   spaces (ADR 0021).

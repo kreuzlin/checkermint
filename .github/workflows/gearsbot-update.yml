@@ -1,0 +1,139 @@
+# Monthly GearsBot update (ADR 0020): compares the pinned commit in
+# sim/gears/UPSTREAM with upstream master. If upstream moved, it bumps the
+# pin, mirrors new third-party files, regenerates the challenge bundle and
+# opens (or updates) one PR from chore/gearsbot-update with a report.
+#
+# The maintainer reviews and merges these PRs (ADR 0020, section 5).
+# Needs the repository setting "Allow GitHub Actions to create and approve
+# pull requests". GitHub starts no workflows for PRs opened with
+# GITHUB_TOKEN: close and reopen the PR to run the checks.
+
+name: GearsBot update
+
+on:
+  schedule:
+    - cron: "17 5 1 * *"   # 1st of each month, 05:17 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: gearsbot-update
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  UPSTREAM_URL: https://github.com/QuirkyCort/gears.git
+  BRANCH: chore/gearsbot-update
+
+jobs:
+  update:
+    name: Check upstream
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Compare pin with upstream master
+        id: pin
+        run: |
+          pinned=$(cat sim/gears/UPSTREAM)
+          latest=$(git ls-remote "$UPSTREAM_URL" refs/heads/master | cut -f1)
+          test -n "$latest"
+          echo "pinned=$pinned" >> "$GITHUB_OUTPUT"
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          if [ "$pinned" = "$latest" ]; then
+            echo "GearsBot is up to date (\`${pinned:0:12}\`)." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Fetch upstream
+        if: steps.pin.outputs.pinned != steps.pin.outputs.latest
+        env:
+          PINNED: ${{ steps.pin.outputs.pinned }}
+          LATEST: ${{ steps.pin.outputs.latest }}
+        run: |
+          git clone -q --filter=blob:none --no-checkout "$UPSTREAM_URL" /tmp/gears
+          git -C /tmp/gears checkout -q "$LATEST"
+
+      - name: Update pin, mirror and bundle
+        if: steps.pin.outputs.pinned != steps.pin.outputs.latest
+        env:
+          PINNED: ${{ steps.pin.outputs.pinned }}
+          LATEST: ${{ steps.pin.outputs.latest }}
+        run: |
+          cp -r sim/gears/challenges_basic /tmp/old-bundle
+          echo "$LATEST" > sim/gears/UPSTREAM
+          short=${LATEST:0:12}
+          {
+            echo "Automatic update of GearsBot from \`${PINNED:0:12}\` to \`$short\` (ADR 0020)."
+            echo
+            echo "**The maintainer reviews and merges this PR.** To run the checks, close and reopen it (GitHub starts no checks for PRs opened by a workflow)."
+            echo
+            echo "## Upstream commits"
+            echo
+            git -C /tmp/gears log --max-count=100 --no-decorate --format="- [\`%h\`](https://github.com/QuirkyCort/gears/commit/%H) %s (%ad)" --date=short "$PINNED..$LATEST"
+            total=$(git -C /tmp/gears rev-list --count "$PINNED..$LATEST")
+            if [ "$total" -gt 100 ]; then echo "- … $total commits in total, only the newest 100 are listed."; fi
+            echo
+            echo "## Basic Challenges"
+            echo
+          } > /tmp/body.md
+          status=ok
+          if ! python3 sim/gears/check.py mirror-add /tmp/gears > /tmp/mirror.md 2>&1; then status=failed; fi
+          if ! python3 sim/gears/check.py bundle /tmp/gears > /tmp/bundle.log 2>&1; then status=failed; fi
+          if [ "$status" = ok ]; then
+            python3 sim/gears/check.py report /tmp/old-bundle sim/gears/challenges_basic >> /tmp/body.md
+            echo >> /tmp/body.md
+            echo "Changed challenge files upstream (also logic changes without new codes):" >> /tmp/body.md
+            echo >> /tmp/body.md
+            echo '```' >> /tmp/body.md
+            git -C /tmp/gears diff --stat "$PINNED" "$LATEST" -- public/js/worlds/extra/challenges_basic.js public/worlds/challenges_basic >> /tmp/body.md
+            echo '```' >> /tmp/body.md
+            if ! python3 sim/gears/build.py /tmp/gears sim/gears /tmp/site > /tmp/build.log 2>&1; then status=failed; fi
+          fi
+          {
+            echo
+            echo "## New mirrored files"
+            echo
+            if [ -s /tmp/mirror.md ]; then cat /tmp/mirror.md; else echo "None."; fi
+            echo
+            echo "## Checks"
+            echo
+            if [ "$status" = ok ]; then
+              echo "Bundle and site build OK:"
+            else
+              echo "**Failed – needs a fix in this PR before merging:**"
+            fi
+            echo '```'
+            cat /tmp/bundle.log /tmp/build.log 2>/dev/null
+            echo '```'
+            echo
+            echo "After the merge: deploy as usual (\`scripts/deploy.sh\` pulls the new \`checkermint-sim\` image). If challenges changed, run \`import_gearsbot_challenges --dry-run\` (ADR 0021)."
+          } >> /tmp/body.md
+          today=$(date +%Y-%m-%d)
+          sed -i "s|^_Last updated: .*_\$|_Last updated: $today (PR \"Update GearsBot to $short\")_|" docs/STATUS.md
+          sed -i "s#^| GearsBot | .*#| GearsBot | pinned upstream commit \`$short\` (\`sim/gears/UPSTREAM\`), updated $today by the update workflow |#" docs/STATUS.md
+          cat /tmp/body.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open or update the PR
+        if: steps.pin.outputs.pinned != steps.pin.outputs.latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LATEST: ${{ steps.pin.outputs.latest }}
+        run: |
+          short=${LATEST:0:12}
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$BRANCH"
+          git add sim/gears docs/STATUS.md
+          git commit -q -m "Update GearsBot to $short"
+          git push -q --force origin "$BRANCH"
+          number=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            gh pr edit "$number" --title "Update GearsBot to $short" --body-file /tmp/body.md
+          else
+            gh pr create --base main --head "$BRANCH" --label ops \
+              --title "Update GearsBot to $short" --body-file /tmp/body.md
+          fi

@@ -1,0 +1,615 @@
+{
+  "upstream": "c0549600a26f9811906b4e02fd9246fe2413a072",
+  "challenges": [
+    {
+      "order": 1,
+      "title": "Basic: Move",
+      "group": "basic",
+      "file": "basic-1.json",
+      "version": "65847fe0",
+      "code": "UNICORN",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside."
+    },
+    {
+      "order": 2,
+      "title": "Basic: Multiple Moves",
+      "group": "basic",
+      "file": "basic-2.json",
+      "version": "c9f70768",
+      "code": "ELEPHANT",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside.\n\nTry using multiple \"Move Forward\" blocks."
+    },
+    {
+      "order": 3,
+      "title": "Basic: Move and Turn 1",
+      "group": "basic",
+      "file": "basic-3.json",
+      "version": "ebe6693c",
+      "code": "DOG",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou will need to use a \"Turn\" block."
+    },
+    {
+      "order": 4,
+      "title": "Basic: Move and Turn 2",
+      "group": "basic",
+      "file": "basic-4.json",
+      "version": "071580c0",
+      "code": "CAT",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou will need to use a \"Turn\" block."
+    },
+    {
+      "order": 5,
+      "title": "Basic: Move and Turn 3",
+      "group": "basic",
+      "file": "basic-5.json",
+      "version": "2af8b1e9",
+      "code": "MOUSE",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside.\n\nSometimes the box is behind you!"
+    },
+    {
+      "order": 6,
+      "title": "Basic: Sleep 1",
+      "group": "sleep",
+      "file": "sleep-1.json",
+      "version": "b28b34e8",
+      "code": "SLOTH",
+      "blocks_limit": null,
+      "mission": "Move your robot into every box.\n\nYou will need to stop inside each box for 1 second before moving to the next!"
+    },
+    {
+      "order": 7,
+      "title": "Basic: Sleep 2",
+      "group": "sleep",
+      "file": "sleep-2.json",
+      "version": "a0d67ae4",
+      "code": "PANDA",
+      "blocks_limit": null,
+      "mission": "Move your robot into every box.\n\nYou will need to stop inside each box for 1 second before moving to the next!"
+    },
+    {
+      "order": 8,
+      "title": "Basic: Maze 1",
+      "group": "maze",
+      "file": "maze-1.json",
+      "version": "1ce38425",
+      "code": "MOLE",
+      "blocks_limit": null,
+      "mission": "Move your robot into every box.\n\nYou will need to stop inside each box for 1 second before moving to the next!"
+    },
+    {
+      "order": 9,
+      "title": "Basic: Maze 2",
+      "group": "maze",
+      "file": "maze-2.json",
+      "version": "4c257c21",
+      "code": "HEDGEHOG",
+      "blocks_limit": null,
+      "mission": "Move your robot into every box.\n\nYou will need to stop inside each box for 1 second before moving to the next!"
+    },
+    {
+      "order": 10,
+      "title": "Basic: Maze 3",
+      "group": "maze",
+      "file": "maze-3.json",
+      "version": "52c6d5cd",
+      "code": "RABBIT",
+      "blocks_limit": null,
+      "mission": "Move your robot into every box.\n\nYou will need to stop inside each box for 1 second before moving to the next!"
+    },
+    {
+      "order": 11,
+      "title": "Basic: Maze 4",
+      "group": "maze",
+      "file": "maze-4.json",
+      "version": "324c0860",
+      "code": "DONKEY",
+      "blocks_limit": null,
+      "mission": "Move your robot into every box.\n\nYou will need to stop inside each box for 1 second before moving to the next!"
+    },
+    {
+      "order": 12,
+      "title": "Basic: Maze 5",
+      "group": "maze",
+      "file": "maze-5.json",
+      "version": "57ce4528",
+      "code": "TURKEY",
+      "blocks_limit": null,
+      "mission": "Move your robot into every box.\n\nYou will need to stop inside each box for 1 second before moving to the next!"
+    },
+    {
+      "order": 13,
+      "title": "Basic: Maze 6",
+      "group": "maze",
+      "file": "maze-6.json",
+      "version": "7bd986c4",
+      "code": "FOX",
+      "blocks_limit": null,
+      "mission": "Move your robot into every box.\n\nYou will need to stop inside each box for 1 second before moving to the next!"
+    },
+    {
+      "order": 14,
+      "title": "Basic: Dungeon 0",
+      "group": "dungeon",
+      "file": "dungeon-0.json",
+      "version": "d16421b8",
+      "code": "IMP",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside."
+    },
+    {
+      "order": 15,
+      "title": "Basic: Dungeon 1",
+      "group": "dungeon",
+      "file": "dungeon-1.json",
+      "version": "4fcbabab",
+      "code": "ORC",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside."
+    },
+    {
+      "order": 16,
+      "title": "Basic: Dungeon 2",
+      "group": "dungeon",
+      "file": "dungeon-2.json",
+      "version": "7114511d",
+      "code": "TROLL",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside.\n\nBe careful! The shortest route isn't always the best..."
+    },
+    {
+      "order": 17,
+      "title": "Basic: Dungeon 3",
+      "group": "dungeon",
+      "file": "dungeon-3.json",
+      "version": "0abf9ae2",
+      "code": "MINOTAUR",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside.\n\nWatch out for the monster!"
+    },
+    {
+      "order": 18,
+      "title": "Basic: Dungeon 4",
+      "group": "dungeon",
+      "file": "dungeon-4.json",
+      "version": "091f44ad",
+      "code": "CYCLOP",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside.\n\nHow can we get that gate open?"
+    },
+    {
+      "order": 19,
+      "title": "Basic: Dungeon 5",
+      "group": "dungeon",
+      "file": "dungeon-5.json",
+      "version": "009cbf96",
+      "code": "DRAGON",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou'll need to use everything you've learned!"
+    },
+    {
+      "order": 20,
+      "title": "Basic: Dungeon 6",
+      "group": "dungeon",
+      "file": "dungeon-6.json",
+      "version": "80b8d5a6",
+      "code": "MANTICORE",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside.\n\nWatch out for the ghost!"
+    },
+    {
+      "order": 21,
+      "title": "Loops: Repeat 0",
+      "group": "loops",
+      "file": "loops-0.json",
+      "version": "dca8f7ad",
+      "code": "PLUTO",
+      "blocks_limit": 4,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou're may only use 4 blocks."
+    },
+    {
+      "order": 22,
+      "title": "Loops: Repeat 0b",
+      "group": "loops",
+      "file": "loops-0b.json",
+      "version": "4db77619",
+      "code": "CHARON",
+      "blocks_limit": 4,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou're may only use 4 blocks."
+    },
+    {
+      "order": 23,
+      "title": "Loops: Repeat 1",
+      "group": "loops",
+      "file": "loops-1.json",
+      "version": "607f3c38",
+      "code": "NEPTUNE",
+      "blocks_limit": 5,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou're may only use 5 blocks."
+    },
+    {
+      "order": 24,
+      "title": "Loops: Repeat 2",
+      "group": "loops",
+      "file": "loops-2.json",
+      "version": "848fd296",
+      "code": "URANUS",
+      "blocks_limit": 6,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou're may only use 6 blocks."
+    },
+    {
+      "order": 25,
+      "title": "Loops: Repeat 2b",
+      "group": "loops",
+      "file": "loops-2b.json",
+      "version": "eb903c3d",
+      "code": "TITANIA",
+      "blocks_limit": 4,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou're may only use 4 blocks."
+    },
+    {
+      "order": 26,
+      "title": "Loops: Repeat 2c",
+      "group": "loops",
+      "file": "loops-2c.json",
+      "version": "fbab8903",
+      "code": "OBERON",
+      "blocks_limit": 9,
+      "mission": "Move your robot into every box and stop for 1 second.\n\nYou're may only use 9 blocks."
+    },
+    {
+      "order": 27,
+      "title": "Loops: Repeat 2d",
+      "group": "loops",
+      "file": "loops-2d.json",
+      "version": "3023901c",
+      "code": "MIRANDA",
+      "blocks_limit": 10,
+      "mission": "Move your robot into every box and stop for 1 second.\n\nYou're may only use 10 blocks."
+    },
+    {
+      "order": 28,
+      "title": "Loops: Repeat 2e",
+      "group": "loops",
+      "file": "loops-2e.json",
+      "version": "4935c9b8",
+      "code": "CRISSIDA",
+      "blocks_limit": 10,
+      "mission": "Move your robot into every box and stop for 1 second.\n\nYou're may only use 10 blocks."
+    },
+    {
+      "order": 29,
+      "title": "Loops: Repeat 3",
+      "group": "loops",
+      "file": "loops-3.json",
+      "version": "ae7011eb",
+      "code": "SATURN",
+      "blocks_limit": 4,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou may need to use more than one repeat loop.\n\nYou're may only use 4 blocks."
+    },
+    {
+      "order": 30,
+      "title": "Loops: Repeat 3b",
+      "group": "loops",
+      "file": "loops-3b.json",
+      "version": "53bc0e16",
+      "code": "TITAN",
+      "blocks_limit": 4,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou may need to use more than one repeat loop.\n\nYou're may only use 4 blocks."
+    },
+    {
+      "order": 31,
+      "title": "Loops: Repeat 4",
+      "group": "loops",
+      "file": "loops-4.json",
+      "version": "5fa0c5f0",
+      "code": "JUPITER",
+      "blocks_limit": 6,
+      "mission": "Move your robot into the green box and stop inside.\n\nNot every block needs to be inside a loop.\n\nYou're may only use 6 blocks."
+    },
+    {
+      "order": 32,
+      "title": "Loops: Repeat 4b",
+      "group": "loops",
+      "file": "loops-4b.json",
+      "version": "b8989a90",
+      "code": "EUROPA",
+      "blocks_limit": 7,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou're may only use 7 blocks."
+    },
+    {
+      "order": 33,
+      "title": "Loops: Repeat 5",
+      "group": "loops",
+      "file": "loops-5.json",
+      "version": "729ad780",
+      "code": "MARS",
+      "blocks_limit": 7,
+      "mission": "Collect all the coins.\n\nYou're may only use 4 blocks."
+    },
+    {
+      "order": 34,
+      "title": "Loops: Repeat 5b",
+      "group": "loops",
+      "file": "loops-5b.json",
+      "version": "ea21f9d5",
+      "code": "PHOBOS",
+      "blocks_limit": 7,
+      "mission": "Collect all the coins.\n\nYou're may only use 7 blocks."
+    },
+    {
+      "order": 35,
+      "title": "Loops: Repeat 6",
+      "group": "loops",
+      "file": "loops-6.json",
+      "version": "5484bb7c",
+      "code": "EARTH",
+      "blocks_limit": 10,
+      "mission": "Collect all the coins.\n\nYou're may only use 10 blocks."
+    },
+    {
+      "order": 36,
+      "title": "Loops: Repeat 7",
+      "group": "loops",
+      "file": "loops-7.json",
+      "version": "a260f623",
+      "code": "MOON",
+      "blocks_limit": 8,
+      "mission": "Move your robot into the green box and stop inside.\n\nHint: Look at the example.\n\nYou're may only use 8 blocks."
+    },
+    {
+      "order": 37,
+      "title": "Condition: Color 1",
+      "group": "conditions",
+      "file": "conditions-1.json",
+      "version": "b06212fe",
+      "code": "STONE",
+      "blocks_limit": null,
+      "mission": "worldBaseObject_box0STONE"
+    },
+    {
+      "order": 38,
+      "title": "Condition: Color 2",
+      "group": "conditions",
+      "file": "conditions-2.json",
+      "version": "4757e227",
+      "code": "SECRETS",
+      "blocks_limit": null,
+      "mission": "worldBaseObject_box0SECRETS"
+    },
+    {
+      "order": 39,
+      "title": "Condition: Color 3",
+      "group": "conditions",
+      "file": "conditions-3.json",
+      "version": "ecbb4ae5",
+      "code": "AZKABAN",
+      "blocks_limit": null,
+      "mission": "worldBaseObject_box0AZKABAN"
+    },
+    {
+      "order": 40,
+      "title": "Condition: Color 4",
+      "group": "conditions",
+      "file": "conditions-4.json",
+      "version": "4c96c864",
+      "code": "FIRE",
+      "blocks_limit": null,
+      "mission": "worldBaseObject_box0FIRE"
+    },
+    {
+      "order": 41,
+      "title": "Condition: Color 5",
+      "group": "conditions",
+      "file": "conditions-5.json",
+      "version": "d5353fa9",
+      "code": "PHOENIX",
+      "blocks_limit": null,
+      "mission": "worldBaseObject_box0PHOENIX"
+    },
+    {
+      "order": 42,
+      "title": "Condition: Color 6",
+      "group": "conditions",
+      "file": "conditions-6.json",
+      "version": "4f834e54",
+      "code": "PRINCE",
+      "blocks_limit": null,
+      "mission": "worldBaseObject_box0PRINCE"
+    },
+    {
+      "order": 43,
+      "title": "Condition: Color 7",
+      "group": "conditions",
+      "file": "conditions-7.json",
+      "version": "86502bb0",
+      "code": "CHOCOLATE",
+      "blocks_limit": null,
+      "mission": "worldBaseObject_box0CHOCOLATE"
+    },
+    {
+      "order": 44,
+      "title": "Condition: Color 8",
+      "group": "conditions",
+      "file": "conditions-8.json",
+      "version": "8ad2c418",
+      "code": "BANANA",
+      "blocks_limit": null,
+      "mission": "worldBaseObject_box0BANANA"
+    },
+    {
+      "order": 45,
+      "title": "Condition: Color 8b",
+      "group": "conditions",
+      "file": "conditions-8b.json",
+      "version": "4aad9762",
+      "code": "SALTED CARAMEL",
+      "blocks_limit": null,
+      "mission": "worldBaseObject_box0SALTED CARAMEL"
+    },
+    {
+      "order": 46,
+      "title": "Condition: Color 9",
+      "group": "conditions",
+      "file": "conditions-9.json",
+      "version": "3702a992",
+      "code": "AVOCADO",
+      "blocks_limit": null,
+      "mission": "worldBaseObject_box0AVOCADO"
+    },
+    {
+      "order": 47,
+      "title": "Condition: Color 9b",
+      "group": "conditions",
+      "file": "conditions-9b.json",
+      "version": "ac0bedb2",
+      "code": "BLUEBERRY",
+      "blocks_limit": null,
+      "mission": "worldBaseObject_box0BLUEBERRY"
+    },
+    {
+      "order": 48,
+      "title": "Condition: Color 10",
+      "group": "conditions",
+      "file": "conditions-10.json",
+      "version": "87b48a99",
+      "code": "VANILLA",
+      "blocks_limit": null,
+      "mission": "worldBaseObject_box0VANILLA"
+    },
+    {
+      "order": 49,
+      "title": "Condition: Color 11",
+      "group": "conditions",
+      "file": "conditions-11.json",
+      "version": "85e3052e",
+      "code": "CARAMEL",
+      "blocks_limit": null,
+      "mission": "worldBaseObject_box0CARAMEL"
+    },
+    {
+      "order": 50,
+      "title": "Condition: Color 12",
+      "group": "conditions",
+      "file": "conditions-12.json",
+      "version": "6d42f222",
+      "code": "OREO",
+      "blocks_limit": null,
+      "mission": "worldBaseObject_box0OREO"
+    },
+    {
+      "order": 51,
+      "title": "Abstraction: Dungeon 1",
+      "group": "abstraction",
+      "file": "abstraction-1.json",
+      "version": "3d38a55b",
+      "code": "TABBY",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside.\n\nDon't get distracted by the alien!"
+    },
+    {
+      "order": 52,
+      "title": "Abstraction: Dungeon 2",
+      "group": "abstraction",
+      "file": "abstraction-2.json",
+      "version": "35d1b224",
+      "code": "CALICO",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside.\n\nWhy is there a zebra in the dungeon?"
+    },
+    {
+      "order": 53,
+      "title": "Abstraction: Dungeon 3",
+      "group": "abstraction",
+      "file": "abstraction-3.json",
+      "version": "b07838d3",
+      "code": "GINGER",
+      "blocks_limit": 5,
+      "mission": "Move your robot into the green box and stop inside.\n\nThe cat looks fascinated by the ball!\n\nYou're may only use 5 blocks."
+    },
+    {
+      "order": 54,
+      "title": "Abstraction: Dungeon 4",
+      "group": "abstraction",
+      "file": "abstraction-4.json",
+      "version": "468cc179",
+      "code": "SIAMESE",
+      "blocks_limit": 4,
+      "mission": "Collect all the coins.\n\nEverything is spinning!\n\nYou're may only use 4 blocks."
+    },
+    {
+      "order": 55,
+      "title": "Abstraction: Dungeon 5",
+      "group": "abstraction",
+      "file": "abstraction-5.json",
+      "version": "926b32e2",
+      "code": "RAGDOLL",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside.\n\nDon't let the water distract you! The green box changes position on reset."
+    },
+    {
+      "order": 56,
+      "title": "Abstraction: Dungeon 6",
+      "group": "abstraction",
+      "file": "abstraction-6.json",
+      "version": "a2f2969a",
+      "code": "Indri",
+      "blocks_limit": 1,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou're may only use 1 block."
+    },
+    {
+      "order": 57,
+      "title": "Abstraction: Dungeon 7",
+      "group": "abstraction",
+      "file": "abstraction-7.json",
+      "version": "f5b3c468",
+      "code": "Fossa",
+      "blocks_limit": 8,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou're may only use 8 block."
+    },
+    {
+      "order": 58,
+      "title": "Abstraction: Dungeon 8",
+      "group": "abstraction",
+      "file": "abstraction-8.json",
+      "version": "5957e6b8",
+      "code": "Dingo",
+      "blocks_limit": 11,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou're may only use 11 block."
+    },
+    {
+      "order": 59,
+      "title": "Abstraction: Dungeon 9",
+      "group": "abstraction",
+      "file": "abstraction-9.json",
+      "version": "3b330462",
+      "code": "Aardvark",
+      "blocks_limit": 12,
+      "mission": "Move your robot into the green box and stop inside.\n\nYou're may only use 12 block."
+    },
+    {
+      "order": 60,
+      "title": "Abstraction: Dungeon 10",
+      "group": "abstraction",
+      "file": "abstraction-10.json",
+      "version": "499c54f1",
+      "code": "Zapus",
+      "blocks_limit": 5,
+      "mission": "Collect all the coins.\n\nYou're may only use 5 blocks."
+    },
+    {
+      "order": 61,
+      "title": "Abstraction: Dungeon 11",
+      "group": "abstraction",
+      "file": "abstraction-11.json",
+      "version": "4f35d8a5",
+      "code": "Xerus",
+      "blocks_limit": null,
+      "mission": "Move your robot into the green box and stop inside.\n\nNo blocks limits, but the green box changes position on reset."
+    }
+  ]
+}
