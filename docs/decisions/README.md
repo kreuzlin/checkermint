@@ -27,3 +27,4 @@ to Checkermint.
 | 0015 | [A version switch replaces the draft](0015-version-switch-replaces-draft.md) | accepted |
 | 0016 | [Demo data for local development, removable despite ADR 0010](0016-demo-data-command.md) | accepted |
 | 0017 | [File copy of the media volume in the nightly backup](0017-file-copy-of-media-in-nightly-backup.md) | accepted |
+| 0018 | [Badge images uploaded in the admin (exception from ADR 0009)](0018-badge-images-uploaded-in-the-admin.md) | accepted |

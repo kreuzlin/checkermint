@@ -86,7 +86,9 @@ Rationale lives in `docs/decisions/`. To deviate, write a new ADR first.
   directly to `main`.
   - Each step gets its own branch from an up-to-date `main`, named
     `<type>/<short-description>` (e.g. `feat/events`, `fix/contact-form`,
-    `docs/…`, `chore/…`).
+    `docs/…`, `chore/…`). **Never stack PRs** (maintainer's rule,
+    2026-11-21): every PR starts from `main`, one after another; a PR that
+    depends on another one waits until that one is merged.
   - Push the branch and open a PR against `main` with `gh pr create`; the PR
     description (English) explains what changed and how it was tested.
   - `main` is protected by the ruleset "protect main" that only allows
@@ -146,8 +148,9 @@ Rationale lives in `docs/decisions/`. To deviate, write a new ADR first.
   `.env` or the crontab, installing packages, restarting containers.
   Exception: the normal deployment after a merged PR (above). An OK covers
   only the task it was given for.
-- **Do not pipe `gh` output** through `tail`, `head`, `grep` or similar, and
-  do not hide its stderr: errors and hints from `gh` must stay visible.
+- **Do not pipe `gh` or `git` output** through `tail`, `head`, `grep` or
+  similar, and do not hide their stderr: errors and hints must stay
+  visible.
 - **Small steps.** Commit after every working step (tests green, Ruff clean).
   Keep PRs small – one step of the plan per PR. Keep migrations in their own
   PR where possible, so the rest can be merged without waiting.
