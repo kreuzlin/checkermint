@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Use a fast password hasher in tests")_
+_Last updated: 2026-11-21 (PR "Build the image in parallel with the tests")_
 
 ## Live
 
@@ -400,6 +400,12 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   site keeps PBKDF2, checked by `config/tests/test_password_hashers.py`.
   Locally 505 tests in 16.5 s instead of 114 s (hashing was about 85 % of
   the test time, analysis 2026-11-21).
+
+- #118: the image job no longer waits for the test job; on pull requests
+  both run at the same time (both stay required checks). Until #119 is
+  merged, `main` also runs both in parallel, so `latest` can be pushed
+  before the tests on `main` finish; the deploy still waits for the whole
+  run to be green.
 
 ## Open issues
 

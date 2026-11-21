@@ -313,7 +313,7 @@ Browser ──HTTPS──▶ caddy ──▶ web (Gunicorn + Django, WhiteNoise 
 ## Delivery
 
 1. Pull request → CI: Ruff, `manage.py check`, missing-migration check,
-   tests, image build (no push).
+   tests, and in parallel the image build (no push).
 2. Merge to `main` → CI pushes `ghcr.io/kreuzlin/checkermint:latest` and
    `:sha-<commit>`.
 3. `scripts/deploy.sh` on the server pulls the image, runs migrations and
