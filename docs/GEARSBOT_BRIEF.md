@@ -121,4 +121,5 @@ Upstream: https://github.com/QuirkyCort/gears (default branch `master`). Verify 
 - Show kreuzlin the ADRs and the issue plan before building.
 - Then one issue per PR, in this order: hosting and build, update workflow, simulator configuration on tasks, submissions and review, import command, coach guide.
 - As before: migrations and changes to server, DNS, Caddy or deployment are merged by kreuzlin. Update PRs from the scheduled workflow too.
+  - Clarified by kreuzlin on 2026-11-21, after the spike: merging follows the current rule in CLAUDE.md (Claude merges once green and asks first for destructive migrations, server/DNS/Caddy/secrets/deploy changes and CI changes that weaken checks). Only the update PRs from the scheduled workflow are merged by kreuzlin himself (ADR 0020).
 - Test the simulator once on the devices used in the club (3D performance) before publishing the first tasks.

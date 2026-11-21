@@ -1,6 +1,6 @@
 # 0021: Simulator configuration on task versions, completion code check
 
-- Status: proposed
+- Status: accepted (maintainer, 2026-11-21)
 - Date: 2026-11-21
 
 ## Context
@@ -174,7 +174,8 @@ PR with the German UI; the exact JSON goes into the coach guide.
 ## Consequences
 
 - One migration that only adds two tables (no OK needed by the CLAUDE.md
-  rule; see the open question on who merges in the brief, section 5).
+  merge rule, which applies to this brief too: maintainer's decision
+  2026-11-21).
 - Imported challenges keep working after GearsBot updates as long as the
   upstream file name stays the same; the update report (ADR 0020) says when
   it does not.

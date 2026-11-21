@@ -1,6 +1,6 @@
 # 0019: GearsBot hosting: own origin, own image, caching, CSP
 
-- Status: proposed
+- Status: accepted (maintainer, 2026-11-21)
 - Date: 2026-11-21
 
 ## Context

@@ -496,11 +496,17 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   0.8 MB, plus one on GitHub), the challenge file name must stay in the
   world URL, the block filter uses English ids (works in German), the
   brief's first block filter lacks the turns that "Move and Turn" needs.
-- ADRs 0019–0022 **proposed**, waiting for the maintainer's review: hosting
-  on `sim.checkermint.ch` with its own image, pin and monthly update PRs,
+- ADRs 0019–0022 **accepted** by the maintainer (2026-11-21): hosting on
+  `sim.checkermint.ch` with its own image, pin and monthly update PRs,
   simulator configuration on task versions and the code check, GPLv3 and
   attribution.
-- Next: after the OK on the ADRs, the issues in the brief's order (hosting
+- Maintainer's decisions 2026-11-21: merging follows CLAUDE.md as for
+  everything else; only the scheduled GearsBot update PRs are merged by the
+  maintainer. "Grundlagen" shows turn blocks (ADR 0021). All 34 external
+  files are mirrored and the simulator's CSP blocks third-party hosts. The
+  challenge rules live in GearsBot and can change with an update; update
+  PRs report it (ADR 0020).
+- Next: the issues in the brief's order (hosting
   and build, update workflow, simulator configuration, submissions and
   review, import command, coach guide), one PR each, never stacked.
 - Needs the maintainer later: DNS record `sim` (A and AAAA, only added),
@@ -523,7 +529,7 @@ Overview: `gh issue list`. At the time of writing:
    maintainer declares the app productive.
 2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
-3. GearsBot: maintainer reviews ADRs 0019–0022 and the issue plan
+3. GearsBot: issues one after another, starting with the `sim` image
    (see "GearsBot" above).
 4. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes, added with #28), htmx served as a local static file, `robohash` (avatars),

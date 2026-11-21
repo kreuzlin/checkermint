@@ -1,6 +1,6 @@
 # 0022: GearsBot license (GPLv3) and attribution
 
-- Status: proposed
+- Status: accepted (maintainer, 2026-11-21)
 - Date: 2026-11-21
 
 ## Context

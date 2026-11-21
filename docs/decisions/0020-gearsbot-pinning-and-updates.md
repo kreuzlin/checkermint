@@ -1,6 +1,6 @@
 # 0020: GearsBot pinning, patches and monthly update PRs
 
-- Status: proposed
+- Status: accepted (maintainer, 2026-11-21)
 - Date: 2026-11-21
 
 ## Context
