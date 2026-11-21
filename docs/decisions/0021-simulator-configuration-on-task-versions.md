@@ -176,6 +176,12 @@ of each imported version; coaches can change it in a draft):
 | Bedingungen | + `Conditions` (if), `tw_color`, `logic_compare`, `logic_operation`, `logic_boolean` |
 | Funktionen | + `Variables`, `Functions` |
 
+Implemented in #146 (`tasks.gearsbot_import.FILTERS`) and checked in Chrome
+with the German UI for one task per group: the toolbox shows exactly these
+blocks; `tw_color`, which GearsBot's toolbox marks as hidden, appears when
+the filter shows it. The beginner categories keep their English names
+"Movement" and "Conditions" (GearsBot has no translation for them).
+
 Turns are in the first group already, unlike the brief's proposal:
 "Basic: Move and Turn 1–3" need them (spike). Each filter denies all
 categories except those listed and shows single blocks with `show.blocks`
