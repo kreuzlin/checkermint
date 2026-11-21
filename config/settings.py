@@ -170,6 +170,14 @@ PRIVACY_EMAIL = "privacy@checkermint.ch"
 # shown at /version. "dev" for local builds.
 APP_COMMIT = env("APP_COMMIT", default="dev")
 
+# GearsBot simulator (ADR 0019): its origin, e.g. https://sim.checkermint.ch.
+# Empty: no simulator (no button, no CORS, no paragraph on the privacy page).
+SIMULATOR_URL = env("SIMULATOR_URL", default="").rstrip("/")
+# Pinned GearsBot commit, shown on the imprint (ADR 0022). The app image
+# contains only this file of sim/ (.dockerignore).
+_gearsbot_pin = BASE_DIR / "sim" / "gears" / "UPSTREAM"
+GEARSBOT_COMMIT = _gearsbot_pin.read_text().strip() if _gearsbot_pin.exists() else ""
+
 # --- Email ----------------------------------------------------------------
 
 # Development prints emails to the console; production uses SMTP (.env).

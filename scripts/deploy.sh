@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 compose() { docker compose -f compose.prod.yaml "$@"; }
 
 git pull --ff-only
-compose pull web caddy
+compose pull web caddy sim
 compose up -d db
 # Migrations run once, before the new version takes traffic.
 compose run --rm web python manage.py migrate --noinput

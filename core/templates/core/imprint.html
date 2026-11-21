@@ -13,6 +13,17 @@
   <h2>Datenschutz</h2>
   <p>Was {{ site_short_name }} speichert und warum: <a href="{% url 'core:privacy' %}">Datenschutz</a>.</p>
 
+  {% if gearsbot_commit %}
+  <h2>Simulator</h2>
+  <p>Der Roboter-Simulator ist <a href="https://github.com/QuirkyCort/gears">GearsBot</a>
+    von Cort Wee (A Posteriori), lizenziert unter der GNU General Public License v3.
+    Wir setzen die Version
+    <a href="https://github.com/QuirkyCort/gears/commit/{{ gearsbot_commit }}"><code>{{ gearsbot_commit|slice:":12" }}</code></a>
+    ein. Unsere Anpassungen stehen unter der gleichen Lizenz in
+    <a href="https://github.com/kreuzlin/checkermint/tree/main/sim/gears">github.com/kreuzlin/checkermint</a>
+    (Ordner <code>sim/gears</code>).</p>
+  {% endif %}
+
   <h2>Bildnachweise</h2>
   <p>{% avatar_credits %}</p>
 </div>

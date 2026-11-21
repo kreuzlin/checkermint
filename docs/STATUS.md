@@ -10,7 +10,7 @@ Next project, approved by the maintainer 2026-11-21:
 [`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md) (GearsBot simulator; see
 "GearsBot" below).
 
-_Last updated: 2026-11-21 (PR "Build the GearsBot simulator image", #141)_
+_Last updated: 2026-11-21 (PR "Serve the GearsBot simulator on its own subdomain", #142)_
 
 ## Live
 
@@ -40,13 +40,13 @@ _Last updated: 2026-11-21 (PR "Build the GearsBot simulator image", #141)_
 | Server | UpCloud `de-fra1` (Frankfurt), `85.9.202.23` / `2a04:3542:1000:910:9010:e8ff:fe50:74f8`, Ubuntu 26.04.1, 2 cores / 2 GB / 30 GB, 2 GB swap, time zone Europe/Zurich, `ufw` (22, 80, 443 tcp/udp), unattended upgrades. Set up 2026-11-20 by Claude (deployment.md, section 1) |
 | Access | `ssh deploy@85.9.202.23` (key only, root login and passwords disabled, passwordless sudo, member of `docker`) |
 | Docker | Docker Engine 29.10 with Compose 5.8 from Docker's apt repository; `/etc/docker/daemon.json` limits container logs to 5 × 10 MB = 50 MB per container (maintainer's decision 2026-11-20, #97); logs also go when a container is recreated |
-| App | `/srv/checkermint` (git checkout), `compose.prod.yaml`: `db` (PostgreSQL 18), `web` (GHCR image, Gunicorn), `caddy` (HTTPS) |
+| App | `/srv/checkermint` (git checkout), `compose.prod.yaml`: `db` (PostgreSQL 18), `web` (GHCR image, Gunicorn), `caddy` (HTTPS), `sim` (GearsBot, own GHCR image, since #142) |
 | Secrets | `/srv/checkermint/.env` on the server only |
 | Deploy | `scripts/deploy.sh` on the server after CI has pushed the image for the merged commit |
 | Backups | cron 02:00 `scripts/backup.sh`: database dump (14 days) and `media.tar` (latest only) in `backups/` (ADR 0017); restore test `scripts/test-restore.sh`; first nightly run 2026-11-21 02:00 OK (dump and `media.tar`); UpCloud backup daily at 02:15 (set by the maintainer 2026-11-20, after the dump); must include the `media` volume (ADR 0009) |
 | Cron | `deploy`'s crontab: `0 2 * * * cd /srv/checkermint && scripts/backup.sh` (switched from `backup-db.sh` after #107, 2026-11-20) |
 | Mail | Hostpoint SMTP `asmtp.mail.hostpoint.ch:465` (SSL), login and sender `mail@checkermint.ch` (mailbox created by the maintainer 2026-11-19). Outbound 465/587 not blocked by UpCloud. SPF `redirect=spf-permissive.mail.hostpoint.ch`, DKIM (three keys, selectors `20261121-{rsa1024,rsa2048,ed25519}-2051a403`) and DMARC `p=quarantine` enabled by the maintainer at Hostpoint 2026-11-21; sender policy "only with the mailbox's own user" fits (login, `DEFAULT_FROM_EMAIL` and `SERVER_EMAIL` are all `mail@checkermint.ch`) |
-| DNS | Hostpoint; only apex and `www` of checkermint.ch are changed (#2). Both point to the server (A and AAAA) since 2026-11-20; MX records unchanged |
+| DNS | Hostpoint; only apex, `www` and `sim` of checkermint.ch are changed (#2, GearsBot brief). Both point to the server (A and AAAA) since 2026-11-20; `sim` (A and AAAA, GearsBot simulator) added by the maintainer 2026-11-21; MX records unchanged |
 | CI | GitHub Actions: on pull requests lint + tests and, in parallel, an image build (no push); on `main` only the `linux/amd64` image build and push to `ghcr.io/kreuzlin/checkermint` (`latest`, `sha-<commit>`), no second test run (#118, #119); runs on `main` are queued, never cancelled |
 | GitHub | Squash merge only (PR title/body), auto-merge, head branches deleted; ruleset "protect main" active (PR, CI checks, branch up to date with `main` since #119, no force push/deletion); labels `ops`, `content`, `bug`, `enhancement` |
 
@@ -513,11 +513,17 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   34 mirrored files (553 URLs rewritten), start page with German default,
   Caddy with caching and CSP. Checked locally with Chrome: challenge deep
   link with world and filter from another origin works, German UI, filter
-  applies, no CSP violations, no third-party requests. Not on the server
-  yet (#142). The new GHCR package is private by default: the maintainer
-  makes it public (like the app image) before #142 is deployed. The hidden
+  applies, no CSP violations, no third-party requests. The GHCR package
+  `checkermint-sim` is public (anonymous pull checked 2026-11-21). The hidden
   beginner category is labelled "Movement" in English (no translation in
   GearsBot).
+- #142: `sim` service in `compose.prod.yaml`, Caddy site `{$SIM_ADDRESS}`
+  → `sim:8080`, `deploy.sh` pulls `sim`, new variables `SIM_ADDRESS`,
+  `SIMULATOR_URL`, `SIM_IMAGE_TAG`; imprint names GearsBot with the pinned
+  commit (ADR 0022), privacy page has a "Simulator" paragraph when
+  `SIMULATOR_URL` is set ("Stand" 21 November 2026). DNS `sim` A and AAAA
+  added by the maintainer 2026-11-21; the maintainer allowed Claude to set
+  the `.env` values on the server.
 - Next: the issues in the brief's order (hosting
   and build, update workflow, simulator configuration, submissions and
   review, import command, coach guide), one PR each, never stacked.

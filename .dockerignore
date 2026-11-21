@@ -18,3 +18,4 @@ deploy
 .claude
 # GearsBot packaging: built as its own image (sim/gears/Dockerfile).
 sim
+!sim/gears/UPSTREAM
