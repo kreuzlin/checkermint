@@ -17,6 +17,7 @@
     {% if is_coach %}
       <p class="help">Als Coach siehst du die neuste veröffentlichte Version. Lösungen bewertest du in der Warteschlange.</p>
       <p><a href="{% url 'overviews:task' slug=task.slug %}">Auswertung: wer sie gelöst hat, Hinweise, Versionen</a></p>
+      <p><a href="{% url 'admin:tasks_task_change' task.pk %}">In der Verwaltung bearbeiten</a> (neue Version, Anforderungen, Hinweise, Badge)</p>
     {% else %}
       {% if attempt %}<p class="help">Begonnen am {{ attempt.started_at|date:"j. F Y" }}.</p>{% endif %}
       {% if is_waiting %}
