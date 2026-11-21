@@ -3,9 +3,9 @@ draft tasks (ADR 0021, #146). On the server only with the maintainer's OK."""
 
 from pathlib import Path
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
-from tasks.gearsbot_import import BUNDLE, import_challenges
+from tasks.gearsbot_import import BUNDLE, TopicNameTaken, import_challenges
 
 
 class Command(BaseCommand):
@@ -28,7 +28,10 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, dry_run, bundle, **options):
-        result = import_challenges(bundle, dry_run=dry_run)
+        try:
+            result = import_challenges(bundle, dry_run=dry_run)
+        except TopicNameTaken as error:
+            raise CommandError(str(error)) from None
         sections = [
             ("New tasks (unpublished drafts)", result.created),
             ("Drafts updated with the new world or code", result.updated_drafts),

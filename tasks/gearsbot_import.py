@@ -27,6 +27,8 @@ WORLD_FILENAME = "welt.json"
 FILTER_FILENAME = "bloecke.json"
 PROJECT_KEY = "projekt"
 CHANGE_NOTE = "GearsBot-Update: Welt oder Code der Challenge geändert."
+TOPIC_NAME = "Code"
+TOPIC_SLUG = "code"
 
 # Upstream group (file prefix) → German title, base points, minimum level
 # in "Code" (brief, section 3.5). Coaches adjust them in the admin.
@@ -245,13 +247,31 @@ def apply_upstream(version, challenge):
     )
 
 
+class TopicNameTaken(Exception):
+    """Another topic (e.g. the demo topic) already has the name "Code"."""
+
+
+def get_topic():
+    topic = Topic.objects.filter(slug=TOPIC_SLUG).first()
+    if topic is not None:
+        return topic
+    other = Topic.objects.filter(name=TOPIC_NAME).first()
+    if other is not None:
+        raise TopicNameTaken(
+            f"Es gibt schon ein Thema «{TOPIC_NAME}» (Kennung «{other.slug}»), "
+            f"aber nicht das Thema mit der Kennung «{TOPIC_SLUG}», in das die "
+            "Challenges gehören. Ist es das Übungs-Thema der Demo-Daten, "
+            f"benenne es zuerst in der Verwaltung um, z. B. in «{TOPIC_NAME} "
+            "(Demo)». Danach legt der Import das echte Thema an."
+        )
+    return Topic.objects.create(name=TOPIC_NAME, slug=TOPIC_SLUG)
+
+
 def import_challenges(bundle: Path = BUNDLE, dry_run=False) -> ImportResult:
     data = load_bundle(bundle)
     result = ImportResult()
     with transaction.atomic():
-        topic = Topic.objects.filter(slug="code").first()
-        if topic is None:
-            topic = Topic.objects.create(name="Code", slug="code")
+        topic = get_topic()
         slugs = set()
         for challenge in data["challenges"]:
             slug = slug_for(challenge)
