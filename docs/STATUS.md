@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Do not run the tests a second time on main")_
+_Last updated: 2026-11-21 (PR "Accept ADR 0018: badge images uploaded in the admin")_
 
 ## Live
 
@@ -44,7 +44,7 @@ _Last updated: 2026-11-21 (PR "Do not run the tests a second time on main")_
 | Cron | `deploy`'s crontab: `0 2 * * * cd /srv/checkermint && scripts/backup.sh` (switched from `backup-db.sh` after #107, 2026-11-20) |
 | Mail | Hostpoint SMTP `asmtp.mail.hostpoint.ch:465` (SSL), login and sender `mail@checkermint.ch` (mailbox created by the maintainer 2026-11-19). Outbound 465/587 not blocked by UpCloud. SPF `redirect=spf-permissive.mail.hostpoint.ch`, DKIM (three keys, selectors `20261121-{rsa1024,rsa2048,ed25519}-2051a403`) and DMARC `p=quarantine` enabled by the maintainer at Hostpoint 2026-11-21; sender policy "only with the mailbox's own user" fits (login, `DEFAULT_FROM_EMAIL` and `SERVER_EMAIL` are all `mail@checkermint.ch`) |
 | DNS | Hostpoint; only apex and `www` of checkermint.ch are changed (#2). Both point to the server (A and AAAA) since 2026-11-20; MX records unchanged |
-| CI | GitHub Actions: lint + tests, `linux/amd64` image to `ghcr.io/kreuzlin/checkermint` (`latest`, `sha-<commit>`) on `main`; runs on `main` are queued, never cancelled |
+| CI | GitHub Actions: on pull requests lint + tests and, in parallel, an image build (no push); on `main` only the `linux/amd64` image build and push to `ghcr.io/kreuzlin/checkermint` (`latest`, `sha-<commit>`), no second test run (#118, #119); runs on `main` are queued, never cancelled |
 | GitHub | Squash merge only (PR title/body), auto-merge, head branches deleted; ruleset "protect main" active (PR, CI checks, branch up to date with `main` since #119, no force push/deletion); labels `ops`, `content`, `bug`, `enhancement` |
 
 Runbook: [`deployment.md`](deployment.md). Architecture:
@@ -411,6 +411,14 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   builds and pushes the image. Needs the ruleset setting "Require branches
   to be up to date before merging" (set by the maintainer); CLAUDE.md
   describes `gh pr update-branch` for PRs that fall behind.
+- ADR 0018 accepted (2026-11-21): coaches upload badge images in the admin
+  (PNG/WebP only, re-encoded without metadata, cropped and centred at
+  512 px, served by a dedicated public view) – a narrow exception from ADR
+  0009. The eight shipped images move into the upload. Implemented in two
+  PRs (#120), both with a migration, merged by the maintainer.
+- Maintainer's rules 2026-11-21: never stack PRs (each from `main`, one
+  after another); `git` output is not filtered either (CLAUDE.md,
+  Workflow).
 
 ## Open issues
 

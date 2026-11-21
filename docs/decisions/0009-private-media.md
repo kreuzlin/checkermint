@@ -1,6 +1,6 @@
 # 0009: Private media served by Django
 
-- Status: accepted
+- Status: accepted (badge images: exception in ADR 0018)
 - Date: 2026-11-18
 
 ## Context
