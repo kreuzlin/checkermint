@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Fix the CSRF error on the phone upload")_
+_Last updated: 2026-11-21 (PR "Show the phone QR code before a draft exists")_
 
 ## Live
 
@@ -444,6 +444,12 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   POST. Now `strict-origin` (only the origin, never the token, as
   referrer); a test posts with CSRF enforcement and an `Origin` header.
   The manual test of the phone upload is to be repeated.
+
+- #130: the QR code for the phone upload appeared only after "Entwurf
+  speichern" – after "Aufgabe starten" the maintainer saw only the file
+  inputs. Now the QR code is shown right away; the link is bound to
+  participant and task, and the first phone upload creates the draft
+  (`ensure_draft`). Live update keeps polling until the draft exists.
 
 ## Open issues
 

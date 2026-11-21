@@ -12,9 +12,10 @@ from django.utils import timezone
 from accounts.models import Profile
 from submissions.models import Submission, SubmissionItem
 from submissions.upload_links import (
+    SALT,
     InvalidUploadLink,
-    draft_for_token,
     make_token,
+    target_for_token,
 )
 
 from .test_form import text_and_code_task
@@ -39,12 +40,38 @@ class PhoneUploadTests(TestCase):
         return Submission.objects.get()
 
     def phone_url(self, draft):
-        return reverse("submissions:phone_upload", kwargs={"token": make_token(draft)})
+        return reverse(
+            "submissions:phone_upload",
+            kwargs={"token": make_token(draft.user, draft.task)},
+        )
 
-    def test_form_asks_for_a_draft_first(self):
+    def test_qr_code_right_away_and_the_phone_creates_the_draft(self):
+        """#130: after "Aufgabe starten" there is no draft yet; the QR code
+        must be there anyway, and the first phone upload creates the draft."""
         response = self.client.get(self.edit)
-        self.assertContains(response, "Speichere zuerst einen Entwurf")
-        self.assertNotContains(response, "<svg")
+        self.assertNotContains(response, "Speichere zuerst einen Entwurf")
+        self.assertContains(response, "QR-Code zum Hochladen mit dem Handy")
+        self.assertFalse(Submission.objects.exists())
+
+        url = response.context["phone_upload"]["url"].replace("http://testserver", "")
+        self.client.logout()
+        page = self.client.get(url)
+        self.assertEqual(page.status_code, 200)
+        self.assertFalse(Submission.objects.exists())  # GET creates nothing
+
+        self.client.post(url, {"fotos": [jpeg("handy.jpg")]})
+        draft = Submission.objects.get()
+        self.assertEqual(draft.status, Submission.Status.DRAFT)
+        self.assertEqual(draft.task_version, self.version)
+        self.assertEqual(
+            list(draft.items.values_list("original_filename", "via_phone")),
+            [("handy.jpg", True)],
+        )
+
+        # Saving on the laptop afterwards keeps the phone photo.
+        self.client.force_login(self.user)
+        self.client.post(self.edit, {"aktion": "speichern"})
+        self.assertEqual(draft.items.count(), 1)
 
     def test_form_shows_qr_code_with_a_signed_link(self):
         draft = self.save_draft()
@@ -54,7 +81,7 @@ class PhoneUploadTests(TestCase):
         url = response.context["phone_upload"]["url"]
         self.assertTrue(url.startswith("http://testserver/hochladen/"))
         token = url.rstrip("/").rsplit("/", 1)[1]
-        self.assertEqual(draft_for_token(token), draft)
+        self.assertEqual(target_for_token(token), (draft.user, draft.task))
 
     def test_no_qr_code_for_tasks_without_uploads(self):
         task, _ = text_and_code_task()
@@ -155,7 +182,7 @@ class PhoneUploadTests(TestCase):
 
     def test_tampered_link_is_invalid(self):
         draft = self.save_draft()
-        token = make_token(draft)
+        token = make_token(draft.user, draft.task)
         url = reverse("submissions:phone_upload", kwargs={"token": token[:-2] + "xx"})
         response = self.client.post(url, {"fotos": [jpeg()]})
         self.assertEqual(response.status_code, 410)
@@ -169,16 +196,48 @@ class PhoneUploadTests(TestCase):
         draft.refresh_from_db()
         self.assertEqual(draft.status, Submission.Status.SUBMITTED)
         response = self.client.post(url, {"fotos": [jpeg("spaet.jpg")]})
-        self.assertContains(response, "keinen Entwurf mehr", status_code=410)
+        self.assertContains(response, "wartet auf einen Coach", status_code=410)
         self.assertEqual(draft.items.count(), 1)
+        self.assertEqual(Submission.objects.count(), 1)
 
     def test_link_is_bound_to_the_participant(self):
         draft = self.save_draft()
         other = User.objects.create_user("ben", password="geheim123")
+        from django.core import signing
+
+        # Old link format (draft id) with someone else's user id.
+        forged = signing.dumps({"s": draft.pk, "u": other.pk}, salt=SALT)
         with self.assertRaises(InvalidUploadLink):
-            from django.core import signing
+            target_for_token(forged)
+        # A link names one participant: Ben's link never reaches Anna's draft.
+        bens = make_token(other, draft.task)
+        url = reverse("submissions:phone_upload", kwargs={"token": bens})
+        self.client.logout()
+        self.client.post(url, {"fotos": [jpeg("ben.jpg")]})
+        self.assertEqual(draft.items.count(), 0)
+        self.assertEqual(Submission.objects.filter(user=other).count(), 1)
 
-            from submissions.upload_links import SALT
+    def test_old_links_with_a_draft_id_still_work(self):
+        from django.core import signing
 
-            forged = signing.dumps({"s": draft.pk, "u": other.pk}, salt=SALT)
-            draft_for_token(forged)
+        draft = self.save_draft()
+        old = signing.dumps(
+            {"s": draft.pk, "u": self.user.pk}, salt=SALT, compress=True
+        )
+        self.assertEqual(target_for_token(old), (self.user, draft.task))
+
+    def test_no_link_for_coaches_or_locked_tasks(self):
+        from django.contrib.auth.models import Group
+        from django.core import signing
+
+        from accounts.roles import COACH_GROUP_NAME
+
+        coach = User.objects.create_user("coach", password="geheim123", is_staff=True)
+        coach.groups.add(Group.objects.get(name=COACH_GROUP_NAME))
+        token = signing.dumps({"t": self.task.pk, "u": coach.pk}, salt=SALT)
+        with self.assertRaises(InvalidUploadLink):
+            target_for_token(token)
+        self.task.min_level = 5
+        self.task.save(update_fields=["min_level"])
+        with self.assertRaisesMessage(InvalidUploadLink, "gesperrt"):
+            target_for_token(make_token(self.user, self.task))

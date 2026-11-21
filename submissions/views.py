@@ -33,6 +33,7 @@ from .services import (
     add_to_draft,
     ensure_draft,
     get_draft,
+    is_waiting,
     items_by_requirement,
     review_submission,
     save_draft,
@@ -50,8 +51,8 @@ from .switching import (
 from .upload_links import (
     LIFETIME_MINUTES,
     InvalidUploadLink,
-    draft_for_token,
     qr_svg,
+    target_for_token,
     upload_url,
 )
 
@@ -110,14 +111,12 @@ class SubmissionView(LoginRequiredMixin, SeoMixin, TemplateView):
         return context
 
     def phone_upload(self, form):
-        """QR code for the phone, if there is a draft with photos or files."""
-        draft = get_draft(self.request.user, self.task)
+        """QR code for the phone whenever the task asks for photos or files –
+        also before a draft exists; the first phone upload creates it (#130)."""
         has_uploads = any(isinstance(row.handler, UploadHandler) for row in form.rows)
         if not has_uploads:
             return None
-        if draft is None:
-            return {"needs_draft": True}
-        url = upload_url(self.request, draft)
+        url = upload_url(self.request, self.request.user, self.task)
         return {"url": url, "qr": qr_svg(url), "minutes": LIFETIME_MINUTES}
 
     def post(self, request, *args, **kwargs):
@@ -250,27 +249,38 @@ class PhoneUploadView(SeoMixin, TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         try:
-            self.draft = draft_for_token(kwargs["token"])
+            self.participant, self.task = target_for_token(kwargs["token"])
         except InvalidUploadLink as error:
-            return render(
-                request,
-                "submissions/phone_upload_invalid.html",
-                {"page_title": "Link ungültig", "message": error.message},
-                status=410,
-            )
+            return self.invalid(error.message)
+        draft = get_draft(self.participant, self.task)
+        if draft is not None:
+            self.version = draft.task_version
+            self.stored = items_by_requirement(draft)
+        else:
+            # No draft yet: the first upload creates it (#130), starting from
+            # the same content the form would show.
+            self.version = visible_version(self.participant, self.task)
+            self.stored = starting_content(self.participant, self.task, self.version)
         return super().dispatch(request, *args, **kwargs)
+
+    def invalid(self, message):
+        return render(
+            self.request,
+            "submissions/phone_upload_invalid.html",
+            {"page_title": "Link ungültig", "message": message},
+            status=410,
+        )
 
     def make_form(self, data=None, files=None):
         return PhoneUploadForm(
-            self.draft.task_version.requirements.all(),
-            items_by_requirement(self.draft),
-            data=data,
-            files=files,
+            self.version.requirements.all(), self.stored, data=data, files=files
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(draft=self.draft, form=kwargs.get("form") or self.make_form())
+        context.update(
+            version=self.version, form=kwargs.get("form") or self.make_form()
+        )
         return context
 
     def post(self, request, *args, **kwargs):
@@ -278,7 +288,13 @@ class PhoneUploadView(SeoMixin, TemplateView):
         if not form.is_valid():
             return self.render_to_response(self.get_context_data(form=form))
         try:
-            add_to_draft(self.draft, form.items, via_phone=True)
+            draft = ensure_draft(self.participant, self.task)
+            if draft.task_version_id != self.version.pk:
+                raise SubmissionNotAllowed(
+                    "Die Aufgabe hat inzwischen eine andere Version. Lass dir "
+                    "auf dem anderen Gerät einen neuen QR-Code zeigen."
+                )
+            add_to_draft(draft, form.items, via_phone=True)
         except SubmissionNotAllowed as error:
             messages.error(request, str(error))
         else:
@@ -304,14 +320,20 @@ class StoredItemsView(LoginRequiredMixin, View):
     def get(self, request, slug, key):
         user = request.user
         task, _, state = task_for(user, slug)
-        draft = get_draft(user, task)
-        if is_coach(user) or state.is_locked or draft is None:
+        if is_coach(user) or state.is_locked:
             return HttpResponse(status=STOP_POLLING)
-        requirement = draft.task_version.requirements.filter(key=key).first()
+        draft = get_draft(user, task)
+        if draft is None and is_waiting(user, task):
+            return HttpResponse(status=STOP_POLLING)
+        version = draft.task_version if draft else visible_version(user, task)
+        requirement = version.requirements.filter(key=key).first()
         if requirement is None or not isinstance(
             handler_for(requirement), UploadHandler
         ):
             return HttpResponse(status=STOP_POLLING)
+        if draft is None:
+            # Keep polling: the first phone upload creates the draft (#130).
+            return HttpResponse(status=204)
         items = items_by_requirement(draft).get(requirement.pk, [])
         signature = stored_signature(items)
         if request.GET.get("stand") == signature:
