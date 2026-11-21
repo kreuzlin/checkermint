@@ -76,7 +76,7 @@ image build:
 - `UPSTREAM` is a full SHA and the checked-out commit matches it;
 - all patches apply;
 - every `files.aposteriori.com.sg` / `raw.githubusercontent.com` URL in
-  `public/` has an entry in `sim/gears/mirror/mirror.json`, every manifest
+  `public/` has an entry in `sim/gears/mirror.json`, every manifest
   file exists and matches its SHA-256; after the rewrite no such URL is left;
 - `challenges_basic.js` can be parsed: every option has a world file that
   exists and is valid JSON with `worldName` and `options`, every world file

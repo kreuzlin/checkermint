@@ -10,7 +10,7 @@ Next project, approved by the maintainer 2026-11-21:
 [`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md) (GearsBot simulator; see
 "GearsBot" below).
 
-_Last updated: 2026-11-21 (PR "Add the GearsBot brief, spike and ADRs 0019–0022")_
+_Last updated: 2026-11-21 (PR "Build the GearsBot simulator image", #141)_
 
 ## Live
 
@@ -506,6 +506,18 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   files are mirrored and the simulator's CSP blocks third-party hosts. The
   challenge rules live in GearsBot and can change with an update; update
   PRs report it (ADR 0020).
+- Issues #141–#147 created 2026-11-21 (image, server, update workflow,
+  task configuration, submissions, import, coach guide).
+- #141: `sim/gears/` builds `ghcr.io/kreuzlin/checkermint-sim` (workflow
+  "Simulator", only when `sim/` changes): upstream at the pinned commit,
+  34 mirrored files (553 URLs rewritten), start page with German default,
+  Caddy with caching and CSP. Checked locally with Chrome: challenge deep
+  link with world and filter from another origin works, German UI, filter
+  applies, no CSP violations, no third-party requests. Not on the server
+  yet (#142). The new GHCR package is private by default: the maintainer
+  makes it public (like the app image) before #142 is deployed. The hidden
+  beginner category is labelled "Movement" in English (no translation in
+  GearsBot).
 - Next: the issues in the brief's order (hosting
   and build, update workflow, simulator configuration, submissions and
   review, import command, coach guide), one PR each, never stacked.

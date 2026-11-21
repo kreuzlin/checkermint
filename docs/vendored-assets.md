@@ -10,3 +10,11 @@ To update: download the new tarball from the npm registry, compare its
 SHA-512 with `dist.integrity` from `https://registry.npmjs.org/htmx.org/<version>`,
 copy `dist/htmx.min.js` under a new versioned name, update the templates
 that load it and this table.
+
+## GearsBot simulator
+
+GearsBot itself is not vendored: the `sim` image fetches the commit pinned in
+`sim/gears/UPSTREAM` at build time (ADR 0019, 0020). Vendored are only the
+34 files GearsBot would load from third-party hosts, in `sim/gears/mirror/`
+with source URL and SHA-256 in `sim/gears/mirror.json` (checked by
+`sim/gears/build.py`). See `sim/gears/README.md`.
