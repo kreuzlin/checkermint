@@ -79,9 +79,11 @@ jobs:
       - name: Tests
         run: uv run python manage.py test
 
+  # Runs at the same time as the tests (#118): on pull requests it only
+  # checks that the image builds; both jobs are required checks. On main the
+  # deploy waits for the whole run to be green (CLAUDE.md, Deploying).
   image:
     name: Build image (linux/amd64)
-    needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
