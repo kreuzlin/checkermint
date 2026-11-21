@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Add badge artwork")_
+_Last updated: 2026-11-21 (PR "Record badges created on the server")_
 
 ## Live
 
@@ -374,6 +374,11 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   versions to `badges/static/badges/img/`, which the badge admin offers.
   Checked at 40 px on the dark background. Coaches create the badges in
   the admin and pick the image there.
+- 2026-11-21: on the maintainer's request, Claude created the six badges
+  in the production database (name, one-sentence description, image), not
+  attached to any task yet – there are only demo tasks so far. Real
+  content, not demo data: `seed_demo --remove` does not touch them.
+  Descriptions can be changed in the admin.
 
 ## Open issues
 

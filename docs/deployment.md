@@ -346,8 +346,8 @@ issue are tracked there.
 - [ ] Maintainer's superuser exists; coaches have staff accounts in the
   group "Coach" (no superusers).
 - [ ] Topics, level table, first tasks with published versions and hints.
-- [ ] Badges created in the admin with their images (artwork delivered
-  2026-11-21, #4) and attached to tasks.
+- [ ] Badges attached to tasks (the six badges with images exist since
+  2026-11-21, #4).
 - [ ] No demo or test data on the server. Demo data was loaded for
   testing on 2026-11-20; remove it (same one-off container, the site
   keeps `DEBUG=false`):
