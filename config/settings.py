@@ -93,6 +93,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # --- Authentication -------------------------------------------------------
 
+# Tests only: a fast password hasher (config/test_runner.py, #117). The
+# live site keeps Django's default hashers (PBKDF2).
+TEST_RUNNER = "config.test_runner.FastPasswordHasherRunner"
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
