@@ -238,8 +238,10 @@ Schedule the UpCloud backup after the dump (ADR 0008).
 `scripts/backup.sh` (cron, nightly, ADR 0017) writes to `backups/`
 (mode `600`, not in git):
 
-- `db-YYYY-MM-DD.dump` – `pg_dump` custom format, the last 14 days
-  (`KEEP_DAYS`).
+- `db-YYYY-MM-DD-HHMMSS.dump` – `pg_dump` custom format, the last 14 days
+  (`KEEP_DAYS`). The time of day keeps a manual run (e.g. before a risky
+  migration) from replacing the nightly dump of the same day; dumps from
+  before 2026-11-21 are named `db-YYYY-MM-DD.dump`.
 - `media.tar` – copy of the uploaded files from the Docker volume
   `<project>_media` (mounted only into `web`, private, ADR 0009); only the
   latest. Older states are in the UpCloud backups of the disk.
@@ -265,7 +267,7 @@ keeping):
 # Database
 docker compose -f compose.prod.yaml exec -T db \
   sh -c 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --clean --if-exists' \
-  < backups/db-YYYY-MM-DD.dump
+  < backups/db-YYYY-MM-DD-HHMMSS.dump
 
 # Uploaded files: empty the volume, then unpack the copy
 docker compose -f compose.prod.yaml exec -T web \
@@ -360,8 +362,9 @@ issue are tracked there.
 - [ ] Landing page wording, privacy page and imprint reviewed; decision
   on a postal address in the imprint (2026-11-20: none, contact
   `privacy@checkermint.ch`).
-- [ ] Manual test of phone upload and live update
-  ([`manual-testing.md`](manual-testing.md)) on the live site.
+- [x] Manual test of phone upload and live update
+  ([`manual-testing.md`](manual-testing.md)) on the live site (2026-11-21,
+  after fixing #128, #130, #132, #134).
 - [ ] Public profile of a test participant shows nothing private (no real
   name, no email, no feedback).
 

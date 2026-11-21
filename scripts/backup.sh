@@ -1,7 +1,8 @@
 #!/bin/sh
 # Nightly backup before the UpCloud disk backup (ADR 0008, ADR 0017). Run by
 # cron on the production server from the repo checkout:
-#   - database dump backups/db-YYYY-MM-DD.dump, the last KEEP_DAYS days
+#   - database dump backups/db-YYYY-MM-DD-HHMMSS.dump, the last KEEP_DAYS
+#     days; the time keeps a manual run from replacing the nightly one
 #   - copy of the uploaded files (media volume) backups/media.tar, only the
 #     latest; older states are in the UpCloud backups
 # APP_DIR overrides the checkout directory (default: the script's parent).
@@ -14,7 +15,7 @@ umask 077
 mkdir -p backups
 
 # Database. Custom format: compressed, restorable with pg_restore.
-file="backups/db-$(date +%Y-%m-%d).dump"
+file="backups/db-$(date +%Y-%m-%d-%H%M%S).dump"
 compose exec -T db \
     sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" --format=custom' \
     > "$file.tmp"
