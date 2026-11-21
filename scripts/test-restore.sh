@@ -8,7 +8,8 @@ set -eu
 cd "${APP_DIR:-$(dirname "$0")/..}"
 
 compose() { docker compose -f compose.prod.yaml "$@"; }
-dump=$(ls backups/db-*.dump 2>/dev/null | sort | tail -n 1)
+# Newest by modification time (names with and without time of day exist).
+dump=$(ls -t backups/db-*.dump 2>/dev/null | head -n 1)
 [ -n "$dump" ] || { echo "No database dump in backups/" >&2; exit 1; }
 [ -f backups/media.tar ] || { echo "No backups/media.tar" >&2; exit 1; }
 

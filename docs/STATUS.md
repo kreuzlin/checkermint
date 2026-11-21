@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Offer only photos on the phone upload page")_
+_Last updated: 2026-11-21 (PR "Add the time of day to database dump names")_
 
 ## Live
 
@@ -463,6 +463,13 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   appears only for tasks with photos (brief 5.7). The coach upload keeps
   photos and files. Videos stay out of scope for version 1 (brief,
   section 6). The maintainer's phone upload works (2026-11-21).
+
+- Database dumps are named `db-YYYY-MM-DD-HHMMSS.dump`: the manual
+  backup before #127 had replaced the nightly dump of the same day
+  (`db-YYYY-MM-DD.dump`). `scripts/test-restore.sh` picks the newest dump
+  by modification time.
+- The maintainer's phone upload works (2026-11-21, after #128–#134);
+  checked off in the go-live checklist.
 
 ## Open issues
 
