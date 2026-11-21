@@ -4,7 +4,8 @@
 {% block content %}
   <h1>Aufgaben</h1>
   {% if is_coach %}
-    <p class="help">Als Coach siehst du alle Aufgaben ohne Sperre. Entwürfe und archivierte Aufgaben findest du in der Verwaltung.</p>
+    <p class="help">Als Coach siehst du alle Aufgaben ohne Sperre. Entwürfe und archivierte Aufgaben findest du in der <a href="{% url 'admin:tasks_task_changelist' %}">Verwaltung</a>.</p>
+    <p><a class="button button-secondary" href="{% url 'admin:tasks_task_add' %}">Neue Aufgabe erstellen</a></p>
   {% endif %}
 
   {% for section in sections %}

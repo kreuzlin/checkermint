@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Record the email tests")_
+_Last updated: 2026-11-21 (PR "Link coaches to the admin from the site")_
 
 ## Live
 
@@ -478,6 +478,10 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   (possible later: sender name "Checkermint", calmer wording). The email
   to a participant after a review is still to be tried (needs an address
   on a demo account).
+
+- #138: coaches reach the admin without typing `/admin/`: "Verwaltung"
+  in the main navigation, "Neue Aufgabe erstellen" on the catalogue and
+  "In der Verwaltung bearbeiten" on each task page (coaches only).
 
 ## Open issues
 

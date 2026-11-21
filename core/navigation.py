@@ -23,4 +23,6 @@ MAIN_NAVIGATION: list[NavItem] = [
     NavItem("Teilnehmende", "accounts:participant_list", members_only=True),
     NavItem("Warteschlange", "submissions:queue", coaches_only=True),
     NavItem("Fortschritt", "overviews:matrix", coaches_only=True),
+    # The Django admin: tasks, topics, badges, accounts (#138).
+    NavItem("Verwaltung", "admin:index", coaches_only=True),
 ]
