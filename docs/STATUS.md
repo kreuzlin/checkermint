@@ -10,7 +10,7 @@ Next project, approved by the maintainer 2026-11-21:
 [`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md) (GearsBot simulator; see
 "GearsBot" below).
 
-_Last updated: 2026-11-21 (PR "Translate the GearsBot missions and fix the condition missions")_
+_Last updated: 2026-11-21 (PR "Record the translated GearsBot versions")_
 
 ## Live
 
@@ -26,7 +26,7 @@ _Last updated: 2026-11-21 (PR "Translate the GearsBot missions and fix the condi
   "Code" with the 61 GearsBot challenges (unpublished drafts). Email
   goes out via Hostpoint SMTP since 2026-11-20 (#42).
 - Deployed commit: `curl -s https://checkermint.ch/version`, compare with
-  `git rev-parse origin/main`. Last deploy: 2026-11-21, `6f8f868` (#154). Docs- or CI-only changes need no deploy (the live
+  `git rev-parse origin/main`. Last deploy: 2026-11-21, `f2ba1d1` (#159). Docs- or CI-only changes need no deploy (the live
   commit then lags behind `main`).
 - Search engines: never indexed (brief, section 4). Django sends
   `X-Robots-Tag: noindex, nofollow` on every response, `/robots.txt`
@@ -633,8 +633,11 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   paragraph table; block limit sentences dropped, the instructions state
   the checked limit – upstream's loops-5 text says 4, the check allows 7);
   tests: every bundle mission translated, no instructions contain the
-  code. After the deploy, each GearsBot task gets a new published version
-  with the regenerated instructions (maintainer's request).
+  code.
+- 2026-11-21: #159 deployed (`f2ba1d1`). With the maintainer's OK, every
+  GearsBot task got version 2 with the regenerated German instructions,
+  published (change note "Mission auf Deutsch übersetzt."); checked on the
+  server: no latest instructions contain the expected code.
 - Needs the maintainer and coaches: testing the simulator on the club's
   devices, reviewing the published challenges (changes need a new version,
   guide, section 1), adding hints,
