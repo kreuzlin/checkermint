@@ -35,8 +35,9 @@ SOURCE = ROOT / "design" / "logo"
 TARGET = ROOT / "core" / "static" / "core" / "brand"
 BADGE_SOURCE = ROOT / "design" / "badges"
 BADGE_TARGET = ROOT / "badges" / "static" / "badges" / "img"
-# Badges are shown at 40-48 px; 160 px stays sharp on 3x screens.
-BADGE_SIZE = 160
+# 512 px: the data migration badges/0005 moves these into the uploaded
+# badge images (ADR 0018), which are 512 px; shown at 40-48 px.
+BADGE_SIZE = 512
 # Share of the height the visible motif fills (as in the first badge set).
 BADGE_FILL = 0.85
 # Alpha above which a pixel counts as part of the motif (ignores faint glow).

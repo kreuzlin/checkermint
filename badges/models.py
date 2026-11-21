@@ -6,6 +6,8 @@ from django.db import models
 from django.templatetags.static import static
 from django.utils import timezone
 
+from core.private_files import RandomUploadPath
+
 # Badge artwork is a static asset, not an upload: it can appear on public
 # profiles, and uploads are always private (brief 4.2, ADR 0009). Original
 # files go to design/ (issue #4); the web versions live here.
@@ -42,6 +44,14 @@ class Badge(models.Model):
             "Eines der Badge-Bilder, die mit der Website ausgeliefert werden. "
             "Leer: neutraler Platzhalter."
         ),
+    )
+    # The uploaded badge image (ADR 0018): our own 512 px PNG, produced by
+    # badges.images.process_badge_image. Replaces `image` (#120); until the
+    # second PR switches over, the site still shows `image`.
+    image_file = models.ImageField(
+        "Bilddatei",
+        upload_to=RandomUploadPath("badges"),
+        blank=True,
     )
     created_at = models.DateTimeField("Erstellt", auto_now_add=True)
 
