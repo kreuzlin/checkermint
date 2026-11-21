@@ -1,8 +1,10 @@
+import json
 import re
+import secrets
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
@@ -197,8 +199,8 @@ class Task(models.Model):
     def create_draft(self, user=None):
         """ "Neue Version erstellen" (brief 5.4, ADR 0010).
 
-        Copies the latest published version with its requirements and hints
-        (keys kept) into a new draft. Without any version, an empty draft is
+        Copies the latest published version with its requirements, hints and
+        simulator settings (keys kept, new simulator token) into a new draft. Without any version, an empty draft is
         created. Returns the existing draft if there is one.
         """
         with transaction.atomic():
@@ -237,6 +239,23 @@ class Task(models.Model):
             Hint.objects.bulk_create(
                 Hint(task_version=draft, key=h.key, order=h.order, text=h.text)
                 for h in source.hints.all()
+            )
+            config = SimulatorConfig.objects.filter(task_version=source).first()
+            if config is not None:
+                # New token: the copy gets its own file URLs (ADR 0021).
+                SimulatorConfig.objects.create(
+                    task_version=draft,
+                    world_scripts=config.world_scripts,
+                    expected_code=config.expected_code,
+                )
+            SimulatorFile.objects.bulk_create(
+                SimulatorFile(
+                    task_version=draft,
+                    role=f.role,
+                    filename=f.filename,
+                    content=f.content,
+                )
+                for f in source.simulator_files.all()
             )
             return draft
 
@@ -405,18 +424,12 @@ class VersionChildQuerySet(models.QuerySet):
         return super().bulk_create(objs, *args, **kwargs)
 
 
-class VersionChild(models.Model):
-    """Base for rows that belong to a task version (requirements, hints)."""
+class VersionBound(models.Model):
+    """Base for rows that belong to a task version and are immutable once it
+    is published (ADR 0010): requirements, hints, simulator settings.
 
-    key = models.SlugField(
-        "Schlüssel",
-        max_length=50,
-        help_text=(
-            "Fester Kurzname, bleibt in neuen Versionen gleich (verbindet "
-            "Entwürfe und Hinweise über Versionen hinweg)."
-        ),
-    )
-    order = models.PositiveSmallIntegerField("Reihenfolge", default=0)
+    Subclasses define `task_version`.
+    """
 
     objects = VersionChildQuerySet.as_manager()
 
@@ -446,6 +459,23 @@ class VersionChild(models.Model):
             .values_list("task_version__status", flat=True)
         )
         return TaskVersion.Status.PUBLISHED in stored
+
+
+class VersionChild(VersionBound):
+    """Base for rows that belong to a task version (requirements, hints)."""
+
+    key = models.SlugField(
+        "Schlüssel",
+        max_length=50,
+        help_text=(
+            "Fester Kurzname, bleibt in neuen Versionen gleich (verbindet "
+            "Entwürfe und Hinweise über Versionen hinweg)."
+        ),
+    )
+    order = models.PositiveSmallIntegerField("Reihenfolge", default=0)
+
+    class Meta:
+        abstract = True
 
 
 class TaskRequirement(VersionChild):
@@ -534,6 +564,141 @@ class Hint(VersionChild):
 
     def __str__(self):
         return f"Hinweis {self.key}"
+
+
+# --- GearsBot simulator (ADR 0021) -----------------------------------------
+
+
+def new_simulator_token() -> str:
+    """Unguessable part of the public URLs of a version's simulator files."""
+    return secrets.token_urlsafe(24)
+
+
+SIMULATOR_FILE_MAX_BYTES = 2 * 1024 * 1024
+
+
+class SimulatorConfig(VersionBound):
+    """Links a task version to the GearsBot simulator (ADR 0021)."""
+
+    task_version = models.OneToOneField(
+        TaskVersion,
+        on_delete=models.CASCADE,
+        related_name="simulator",
+        verbose_name="Version",
+    )
+    token = models.CharField(
+        "Schlüssel für die Dateien",
+        max_length=64,
+        unique=True,
+        default=new_simulator_token,
+        editable=False,
+    )
+    world_scripts = models.CharField(
+        "Welt-Skripte",
+        max_length=200,
+        blank=True,
+        validators=[
+            RegexValidator(
+                r"^[a-z0-9_]+(,[a-z0-9_]+)*$",
+                "Nur Kleinbuchstaben, Ziffern und _, mehrere mit Komma getrennt.",
+            )
+        ],
+        help_text=(
+            "Zusätzliche GearsBot-Welten, z. B. «challenges_basic» für die "
+            "Basic Challenges. Meistens leer."
+        ),
+    )
+    expected_code = models.CharField(
+        "Erwarteter Code",
+        max_length=100,
+        blank=True,
+        help_text=(
+            "Der Code, den GearsBot bei Erfolg zeigt. Nur Coaches sehen ihn: "
+            "Die Bewertung zeigt, ob der eingereichte Code stimmt. Leer = keine "
+            "Prüfung."
+        ),
+    )
+
+    class Meta:
+        verbose_name = "Simulator-Einstellung"
+        verbose_name_plural = "Simulator-Einstellungen"
+
+    def __str__(self):
+        return "Simulator"
+
+
+class SimulatorFile(VersionBound):
+    """A JSON file of a version's simulator setup, served without login under
+    the config's token (ADR 0021). Task content only, never personal data."""
+
+    class Role(models.TextChoices):
+        WORLD = "world", "Welt"
+        CHALLENGE_WORLD = "challenge_world", "Challenge-Welt"
+        ROBOT = "robot", "Roboter"
+        FILTER = "filter", "Blockauswahl"
+
+    task_version = models.ForeignKey(
+        TaskVersion,
+        on_delete=models.CASCADE,
+        related_name="simulator_files",
+        verbose_name="Version",
+    )
+    role = models.CharField("Art", max_length=20, choices=Role.choices)
+    filename = models.CharField(
+        "Dateiname",
+        max_length=100,
+        validators=[
+            RegexValidator(
+                r"^[A-Za-z0-9_-]+\.json$",
+                "Nur Buchstaben, Ziffern, - und _, Endung .json (z. B. welt.json).",
+            )
+        ],
+        help_text=(
+            "Name in der Adresse. Für eine Challenge-Welt der Originalname aus "
+            "GearsBot (z. B. maze-1.json), sonst erkennt GearsBot die Challenge "
+            "nicht."
+        ),
+    )
+    content = models.JSONField(
+        "Inhalt",
+        help_text=(
+            "JSON aus GearsBot (gespeicherte Welt, Roboter oder Blockauswahl). "
+            "Nur Aufgabeninhalt, keine Personendaten: die Datei ist ohne "
+            "Anmeldung abrufbar. Verweis auf eine andere Datei dieser Version: "
+            "«sim-file:dateiname.json»."
+        ),
+    )
+
+    class Meta:
+        verbose_name = "Simulator-Datei"
+        verbose_name_plural = "Simulator-Dateien"
+        ordering = ["task_version", "role", "pk"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["task_version", "role"],
+                name="tasks_simulatorfile_unique_role",
+                violation_error_message="Diese Art gibt es in der Version schon.",
+            ),
+            models.UniqueConstraint(
+                fields=["task_version", "filename"],
+                name="tasks_simulatorfile_unique_filename",
+                violation_error_message="Dieser Dateiname kommt in der Version schon vor.",
+            ),
+        ]
+
+    def __str__(self):
+        return self.filename
+
+    def clean(self):
+        if not isinstance(self.content, dict):
+            raise ValidationError(
+                {"content": "Der Inhalt muss ein JSON-Objekt sein: {…}."}
+            )
+        size = len(json.dumps(self.content, ensure_ascii=False).encode())
+        if size > SIMULATOR_FILE_MAX_BYTES:
+            raise ValidationError(
+                {"content": "Die Datei ist zu gross (höchstens 2 MB)."}
+            )
 
 
 # --- Images in instructions (brief 5.4, ADR 0010, ADR 0009) ---------------

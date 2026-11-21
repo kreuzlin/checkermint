@@ -156,6 +156,15 @@ class VersionAdminTests(TestCase):
             "hints-0-order": 0,
             "hints-0-text": "Neuer Text",
             "hints-0-DELETE": "",
+            # Simulator inlines (ADR 0021): empty, but always posted.
+            "simulator-TOTAL_FORMS": 0,
+            "simulator-INITIAL_FORMS": 0,
+            "simulator-MIN_NUM_FORMS": 0,
+            "simulator-MAX_NUM_FORMS": 1,
+            "simulator_files-TOTAL_FORMS": 0,
+            "simulator_files-INITIAL_FORMS": 0,
+            "simulator_files-MIN_NUM_FORMS": 0,
+            "simulator_files-MAX_NUM_FORMS": 1000,
         }
         response = self.client.post(self.version_url(draft), data)
         self.assertEqual(response.status_code, 302, getattr(response, "context", None))

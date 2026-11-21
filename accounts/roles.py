@@ -28,6 +28,8 @@ COACH_PERMISSIONS = {
         "taskrequirement": ["view", "add", "change", "delete"],
         "hint": ["view", "add", "change", "delete"],
         "instructionimage": ["view", "add", "change", "delete"],
+        "simulatorconfig": ["view", "add", "change", "delete"],
+        "simulatorfile": ["view", "add", "change", "delete"],
     },
     # Awards are made by reviews; coaches see them and can revoke one
     # (delete), never add or edit them by hand (ADR 0013).

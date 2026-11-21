@@ -146,6 +146,30 @@ when moving a row out of one).
 |---|---|---|
 | `text` | text | Markdown |
 
+### SimulatorConfig and SimulatorFile (ADR 0021)
+
+GearsBot settings of a version. Same immutability guard as requirements and
+hints (shared abstract base `VersionBound`); `create_draft` copies both.
+
+| SimulatorConfig field | Type | Rules |
+|---|---|---|
+| `task_version` | one-to-one → TaskVersion, cascade | optional: without it the task has no simulator |
+| `token` | char 64, unique | random (`secrets.token_urlsafe(24)`), not editable; a copied version gets a new one |
+| `world_scripts` | char 200, optional | comma-separated GearsBot world scripts, `^[a-z0-9_]+(,[a-z0-9_]+)*$` |
+| `expected_code` | char 100, optional | completion code; shown only to coaches (review), never to participants or in the JSON |
+
+| SimulatorFile field | Type | Rules |
+|---|---|---|
+| `task_version` | FK → TaskVersion, cascade | |
+| `role` | `world` / `challenge_world` / `robot` / `filter` | unique per version |
+| `filename` | char 100 | `^[A-Za-z0-9_-]+\.json$`, unique per version; for a challenge world the upstream name |
+| `content` | JSON object | at most 2 MB; a string `"sim-file:<filename>"` stands for the absolute URL of that file of the same version |
+
+Served without login at `/sim/<token>/<filename>` (CORS for
+`SIMULATOR_URL`, 404 for archived tasks, `no-store` for drafts). The button
+"Im Simulator öffnen" appears when `SIMULATOR_URL` is set and the version
+has a config and a `world` file.
+
 ### InstructionImage
 
 Images for the instructions of a task, shared by its versions (ADR 0010),
