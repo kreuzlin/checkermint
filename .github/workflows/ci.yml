@@ -1,5 +1,10 @@
-# CI: lint and test every pull request and push to main; build the
-# production image for linux/amd64 (ADR 0006) and push it to GHCR from main.
+# CI: lint and test every pull request; build the production image for
+# linux/amd64 (ADR 0006) on pull requests and push it to GHCR from main.
+#
+# Tests run only on pull requests (#119). They test the merge result with
+# the current main, and the ruleset requires branches to be up to date
+# before merging, so the squash commit on main is exactly the tested code.
+# On main only the image is built and pushed.
 
 name: CI
 
@@ -29,6 +34,7 @@ env:
 jobs:
   test:
     name: Lint and test
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -80,8 +86,8 @@ jobs:
         run: uv run python manage.py test
 
   # Runs at the same time as the tests (#118): on pull requests it only
-  # checks that the image builds; both jobs are required checks. On main the
-  # deploy waits for the whole run to be green (CLAUDE.md, Deploying).
+  # checks that the image builds; both jobs are required checks. On main it
+  # is the only job and pushes the image (#119).
   image:
     name: Build image (linux/amd64)
     runs-on: ubuntu-latest

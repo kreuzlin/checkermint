@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Build the image in parallel with the tests")_
+_Last updated: 2026-11-21 (PR "Do not run the tests a second time on main")_
 
 ## Live
 
@@ -45,7 +45,7 @@ _Last updated: 2026-11-21 (PR "Build the image in parallel with the tests")_
 | Mail | Hostpoint SMTP `asmtp.mail.hostpoint.ch:465` (SSL), login and sender `mail@checkermint.ch` (mailbox created by the maintainer 2026-11-19). Outbound 465/587 not blocked by UpCloud. SPF `redirect=spf-permissive.mail.hostpoint.ch`, DKIM (three keys, selectors `20261121-{rsa1024,rsa2048,ed25519}-2051a403`) and DMARC `p=quarantine` enabled by the maintainer at Hostpoint 2026-11-21; sender policy "only with the mailbox's own user" fits (login, `DEFAULT_FROM_EMAIL` and `SERVER_EMAIL` are all `mail@checkermint.ch`) |
 | DNS | Hostpoint; only apex and `www` of checkermint.ch are changed (#2). Both point to the server (A and AAAA) since 2026-11-20; MX records unchanged |
 | CI | GitHub Actions: lint + tests, `linux/amd64` image to `ghcr.io/kreuzlin/checkermint` (`latest`, `sha-<commit>`) on `main`; runs on `main` are queued, never cancelled |
-| GitHub | Squash merge only (PR title/body), auto-merge, head branches deleted; ruleset "protect main" active (PR, CI checks, no force push/deletion); labels `ops`, `content`, `bug`, `enhancement` |
+| GitHub | Squash merge only (PR title/body), auto-merge, head branches deleted; ruleset "protect main" active (PR, CI checks, branch up to date with `main` since #119, no force push/deletion); labels `ops`, `content`, `bug`, `enhancement` |
 
 Runbook: [`deployment.md`](deployment.md). Architecture:
 [`architecture.md`](architecture.md). Decisions: [`decisions/`](decisions/)
@@ -406,6 +406,11 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   merged, `main` also runs both in parallel, so `latest` can be pushed
   before the tests on `main` finish; the deploy still waits for the whole
   run to be green.
+
+- #119: `Lint and test` runs only on pull requests; on `main` CI only
+  builds and pushes the image. Needs the ruleset setting "Require branches
+  to be up to date before merging" (set by the maintainer); CLAUDE.md
+  describes `gh pr update-branch` for PRs that fall behind.
 
 ## Open issues
 
