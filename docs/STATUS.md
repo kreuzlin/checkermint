@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Upload badge images in the admin")_
+_Last updated: 2026-11-21 (PR "Fix the CSRF error on the phone upload")_
 
 ## Live
 
@@ -439,6 +439,12 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   and the badge part of `design/generate_assets.py` are gone. Merged after
   the maintainer's OK (field removal).
 
+- #128: the phone upload failed on the maintainer's iPhone with 403 (CSRF):
+  the page's `no-referrer` policy makes browsers send `Origin: null` on the
+  POST. Now `strict-origin` (only the origin, never the token, as
+  referrer); a test posts with CSRF enforcement and an `Origin` header.
+  The manual test of the phone upload is to be repeated.
+
 ## Open issues
 
 Overview: `gh issue list`. At the time of writing:
@@ -446,7 +452,6 @@ Overview: `gh issue list`. At the time of writing:
 | # | Topic | Who |
 |---|---|---|
 | 1 | Production server (UpCloud): set up, deployed, backups running, maintainer's admin account created (2026-11-20) – nothing left, can be closed | Maintainer |
-| 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs that need the maintainer's OK (CLAUDE.md, Workflow) are marked. #42, #49 and #50 done | Claude Code |
 
 ## Next steps
 

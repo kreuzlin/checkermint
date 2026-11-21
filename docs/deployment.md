@@ -339,15 +339,15 @@ issue are tracked there.
 - [x] Rollback tested (section 4, #50, 2026-11-20).
 - [x] Container log retention matches the privacy page: 50 MB per
   container (`/etc/docker/daemon.json`, section 1; #97).
-- [ ] Disk: `df -h /` well below 80 %.
+- [x] Disk: `df -h /` well below 80 % (25 % on 2026-11-21).
 
 **Accounts and content** (in the admin, by the maintainer and coaches)
 
 - [ ] Maintainer's superuser exists; coaches have staff accounts in the
   group "Coach" (no superusers).
 - [ ] Topics, level table, first tasks with published versions and hints.
-- [ ] Badges attached to tasks (the six badges with images exist since
-  2026-11-21, #4).
+- [ ] Badges attached to tasks (the eight badges with images exist since
+  2026-11-21, #4, #120).
 - [ ] No demo or test data on the server. Demo data was loaded for
   testing on 2026-11-20; remove it (same one-off container, the site
   keeps `DEBUG=false`):

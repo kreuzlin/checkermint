@@ -124,7 +124,9 @@ Overview of how the project is built and run. Decisions and their rationale:
   holds submission and user id, is valid 30 minutes and only while that
   submission is still the participant's draft. The page needs no login,
   shows only the task title and requirement labels (no names, no
-  thumbnails), sends `no-referrer`, and only adds photos/files (same
+  thumbnails), sets the referrer policy `strict-origin` (referrers carry
+  only the origin, never the token; `no-referrer` made browsers send
+  `Origin: null` and broke the CSRF check, #128), and only adds photos/files (same
   handlers and image pipeline, `max_count` respected); invalid or expired
   links answer 410.
 - Live update (#29): with a draft, the form loads htmx (vendored, see
