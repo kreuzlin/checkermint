@@ -213,6 +213,19 @@ commit>` in `.env` rolls back only GearsBot (ghcr.io/kreuzlin/checkermint-sim
 gets a new `sha-…` only for merges that change `sim/`). Alternatively pin the
 old commit in `sim/gears/UPSTREAM` in a PR (ADR 0020).
 
+After a **GearsBot update PR** (ADR 0020) is merged and deployed: if its
+report lists changed, added or removed challenges, re-run the import on the
+server – dry run first, the real run only with the maintainer's OK (it
+writes):
+
+```bash
+docker compose -f compose.prod.yaml exec web python manage.py import_gearsbot_challenges --dry-run
+docker compose -f compose.prod.yaml exec web python manage.py import_gearsbot_challenges
+```
+
+Published versions are never changed; changed challenges get a new draft
+for the coaches ([`gearsbot-coaches.md`](gearsbot-coaches.md), section 4).
+
 Every merge to `main` has an image `sha-<full commit>` on GHCR (docs-only
 merges too). `scripts/deploy.sh` also pulls the repo, so scripts and
 `compose.prod.yaml` stay at `main` – only the app image goes back.
@@ -362,6 +375,11 @@ issue are tracked there.
 - [ ] Maintainer's superuser exists; coaches have staff accounts in the
   group "Coach" (no superusers).
 - [ ] Topics, level table, first tasks with published versions and hints.
+- [ ] GearsBot: simulator tried on the club's devices (3D performance;
+  check "Funktionen 4", which logged a shader error in headless Chrome);
+  the Basic Challenges to be offered reviewed and published by the coaches
+  ([`gearsbot-coaches.md`](gearsbot-coaches.md)). Imported as drafts on
+  2026-11-21.
 - [ ] Badges attached to tasks (the eight badges with images exist since
   2026-11-21, #4, #120).
 - [ ] No demo or test data on the server. Demo data was loaded for
