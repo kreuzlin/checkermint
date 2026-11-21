@@ -19,6 +19,11 @@ Writes `core/static/core/brand/`:
 | `favicon-32.png` | `logo/CHECKERMINT_Icon_512.png` | PNG favicon fallback |
 | `apple-touch-icon.png` | `logo/CHECKERMINT_Icon_512.png` | iOS home screen (180 px) |
 
+and `badges/static/badges/img/` from `badges/` (PNGs resized to 160 px,
+SVGs cleaned; web name without the leading number, lower case with
+hyphens, e.g. `01_Erste_LED.png` → `erste-led.png`). The badge admin offers
+every file in that folder.
+
 SVGs are copied without editor metadata (Inkscape/Sodipodi), PNGs are resized
 and saved without metadata. The SVGs contain the lettering as paths, so no
 font files are needed (no external requests). Commit the generated files.
@@ -27,6 +32,7 @@ font files are needed (no external requests). Commit the generated files.
 
 | File(s) | Source / author | Rights |
 |---|---|---|
+| `badges/*.png` (six badges: Erste LED, Code-Starter, Greifarm, Sensor-Profi, Konstrukteur/in, Durchhalter/in) | Delivered by the maintainer (kreuzlin) on 2026-11-21. Created by the maintainer with ChatGPT (image generation) from the prompt in [`badges/PROMPT.md`](badges/PROMPT.md) | Released by the maintainer for Checkermint; AI-made artwork allowed (maintainer's decision 2026-11-19, brief section 11) |
 | `logo/CHECKERMINT_*` (logo package: header, portrait logo dark/light/transparent, icon) | Delivered by the maintainer (kreuzlin) on 2026-11-19. Created by the maintainer with an AI image tool, then vectorised (see `logo/CHECKERMINT_README.txt`, which came with the package) | Released by the maintainer for Checkermint; the maintainer decided on 2026-11-19 that artwork made with AI tools may be used (brief, section 11) |
 
 Not in the repository: the RoboChallenge 2027 flyer that the maintainer gave
@@ -37,5 +43,5 @@ Colours of the logo, used as tokens in `core/static/core/css/site.css`:
 petrol `#020d16`, `#031b23`, `#072a33`, `#0a3640`; mint `#a6fff9`,
 `#76fff5`, `#36f4e4`, `#00dcad`; ice white `#f5ffff`.
 
-Still open (#4): badge artwork. Until then badges show a mint hexagon
-placeholder.
+Badges without an image (empty "Bild" in the admin) still show the mint
+hexagon placeholder.
