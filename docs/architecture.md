@@ -271,7 +271,9 @@ Overview of how the project is built and run. Decisions and their rationale:
   (instruction images, `tasks.apps`), `einreichungsfoto` and
   `einreichungsdatei` (submission items, `submissions.apps`).
 - Images on upload: `core.images.process_image` decodes (JPEG, PNG, WebP,
-  HEIC), applies the EXIF orientation, drops all metadata, limits to
+  HEIC; also "MPO", Pillow's name for JPEGs with a second image such as
+  iPhone photos with an HDR gain map – only the first image is used,
+  #132), applies the EXIF orientation, drops all metadata, limits to
   2000 px and re-encodes (JPEG, or PNG with transparency);
   `process_photo` also makes a thumbnail from the same decode. Markdown images are only allowed when the
   caller passes the allowed images (`core.markdown.render_markdown(text,

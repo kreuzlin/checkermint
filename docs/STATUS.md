@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Show the phone QR code before a draft exists")_
+_Last updated: 2026-11-21 (PR "Accept iPhone JPEGs with a second image")_
 
 ## Live
 
@@ -450,6 +450,12 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   inputs. Now the QR code is shown right away; the link is bound to
   participant and task, and the first phone upload creates the draft
   (`ensure_draft`). Live update keeps polling until the draft exists.
+
+- #132: iPhone photos (`IMG_….jpeg`) were rejected with "Erlaubt sind
+  JPEG, PNG, HEIC und WebP": they contain an HDR gain map, so Pillow opens
+  them as "MPO". Now accepted; only the photo itself is kept, re-encoded
+  as JPEG without metadata. The maintainer's attempt also showed that the
+  CSRF fix (#128) works (`Origin: https://checkermint.ch`, 200).
 
 ## Open issues
 

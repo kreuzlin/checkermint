@@ -21,7 +21,10 @@ THUMBNAIL_EDGE = 400
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 # Refuse decompression bombs early (about 50 megapixels).
 MAX_PIXELS = 50_000_000
-ACCEPTED_FORMATS = {"JPEG", "PNG", "WEBP", "HEIF"}
+# "MPO" is how Pillow names a JPEG with more than one image inside, e.g.
+# current iPhone photos with an HDR gain map (#132). Only the first image
+# (the photo itself) is used; re-encoding drops the rest.
+ACCEPTED_FORMATS = {"JPEG", "MPO", "PNG", "WEBP", "HEIF"}
 
 
 @dataclass(frozen=True)
