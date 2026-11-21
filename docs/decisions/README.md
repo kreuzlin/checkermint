@@ -28,3 +28,7 @@ to Checkermint.
 | 0016 | [Demo data for local development, removable despite ADR 0010](0016-demo-data-command.md) | accepted |
 | 0017 | [File copy of the media volume in the nightly backup](0017-file-copy-of-media-in-nightly-backup.md) | accepted |
 | 0018 | [Badge images uploaded in the admin (exception from ADR 0009)](0018-badge-images-uploaded-in-the-admin.md) | accepted |
+| 0019 | [GearsBot hosting: own origin, own image, caching, CSP](0019-gearsbot-hosting-origin-and-build.md) | accepted |
+| 0020 | [GearsBot pinning, patches and monthly update PRs](0020-gearsbot-pinning-and-updates.md) | accepted |
+| 0021 | [Simulator configuration on task versions, completion code check](0021-simulator-configuration-on-task-versions.md) | accepted |
+| 0022 | [GearsBot license (GPLv3) and attribution](0022-gearsbot-license-and-attribution.md) | accepted |

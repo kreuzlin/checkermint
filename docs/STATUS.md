@@ -6,8 +6,11 @@ live in the linked docs; open work lives in GitHub issues.
 
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
+Next project, approved by the maintainer 2026-11-21:
+[`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md) (GearsBot simulator; see
+"GearsBot" below).
 
-_Last updated: 2026-11-21 (PR "Link coaches to the admin from the site")_
+_Last updated: 2026-11-21 (PR "Add the GearsBot brief, spike and ADRs 0019–0022")_
 
 ## Live
 
@@ -21,8 +24,8 @@ _Last updated: 2026-11-21 (PR "Link coaches to the admin from the site")_
   `demo-anna` … `demo-luna`; must be removed before the go-live). Email
   goes out via Hostpoint SMTP since 2026-11-20 (#42).
 - Deployed commit: `curl -s https://checkermint.ch/version`, compare with
-  `git rev-parse origin/main`. Last deploy: 2026-11-20, `22a0f91` (after the
-  rollback test; app code as `3380288`). Docs- or CI-only changes need no deploy (the live
+  `git rev-parse origin/main`. Last deploy: 2026-11-21, `0a72d51`
+  (checked at the session start on 2026-11-21). Docs- or CI-only changes need no deploy (the live
   commit then lags behind `main`).
 - Search engines: never indexed (brief, section 4). Django sends
   `X-Robots-Tag: noindex, nofollow` on every response, `/robots.txt`
@@ -483,13 +486,42 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   in the main navigation, "Neue Aufgabe erstellen" on the catalogue and
   "In der Verwaltung bearbeiten" on each task page (coaches only).
 
+## GearsBot (brief approved 2026-11-21)
+
+- Brief: [`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md). Spike done 2026-11-21
+  against upstream `c0549600` (still `master`):
+  [`gearsbot-spike.md`](gearsbot-spike.md). All facts of brief section 2
+  confirmed; new findings: 61 challenges with 61 codes, the default robot
+  and other worlds also load from `files.aposteriori.com.sg` (33 files,
+  0.8 MB, plus one on GitHub), the challenge file name must stay in the
+  world URL, the block filter uses English ids (works in German), the
+  brief's first block filter lacks the turns that "Move and Turn" needs.
+- ADRs 0019–0022 **accepted** by the maintainer (2026-11-21): hosting on
+  `sim.checkermint.ch` with its own image, pin and monthly update PRs,
+  simulator configuration on task versions and the code check, GPLv3 and
+  attribution.
+- Maintainer's decisions 2026-11-21: merging follows CLAUDE.md as for
+  everything else; only the scheduled GearsBot update PRs are merged by the
+  maintainer. "Grundlagen" shows turn blocks (ADR 0021). All 34 external
+  files are mirrored and the simulator's CSP blocks third-party hosts. The
+  challenge rules live in GearsBot and can change with an update; update
+  PRs report it (ADR 0020).
+- Next: the issues in the brief's order (hosting
+  and build, update workflow, simulator configuration, submissions and
+  review, import command, coach guide), one PR each, never stacked.
+- Needs the maintainer later: DNS record `sim` (A and AAAA, only added),
+  `.env` values `SIM_ADDRESS` and `SIMULATOR_URL` on the server, OKs for
+  the server/Caddy/deploy PR, merging the GearsBot update PRs, the
+  "GearsBot" check in the ruleset, testing the simulator on the club's
+  devices before the first tasks are published.
+
 ## Open issues
 
 Overview: `gh issue list`. At the time of writing:
 
 | # | Topic | Who |
 |---|---|---|
-| 1 | Production server (UpCloud): set up, deployed, backups running, maintainer's admin account created (2026-11-20) – nothing left, can be closed | Maintainer |
+| 1 | Production server (UpCloud): set up, deployed, backups running, maintainer's admin account created (2026-11-20) – nothing left, can be closed (still open on 2026-11-21) | Maintainer |
 
 ## Next steps
 
@@ -497,7 +529,9 @@ Overview: `gh issue list`. At the time of writing:
    maintainer declares the app productive.
 2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
-3. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
+3. GearsBot: issues one after another, starting with the `sim` image
+   (see "GearsBot" above).
+4. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes, added with #28), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +
    `pillow-heif` (image processing incl. HEIC, explicit since #24).

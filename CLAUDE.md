@@ -31,14 +31,21 @@ Report the result to the maintainer in German before starting new work.
 - **Requirements: [`docs/PROJECT_BRIEF.md`](docs/PROJECT_BRIEF.md)** – roles,
   privacy principles, functional scope of version 1, milestones. Read the
   relevant section before working on a feature.
+- **GearsBot simulator: [`docs/GEARSBOT_BRIEF.md`](docs/GEARSBOT_BRIEF.md)**
+  – approved by the maintainer (2026-11-21), goes beyond version 1:
+  self-hosted GearsBot, tasks linked to simulator worlds, import of the
+  Basic Challenges. Spike results in `docs/gearsbot-spike.md`, decisions in
+  ADRs 0019–0022. Its section 4 lists what stays out of scope.
 - Live on https://checkermint.ch (server details in `docs/STATUS.md`). DNS
   changes are done by the maintainer; only the apex and `www` records of
-  checkermint.ch are ever changed.
+  checkermint.ch are ever changed, plus the new `sim` record for the
+  simulator (GearsBot brief; only added, never another record).
 - Tasks, topics, hints, badges and accounts are maintained by coaches through
   the Django admin – the admin must be understandable for non-technical users
   (German `verbose_name`s, help texts, sensible list views and filters).
-- Scope of version 1: brief, section 5 (out of scope: section 6). No features
-  beyond that without asking.
+- Scope of version 1: brief, section 5 (out of scope: section 6). Beyond
+  that only the GearsBot brief (section 3). No other features without
+  asking.
 
 ## Privacy (binding)
 
