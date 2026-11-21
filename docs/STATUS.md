@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Accept ADR 0018: badge images uploaded in the admin")_
+_Last updated: 2026-11-21 (PR "Add an uploaded image field for badges")_
 
 ## Live
 
@@ -419,6 +419,14 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - Maintainer's rules 2026-11-21: never stack PRs (each from `main`, one
   after another); `git` output is not filtered either (CLAUDE.md,
   Workflow).
+
+- #120, part 1: `Badge.image_file` (migration `badges/0004`) and
+  `badges.images.process_badge_image` (PNG/WebP only, max 2 MB and
+  4096 px, re-encoded as a 512 px PNG without metadata, motif cropped and
+  centred). Data migration `badges/0005` moves the eight shipped images
+  into `image_file`; the shipped files are generated at 512 px for that
+  (about 190 KB each, until part 2 removes them). No visible change yet;
+  merged by the maintainer (migration).
 
 ## Open issues
 
