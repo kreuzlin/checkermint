@@ -377,9 +377,9 @@ issue are tracked there.
 - [ ] Topics, level table, first tasks with published versions and hints.
 - [ ] GearsBot: simulator tried on the club's devices (3D performance;
   check "Funktionen 4", which logged a shader error in headless Chrome);
-  the Basic Challenges to be offered reviewed and published by the coaches
-  ([`gearsbot-coaches.md`](gearsbot-coaches.md)). Imported as drafts on
-  2026-11-21.
+  the Basic Challenges reviewed by the coaches, hints added
+  ([`gearsbot-coaches.md`](gearsbot-coaches.md)). All 61 imported and
+  published on 2026-11-21 (maintainer's request).
 - [ ] Badges attached to tasks (the eight badges with images exist since
   2026-11-21, #4, #120).
 - [ ] No demo or test data on the server. Demo data was loaded for

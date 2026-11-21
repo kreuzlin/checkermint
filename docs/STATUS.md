@@ -10,7 +10,7 @@ Next project, approved by the maintainer 2026-11-21:
 [`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md) (GearsBot simulator; see
 "GearsBot" below).
 
-_Last updated: 2026-11-21 (PR "Record the GearsBot badges on the server")_
+_Last updated: 2026-11-21 (PR "Record the published GearsBot challenges")_
 
 ## Live
 
@@ -615,8 +615,15 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   Warten 2, Labyrinth 6, Verlies 6, Schleifen 7, Bedingungen 12 and
   Funktionen 11 (tasks still unpublished). 15 badges in total; images
   served (200). The eight earlier badges unchanged.
+- 2026-11-21, on the maintainer's request: all 61 GearsBot challenges
+  published on the server (version 1 of each published with
+  `TaskVersion.publish`, task "Für Teilnehmende sichtbar"); "Grundlagen 1"
+  had been published by the maintainer before. Generated instructions,
+  points and levels as imported, no hints yet; the device test on the
+  club's devices is still open.
 - Needs the maintainer and coaches: testing the simulator on the club's
-  devices, reviewing and publishing the challenges (guide, section 1),
+  devices, reviewing the published challenges (changes need a new version,
+  guide, section 1), adding hints,
   merging the GearsBot update PRs; after an update with changed challenges,
   the OK to re-run the import. (DNS `sim`, the `.env` values and the "GearsBot"
   check in the ruleset are done.)
@@ -635,8 +642,9 @@ Overview: `gh issue list`. At the time of writing:
    maintainer declares the app productive.
 2. Maintainer: manual test of the live update (the phone upload itself
    works since 2026-11-21, [`manual-testing.md`](manual-testing.md)).
-3. GearsBot: device test on the club's devices, then coaches review and
-   publish the challenges ([`gearsbot-coaches.md`](gearsbot-coaches.md)).
+3. GearsBot: device test on the club's devices; coaches review the
+   published challenges and add hints
+   ([`gearsbot-coaches.md`](gearsbot-coaches.md)).
 4. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes, added with #28), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +
