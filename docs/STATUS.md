@@ -10,7 +10,7 @@ Next project, approved by the maintainer 2026-11-21:
 [`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md) (GearsBot simulator; see
 "GearsBot" below).
 
-_Last updated: 2026-11-21 (PR "Keep the demo topic apart from the real Code topic")_
+_Last updated: 2026-11-21 (PR "Add the GearsBot guide for coaches", #147)_
 
 ## Live
 
@@ -22,12 +22,11 @@ _Last updated: 2026-11-21 (PR "Keep the demo topic apart from the real Code topi
   IPv6 answer. The maintainer's admin account exists (2026-11-20).
   **Demo data** is loaded for testing (accounts `demo-coach`,
   `demo-anna` … `demo-luna`; must be removed before the go-live). The demo
-  topic "Code" is to be renamed "Code (Demo)" on the server before the
-  GearsBot import (maintainer's decision 2026-11-21, see "GearsBot"). Email
+  topic is named "Code (Demo)" since 2026-11-21, next to the real topic
+  "Code" with the 61 GearsBot challenges (unpublished drafts). Email
   goes out via Hostpoint SMTP since 2026-11-20 (#42).
 - Deployed commit: `curl -s https://checkermint.ch/version`, compare with
-  `git rev-parse origin/main`. Last deploy: 2026-11-21, `d822007` (#153,
-  checked at the session start on 2026-11-21). Docs- or CI-only changes need no deploy (the live
+  `git rev-parse origin/main`. Last deploy: 2026-11-21, `6f8f868` (#154). Docs- or CI-only changes need no deploy (the live
   commit then lags behind `main`).
 - Search engines: never indexed (brief, section 4). Django sends
   `X-Robots-Tag: noindex, nofollow` on every response, `/robots.txt`
@@ -593,11 +592,21 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - Follow-up PR: `seed_demo` now names its topic "Code (Demo)"; the import
   stops with a German explanation when another topic is already named
   "Code" instead of failing with a database error.
-- Next: rename the demo topic on the server, dry run of the import, run it
-  after the maintainer's OK; then the coach guide (#147).
-- Needs the maintainer: OK for the real import run, merging the GearsBot
-  update PRs, testing the simulator on the club's devices before the first
-  tasks are published. (DNS `sim`, the `.env` values and the "GearsBot"
+- 2026-11-21: #154 deployed (`6f8f868`). On the server, with the
+  maintainer's OK: demo topic `demo-code` renamed "Code (Demo)" (the only
+  change), dry run (61 new), then the real import: topic "Code" (slug
+  `code`) with 61 unpublished tasks, each with one draft. Issue #1 closed
+  on the maintainer's confirmation.
+- #147: coach guide in German [`gearsbot-coaches.md`](gearsbot-coaches.md)
+  (how GearsBot tasks work, publishing a challenge, reviewing, own worlds
+  with the JSON upload and a block filter example, updates);
+  `deployment.md` describes re-running the import after an update PR and
+  has a GearsBot item in the go-live checklist; `architecture.md` links
+  the guide. All GearsBot issues of the brief are done.
+- Needs the maintainer and coaches: testing the simulator on the club's
+  devices, reviewing and publishing the challenges (guide, section 1),
+  merging the GearsBot update PRs; after an update with changed challenges,
+  the OK to re-run the import. (DNS `sim`, the `.env` values and the "GearsBot"
   check in the ruleset are done.)
 
 ## Open issues
@@ -606,8 +615,7 @@ Overview: `gh issue list`. At the time of writing:
 
 | # | Topic | Who |
 |---|---|---|
-| 1 | Production server (UpCloud): set up, deployed, backups running, maintainer's admin account created (2026-11-20) – nothing left, can be closed (still open on 2026-11-21) | Maintainer |
-| 147 | GearsBot: coach guide and docs | Claude |
+| – | none (#1 closed 2026-11-21, #147 closed by this PR) | – |
 
 ## Next steps
 
@@ -615,8 +623,8 @@ Overview: `gh issue list`. At the time of writing:
    maintainer declares the app productive.
 2. Maintainer: manual test of the live update (the phone upload itself
    works since 2026-11-21, [`manual-testing.md`](manual-testing.md)).
-3. GearsBot: import on the server (after the dry run and the maintainer's
-   OK), then the coach guide (#147) and the device test.
+3. GearsBot: device test on the club's devices, then coaches review and
+   publish the challenges ([`gearsbot-coaches.md`](gearsbot-coaches.md)).
 4. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes, added with #28), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +

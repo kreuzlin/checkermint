@@ -330,6 +330,10 @@ Browser ──HTTPS──▶ caddy ──▶ web (Gunicorn + Django, WhiteNoise 
   that sets caching, CSP and robots headers. The main Caddy terminates TLS
   and proxies to it. No volumes, no secrets, no access to Checkermint data.
   Built from `sim/gears/` (README there) by the workflow "Simulator".
+  Task versions link to it through `SimulatorConfig` / `SimulatorFile`
+  (ADR 0021); the Basic Challenges come from the committed bundle via
+  `import_gearsbot_challenges`. Coach guide (German):
+  [`gearsbot-coaches.md`](gearsbot-coaches.md).
 
 ## Delivery
 
