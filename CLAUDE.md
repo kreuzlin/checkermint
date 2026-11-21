@@ -94,8 +94,12 @@ Rationale lives in `docs/decisions/`. To deviate, write a new ADR first.
     write it as a good commit subject (English, imperative, e.g. "Add events
     calendar").
   - The ruleset also requires the CI checks "Lint and test" and
-    "Build image (linux/amd64)" to pass before a PR can be merged. If a job
-    is renamed in `.github/workflows/ci.yml`, update the ruleset as well.
+    "Build image (linux/amd64)" to pass before a PR can be merged, and the
+    branch to be **up to date with `main`** ("Require branches to be up to
+    date before merging"): CI tests only pull requests, not `main` again
+    (#119), so the tested merge result must be what lands on `main`. If a
+    job is renamed in `.github/workflows/ci.yml`, update the ruleset as
+    well.
   - Repository settings: **auto-merge is allowed** and **head branches are
     deleted automatically** after the merge.
 - **Merging – Claude merges its own PRs**, except in the cases below:
@@ -104,8 +108,11 @@ Rationale lives in `docs/decisions/`. To deviate, write a new ADR first.
   2. Check the result with
      `gh pr view <N> --json state,mergedAt,autoMergeRequest`: `state` is
      `MERGED`, or `autoMergeRequest` is set (queued – wait with
-     `gh pr checks <N> --watch`, then check again). Anything else means the
-     merge did not happen – report it, do not deploy.
+     `gh pr checks <N> --watch`, then check again). If the PR stays queued
+     because `main` moved in the meantime (`mergeStateStatus` `BEHIND`),
+     run `gh pr update-branch <N>`; the checks run again and auto-merge
+     continues. Anything else means the merge did not happen – report it,
+     do not deploy.
   3. Deploy (see below) and report the result.
   - **Exceptions – the maintainer merges these PRs.** Open the PR, say in the
     PR description and in the chat why it is an exception, and stop:

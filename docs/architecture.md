@@ -314,8 +314,10 @@ Browser ──HTTPS──▶ caddy ──▶ web (Gunicorn + Django, WhiteNoise 
 
 1. Pull request → CI: Ruff, `manage.py check`, missing-migration check,
    tests, and in parallel the image build (no push).
-2. Merge to `main` → CI pushes `ghcr.io/kreuzlin/checkermint:latest` and
-   `:sha-<commit>`.
+2. Merge to `main` (only when the branch is up to date with `main`, so the
+   tested merge result is exactly what lands) → CI builds and pushes
+   `ghcr.io/kreuzlin/checkermint:latest` and `:sha-<commit>`; the tests are
+   not run a second time (#119).
 3. `scripts/deploy.sh` on the server pulls the image, runs migrations and
    restarts the containers.
 
