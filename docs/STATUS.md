@@ -10,7 +10,7 @@ Next project, approved by the maintainer 2026-11-21:
 [`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md) (GearsBot simulator; see
 "GearsBot" below).
 
-_Last updated: 2026-11-21 (PR "Import the GearsBot Basic Challenges as draft tasks", #146)_
+_Last updated: 2026-11-21 (PR "Keep the demo topic apart from the real Code topic")_
 
 ## Live
 
@@ -21,11 +21,13 @@ _Last updated: 2026-11-21 (PR "Import the GearsBot Basic Challenges as draft tas
   Caddy; `http://` and `www` redirect to `https://checkermint.ch/`; IPv4 and
   IPv6 answer. The maintainer's admin account exists (2026-11-20).
   **Demo data** is loaded for testing (accounts `demo-coach`,
-  `demo-anna` … `demo-luna`; must be removed before the go-live). Email
+  `demo-anna` … `demo-luna`; must be removed before the go-live). The demo
+  topic "Code" is to be renamed "Code (Demo)" on the server before the
+  GearsBot import (maintainer's decision 2026-11-21, see "GearsBot"). Email
   goes out via Hostpoint SMTP since 2026-11-20 (#42).
 - Deployed commit: `curl -s https://checkermint.ch/version`, compare with
-  `git rev-parse origin/main`. Last deploy: 2026-11-21, `0a72d51`
-  (checked at the session start on 2026-11-21). Docs- or CI-only changes need no deploy (the live
+  `git rev-parse origin/main`. Last deploy: 2026-11-21, `d822007` (#153,
+  checked at the session start on 2026-11-21). Docs- or CI-only changes need no deploy (the live
   commit then lags behind `main`).
 - Search engines: never indexed (brief, section 4). Django sends
   `X-Robots-Tag: noindex, nofollow` on every response, `/robots.txt`
@@ -581,14 +583,22 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   checked in Chrome per group. Seen in headless Chrome: "Funktionen 4"
   (`abstraction-4`) logs a Babylon shader error, also when loaded from
   GearsBot's own files – to check in the device test.
-- Next: the issues in the brief's order (hosting
-  and build, update workflow, simulator configuration, submissions and
-  review, import command, coach guide), one PR each, never stacked.
-- Needs the maintainer later: DNS record `sim` (A and AAAA, only added),
-  `.env` values `SIM_ADDRESS` and `SIMULATOR_URL` on the server, OKs for
-  the server/Caddy/deploy PR, merging the GearsBot update PRs, the
-  "GearsBot" check in the ruleset, testing the simulator on the club's
-  devices before the first tasks are published.
+- 2026-11-21: #146 deployed (`d822007`, PR #153), no migrations. A first
+  dry run of the import on the server stopped with a database error: the
+  demo topic is named "Code" (slug `demo-code`), so the real topic "Code"
+  (slug `code`) could not be created – topic names are unique.
+  Maintainer's decision: rename the demo topic to "Code (Demo)" and import
+  into a new, real "Code" (removing the demo data later deletes only the
+  demo topic, which is found by its slug).
+- Follow-up PR: `seed_demo` now names its topic "Code (Demo)"; the import
+  stops with a German explanation when another topic is already named
+  "Code" instead of failing with a database error.
+- Next: rename the demo topic on the server, dry run of the import, run it
+  after the maintainer's OK; then the coach guide (#147).
+- Needs the maintainer: OK for the real import run, merging the GearsBot
+  update PRs, testing the simulator on the club's devices before the first
+  tasks are published. (DNS `sim`, the `.env` values and the "GearsBot"
+  check in the ruleset are done.)
 
 ## Open issues
 
@@ -597,15 +607,16 @@ Overview: `gh issue list`. At the time of writing:
 | # | Topic | Who |
 |---|---|---|
 | 1 | Production server (UpCloud): set up, deployed, backups running, maintainer's admin account created (2026-11-20) – nothing left, can be closed (still open on 2026-11-21) | Maintainer |
+| 147 | GearsBot: coach guide and docs | Claude |
 
 ## Next steps
 
 1. The go-live checklist (deployment.md, section 9) until the
    maintainer declares the app productive.
-2. Maintainer: manual test of phone upload and live update
-   ([`manual-testing.md`](manual-testing.md)).
-3. GearsBot: issues one after another, starting with the `sim` image
-   (see "GearsBot" above).
+2. Maintainer: manual test of the live update (the phone upload itself
+   works since 2026-11-21, [`manual-testing.md`](manual-testing.md)).
+3. GearsBot: import on the server (after the dry run and the maintainer's
+   OK), then the coach guide (#147) and the device test.
 4. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes, added with #28), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +

@@ -46,7 +46,10 @@ PARTICIPANTS = [
     ("demo-max", "MaxMotor", "Max Probst"),
     ("demo-luna", "LunaLED", "Luna Demo"),
 ]
-TOPIC_NAMES = ["Code", "Konstruktion", "Elektronik"]
+# "Code (Demo)", not "Code": the real topic "Code" holds the GearsBot
+# challenges (#146) and must not clash with the demo topic.
+CODE_TOPIC = "Code (Demo)"
+TOPIC_NAMES = [CODE_TOPIC, "Konstruktion", "Elektronik"]
 # Only added when the table holds nothing but level 1.
 LEVELS = [(2, 20), (3, 50), (4, 100)]
 
@@ -237,7 +240,7 @@ class Seeder:
 
     def tasks(self):
         code = Topic.objects.create(
-            name="Code",
+            name=CODE_TOPIC,
             slug=PREFIX + "code",
             order=1,
             description="Programme für Arduino und Raspberry Pi Pico.",

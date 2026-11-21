@@ -89,6 +89,13 @@ class SeedDemoTests(TestCase):
         self.assertTrue(User.objects.filter(pk=own.pk).exists())
         self.assertTrue(Task.objects.filter(pk=task.pk).exists())
 
+    def test_demo_topic_coexists_with_the_real_code_topic(self):
+        real = Topic.objects.create(name="Code", slug="code")
+        seed("--password", "geheim123")
+        self.assertTrue(Topic.objects.filter(name="Code (Demo)").exists())
+        seed("--remove")
+        self.assertEqual(list(Topic.objects.all()), [real])
+
     def test_name_clash_is_reported(self):
         user = User.objects.create_user("coach", password="geheim123")
         Profile.objects.create(user=user, nickname="RoboAnna", real_name="Anna")

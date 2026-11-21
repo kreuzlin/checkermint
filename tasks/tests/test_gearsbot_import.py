@@ -6,7 +6,7 @@ import tempfile
 from io import StringIO
 from pathlib import Path
 
-from django.core.management import call_command
+from django.core.management import CommandError, call_command
 from django.test import TestCase
 
 from tasks.gearsbot_import import BUNDLE, FILTERS, import_challenges
@@ -103,6 +103,20 @@ class ImportTests(TestCase):
         self.assertIn("New tasks (unpublished drafts): 61", out.getvalue())
         self.assertIn("Dry run: nothing was saved.", out.getvalue())
         self.assertFalse(Task.objects.exists())
+
+    def test_other_topic_named_code_is_reported_in_german(self):
+        Topic.objects.create(name="Code", slug="demo-code")
+        with self.assertRaisesMessage(CommandError, "benenne es zuerst"):
+            call_command("import_gearsbot_challenges", "--dry-run", stdout=StringIO())
+        self.assertFalse(Task.objects.exists())
+
+    def test_imports_next_to_the_renamed_demo_topic(self):
+        demo = Topic.objects.create(name="Code (Demo)", slug="demo-code")
+        import_challenges()
+        topic = Topic.objects.get(slug="code")
+        self.assertEqual(topic.name, "Code")
+        self.assertEqual(topic.tasks.count(), 61)
+        self.assertFalse(demo.tasks.exists())
 
     def test_archived_tasks_are_skipped(self):
         import_challenges()
