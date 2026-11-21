@@ -9,7 +9,14 @@ from pathlib import Path
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 
-from tasks.gearsbot_import import BUNDLE, FILTERS, import_challenges
+from tasks.gearsbot_import import (
+    BUNDLE,
+    FILTERS,
+    import_challenges,
+    instructions_for,
+    load_bundle,
+)
+from tasks.gearsbot_missions import translate, untranslated
 from tasks.models import SimulatorFile, Task, Topic
 
 
@@ -195,3 +202,38 @@ class UpstreamChangeTests(TestCase):
         result = import_challenges(self.bundle)
         self.assertEqual(result.missing_upstream, ["gearsbot-maze-6"])
         self.assertTrue(Task.objects.filter(slug="gearsbot-maze-6").exists())
+
+
+class MissionTests(TestCase):
+    def setUp(self):
+        self.challenges = {c["file"]: c for c in load_bundle()["challenges"]}
+
+    def test_every_mission_of_the_bundle_is_translated(self):
+        for name, challenge in self.challenges.items():
+            with self.subTest(name):
+                self.assertEqual(untranslated(challenge["mission"]), [])
+
+    def test_instructions_never_show_the_completion_code(self):
+        for name, challenge in self.challenges.items():
+            with self.subTest(name):
+                self.assertNotIn(challenge["code"], instructions_for(challenge))
+
+    def test_condition_missions_are_the_dialog_text(self):
+        text = instructions_for(self.challenges["conditions-1.json"])
+        self.assertIn("> Fahre in das grüne Feld.", text)
+        self.assertIn("Die Farbe auf dem Boden", text)
+
+    def test_block_limit_comes_from_the_check_not_the_mission(self):
+        # Upstream's mission of loops-5 says 4 blocks, its check allows 7.
+        text = instructions_for(self.challenges["loops-5.json"])
+        self.assertIn("höchstens **7 Blöcke**", text)
+        self.assertNotIn("4", text.split("So gehst du vor")[0])
+
+    def test_unknown_paragraphs_stay_english(self):
+        mission = (
+            "Collect all the coins.\n\nBrand new text.\n\nYou're may only use 3 blocks."
+        )
+        self.assertEqual(
+            translate(mission), "Sammle alle Münzen ein.\n\nBrand new text."
+        )
+        self.assertEqual(untranslated(mission), ["Brand new text."])

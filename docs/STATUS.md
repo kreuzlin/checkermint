@@ -10,7 +10,7 @@ Next project, approved by the maintainer 2026-11-21:
 [`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md) (GearsBot simulator; see
 "GearsBot" below).
 
-_Last updated: 2026-11-21 (PR "Record the published GearsBot challenges")_
+_Last updated: 2026-11-21 (PR "Translate the GearsBot missions and fix the condition missions")_
 
 ## Live
 
@@ -621,6 +621,20 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   had been published by the maintainer before. Generated instructions,
   points and levels as imported, no hints yet; the device test on the
   club's devices is still open.
+- Fix and translation (this PR): the bundle had the wrong mission for the
+  14 "Bedingungen" challenges – upstream uses one prefix branch
+  (`includes('conditions-')`) in `displayMission`, which `check.py` did not
+  match, and its branch parser ran on into `render`, so the mission became
+  `worldBaseObject_box0<CODE>`: the **completion code was shown in the
+  instructions** of these 14 published tasks (only demo participants so
+  far). `check.py` now limits a chain to its own function and matches
+  prefix branches; bundle regenerated (only the 14 missions change).
+  Missions are translated to German (`tasks/gearsbot_missions.py`,
+  paragraph table; block limit sentences dropped, the instructions state
+  the checked limit – upstream's loops-5 text says 4, the check allows 7);
+  tests: every bundle mission translated, no instructions contain the
+  code. After the deploy, each GearsBot task gets a new published version
+  with the regenerated instructions (maintainer's request).
 - Needs the maintainer and coaches: testing the simulator on the club's
   devices, reviewing the published challenges (changes need a new version,
   guide, section 1), adding hints,

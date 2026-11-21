@@ -369,7 +369,7 @@
       "version": "b06212fe",
       "code": "STONE",
       "blocks_limit": null,
-      "mission": "worldBaseObject_box0STONE"
+      "mission": "Drive into the green box.\n\nThe position of the box changes randomly every time the world is reset.\n\nUse the color on the ground to figure out where it will appear."
     },
     {
       "order": 38,
@@ -379,7 +379,7 @@
       "version": "4757e227",
       "code": "SECRETS",
       "blocks_limit": null,
-      "mission": "worldBaseObject_box0SECRETS"
+      "mission": "Drive into the green box.\n\nThe position of the box changes randomly every time the world is reset.\n\nUse the color on the ground to figure out where it will appear."
     },
     {
       "order": 39,
@@ -389,7 +389,7 @@
       "version": "ecbb4ae5",
       "code": "AZKABAN",
       "blocks_limit": null,
-      "mission": "worldBaseObject_box0AZKABAN"
+      "mission": "Drive into the green box.\n\nThe position of the box changes randomly every time the world is reset.\n\nUse the color on the ground to figure out where it will appear."
     },
     {
       "order": 40,
@@ -399,7 +399,7 @@
       "version": "4c96c864",
       "code": "FIRE",
       "blocks_limit": null,
-      "mission": "worldBaseObject_box0FIRE"
+      "mission": "Drive into the green box.\n\nThe position of the box changes randomly every time the world is reset.\n\nUse the color on the ground to figure out where it will appear."
     },
     {
       "order": 41,
@@ -409,7 +409,7 @@
       "version": "d5353fa9",
       "code": "PHOENIX",
       "blocks_limit": null,
-      "mission": "worldBaseObject_box0PHOENIX"
+      "mission": "Drive into the green box.\n\nThe position of the box changes randomly every time the world is reset.\n\nUse the color on the ground to figure out where it will appear."
     },
     {
       "order": 42,
@@ -419,7 +419,7 @@
       "version": "4f834e54",
       "code": "PRINCE",
       "blocks_limit": null,
-      "mission": "worldBaseObject_box0PRINCE"
+      "mission": "Drive into the green box.\n\nThe position of the box changes randomly every time the world is reset.\n\nUse the color on the ground to figure out where it will appear."
     },
     {
       "order": 43,
@@ -429,7 +429,7 @@
       "version": "86502bb0",
       "code": "CHOCOLATE",
       "blocks_limit": null,
-      "mission": "worldBaseObject_box0CHOCOLATE"
+      "mission": "Drive into the green box.\n\nThe position of the box changes randomly every time the world is reset.\n\nUse the color on the ground to figure out where it will appear."
     },
     {
       "order": 44,
@@ -439,7 +439,7 @@
       "version": "8ad2c418",
       "code": "BANANA",
       "blocks_limit": null,
-      "mission": "worldBaseObject_box0BANANA"
+      "mission": "Drive into the green box.\n\nThe position of the box changes randomly every time the world is reset.\n\nUse the color on the ground to figure out where it will appear."
     },
     {
       "order": 45,
@@ -449,7 +449,7 @@
       "version": "4aad9762",
       "code": "SALTED CARAMEL",
       "blocks_limit": null,
-      "mission": "worldBaseObject_box0SALTED CARAMEL"
+      "mission": "Drive into the green box.\n\nThe position of the box changes randomly every time the world is reset.\n\nUse the color on the ground to figure out where it will appear."
     },
     {
       "order": 46,
@@ -459,7 +459,7 @@
       "version": "3702a992",
       "code": "AVOCADO",
       "blocks_limit": null,
-      "mission": "worldBaseObject_box0AVOCADO"
+      "mission": "Drive into the green box.\n\nThe position of the box changes randomly every time the world is reset.\n\nUse the color on the ground to figure out where it will appear."
     },
     {
       "order": 47,
@@ -469,7 +469,7 @@
       "version": "ac0bedb2",
       "code": "BLUEBERRY",
       "blocks_limit": null,
-      "mission": "worldBaseObject_box0BLUEBERRY"
+      "mission": "Drive into the green box.\n\nThe position of the box changes randomly every time the world is reset.\n\nUse the color on the ground to figure out where it will appear."
     },
     {
       "order": 48,
@@ -479,7 +479,7 @@
       "version": "87b48a99",
       "code": "VANILLA",
       "blocks_limit": null,
-      "mission": "worldBaseObject_box0VANILLA"
+      "mission": "Drive into the green box.\n\nThe position of the box changes randomly every time the world is reset.\n\nUse the color on the ground to figure out where it will appear."
     },
     {
       "order": 49,
@@ -489,7 +489,7 @@
       "version": "85e3052e",
       "code": "CARAMEL",
       "blocks_limit": null,
-      "mission": "worldBaseObject_box0CARAMEL"
+      "mission": "Drive into the green box.\n\nThe position of the box changes randomly every time the world is reset.\n\nUse the color on the ground to figure out where it will appear."
     },
     {
       "order": 50,
@@ -499,7 +499,7 @@
       "version": "6d42f222",
       "code": "OREO",
       "blocks_limit": null,
-      "mission": "worldBaseObject_box0OREO"
+      "mission": "Drive into the green box.\n\nThe position of the box changes randomly every time the world is reset.\n\nUse the color on the ground to figure out where it will appear."
     },
     {
       "order": 51,

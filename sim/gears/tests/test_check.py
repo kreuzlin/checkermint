@@ -20,6 +20,7 @@ var challenges_basic = new function() {
       options: [
         ['Basic: Move', 'worlds/challenges_basic/basic-1.json?v=aaaa1111'],
         ['Loops: Repeat 2', 'worlds/challenges_basic/loops-2.json?v=bbbb2222'],
+        ['Condition: Color 1', 'worlds/challenges_basic/conditions-1.json?v=cccc3333'],
       ]
     },
   ];
@@ -31,6 +32,8 @@ var challenges_basic = new function() {
       );
     } else if (self.options.jsonFile.includes('loops-2.json')) {
       $message = $('<p>Use a loop &amp; few blocks.</p>');
+    } else if (self.options.jsonFile.includes('conditions-')) {
+      $message = $('<p>Drive into the green box.</p>');
     }
   };
   this.render = function(delta){
@@ -46,6 +49,8 @@ var challenges_basic = new function() {
         [{type: 'drop', trigger: 'a', move: 'b'}],
         6
       );
+    } else if (self.options.jsonFile.includes('conditions-1.json')) {
+      self.renderIntersectOne(delta, 'worldBaseObject_box0', 'STONE');
     }
   };
 }
@@ -54,7 +59,10 @@ var challenges_basic = new function() {
 WORLD = {"worldName": "custom", "options": {"imageURL": "x"}}
 
 
-def make_checkout(root, script=SCRIPT, files=("basic-1.json", "loops-2.json")):
+FILES = ("basic-1.json", "loops-2.json", "conditions-1.json")
+
+
+def make_checkout(root, script=SCRIPT, files=FILES):
     extra = root / "public/js/worlds/extra"
     worlds = root / "public/worlds/challenges_basic"
     extra.mkdir(parents=True)
@@ -75,10 +83,8 @@ class ParseTests(unittest.TestCase):
 
     def test_parses_codes_limits_and_missions(self):
         challenges = check.parse(make_checkout(self.root))
-        self.assertEqual(
-            [c["file"] for c in challenges], ["basic-1.json", "loops-2.json"]
-        )
-        first, second = challenges
+        self.assertEqual([c["file"] for c in challenges], list(FILES))
+        first, second, third = challenges
         self.assertEqual(first["code"], "UNICORN")
         self.assertIsNone(first["blocks_limit"])
         self.assertEqual(first["group"], "basic")
@@ -87,6 +93,10 @@ class ParseTests(unittest.TestCase):
         self.assertEqual(second["code"], "Salted Caramel")
         self.assertEqual(second["blocks_limit"], 6)
         self.assertEqual(second["mission"], "Use a loop & few blocks.")
+        # A prefix branch (`conditions-`) of the mission dialog applies, and
+        # the render chain of the next function never leaks into it.
+        self.assertEqual(third["code"], "STONE")
+        self.assertEqual(third["mission"], "Drive into the green box.")
 
     def test_missing_world_file_fails(self):
         make_checkout(self.root, files=("basic-1.json",))
