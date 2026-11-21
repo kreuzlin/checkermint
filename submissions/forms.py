@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .handlers import UploadHandler, handler_for
+from .handlers import PhotoHandler, UploadHandler, handler_for
 
 
 def field_name(requirement, suffix: str) -> str:
@@ -116,19 +116,22 @@ class SubmissionForm(forms.Form):
 
 
 class PhoneUploadForm(forms.Form):
-    """Only the upload fields (photos, files) of a draft, for the phone page.
+    """Only the upload fields of a draft: for the phone page (photos only,
+    brief 5.7, #134) and the coach upload (photos and files).
 
     Adds to what is stored; removing happens in the full form.
     """
 
-    def __init__(self, requirements, previous, *args, **kwargs):
+    def __init__(self, requirements, previous, *args, photos_only=False, **kwargs):
         super().__init__(*args, **kwargs)
         self.previous = previous
+        self.photos_only = photos_only
         self.items: dict[int, list] = {}
         self.rows = []
+        wanted = PhotoHandler if photos_only else UploadHandler
         for requirement in requirements:
             handler = handler_for(requirement)
-            if not isinstance(handler, UploadHandler):
+            if not isinstance(handler, wanted):
                 continue
             stored = previous.get(requirement.pk, [])
             field = handler.form_fields(requirement, stored)[""]
@@ -154,7 +157,11 @@ class PhoneUploadForm(forms.Form):
             except ValidationError as error:
                 self.add_error(requirement.key, error)
         if not uploaded and not self.errors:
-            raise ValidationError("Wähle zuerst ein Foto oder eine Datei aus.")
+            raise ValidationError(
+                "Wähle zuerst ein Foto aus."
+                if self.photos_only
+                else "Wähle zuerst ein Foto oder eine Datei aus."
+            )
         return cleaned
 
     def added_count(self) -> int:

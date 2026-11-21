@@ -117,8 +117,8 @@ Overview of how the project is built and run. Decisions and their rationale:
   (`hints.services.plan_carry_over`, #38); an open hint request for a hint
   the new version no longer has blocks the switch until a coach decided
   it.
-- Phone upload (#28, brief 5.7): for tasks with photo or file
-  requirements the form shows a QR code (`segno`, inline SVG, generated
+- Phone upload (#28, brief 5.7): for tasks with a photo requirement the
+  form shows a QR code (`segno`, inline SVG, generated
   locally) for `/hochladen/<token>/` right away, also before a draft
   exists (#130). The token is signed with Django's signing
   (`submissions.upload_links`, salt `submissions.upload-link`), holds task
@@ -132,7 +132,9 @@ Overview of how the project is built and run. Decisions and their rationale:
   thumbnails), sets the referrer policy `strict-origin` (referrers carry
   only the origin, never the token; `no-referrer` made browsers send
   `Origin: null` and broke the CSRF check, #128), and only adds photos/files (same
-  handlers and image pipeline, `max_count` respected); invalid or expired
+  handlers and image pipeline, `max_count` respected). Photos only (#134):
+  file requirements (code, 3D models) are left out on the phone and come
+  from the laptop or the coach upload; invalid or expired
   links answer 410.
 - Live update (#29): whenever the QR code is shown, the form loads htmx (vendored, see
   [`vendored-assets.md`](vendored-assets.md)) and every stored-items block

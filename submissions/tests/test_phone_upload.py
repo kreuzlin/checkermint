@@ -89,6 +89,41 @@ class PhoneUploadTests(TestCase):
         self.client.post(url, {"aktion": "speichern", "erklaerung": "x"})
         self.assertNotContains(self.client.get(url), "Fotos mit dem Handy")
 
+    def test_phone_page_offers_photos_only(self):
+        """#134: the phone uploads photos; files (code, 3D models) come from
+        the laptop or a coach (brief 5.7)."""
+        draft = self.save_draft()
+        url = self.phone_url(draft)
+        self.client.logout()
+        page = self.client.get(url)
+        self.assertContains(page, 'name="fotos"')
+        self.assertNotContains(page, 'name="cad"')
+        self.assertNotContains(page, "CAD-Datei")
+        # A file sent anyway for the file requirement is ignored.
+        cad = SimpleUploadedFile("modell.stl", b"solid x")
+        response = self.client.post(url, {"cad": [cad]})
+        self.assertContains(response, "Wähle zuerst ein Foto aus.")
+        self.assertFalse(SubmissionItem.objects.exists())
+
+    def test_no_qr_code_for_tasks_with_files_but_no_photos(self):
+        from tasks.models import Task, TaskRequirement, TaskVersion, Topic
+
+        topic, _ = Topic.objects.get_or_create(name="Code", slug="code")
+        task = Task.objects.create(topic=topic, slug="nur-datei", is_published=False)
+        version = TaskVersion.objects.create(
+            task=task, title="Nur Datei", instructions="Lade dein Programm hoch."
+        )
+        TaskRequirement.objects.create(
+            task_version=version, key="cad", type="file", label="CAD-Datei"
+        )
+        version.publish()
+        task.is_published = True
+        task.save()
+        url = reverse("submissions:edit", kwargs={"slug": task.slug})
+        response = self.client.get(url)
+        self.assertContains(response, "CAD-Datei")  # the laptop form keeps it
+        self.assertNotContains(response, "Fotos mit dem Handy")
+
     def test_upload_passes_the_real_csrf_check_with_an_origin(self):
         """#128: browsers send the page's origin; the CSRF check must pass.
 
@@ -162,7 +197,7 @@ class PhoneUploadTests(TestCase):
         draft = self.save_draft()
         url = self.phone_url(draft)
         response = self.client.post(url, {})
-        self.assertContains(response, "Wähle zuerst ein Foto oder eine Datei aus.")
+        self.assertContains(response, "Wähle zuerst ein Foto aus.")
         response = self.client.post(
             url, {"fotos": [SimpleUploadedFile("x.jpg", b"nope")]}
         )
