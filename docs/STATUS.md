@@ -10,7 +10,7 @@ Next project, approved by the maintainer 2026-11-21:
 [`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md) (GearsBot simulator; see
 "GearsBot" below).
 
-_Last updated: 2026-11-21 (PR "Check GearsBot completion codes and project ZIPs", #145)_
+_Last updated: 2026-11-21 (PR "Import the GearsBot Basic Challenges as draft tasks", #146)_
 
 ## Live
 
@@ -566,6 +566,21 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   GearsBot files and `*.py`, at most 50 entries, 1 MB each, 5 MB in total)
   and show its Python files highlighted. Checked with two real projects
   saved by the live simulator (block and Python mode). No migration.
+- 2026-11-21: #145 deployed (`80a9331`), no migrations.
+- #146: `manage.py import_gearsbot_challenges [--dry-run]` reads the bundle
+  and creates one unpublished task per challenge (`gearsbot-<file>`, topic
+  "Code", order as upstream) with one draft: German title, points and
+  minimum level per group (brief 3.5), generated German instructions with
+  the English mission text and the block limit, requirements
+  `completion-code` and `projekt` (GearsBot ZIP), simulator config with the
+  expected code, world wrapper, challenge world and the group's block
+  filter. Idempotent; on upstream changes a draft is updated in place
+  (coach edits kept) and a published version gets a new draft. The app
+  image now contains the bundle. **Not yet run on the server** (needs the
+  maintainer's OK). Locally: 61 created, second run 61 unchanged, filters
+  checked in Chrome per group. Seen in headless Chrome: "Funktionen 4"
+  (`abstraction-4`) logs a Babylon shader error, also when loaded from
+  GearsBot's own files – to check in the device test.
 - Next: the issues in the brief's order (hosting
   and build, update workflow, simulator configuration, submissions and
   review, import command, coach guide), one PR each, never stacked.

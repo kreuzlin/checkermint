@@ -19,3 +19,4 @@ deploy
 # GearsBot packaging: built as its own image (sim/gears/Dockerfile).
 sim
 !sim/gears/UPSTREAM
+!sim/gears/challenges_basic
