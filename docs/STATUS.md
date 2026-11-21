@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Add an uploaded image field for badges")_
+_Last updated: 2026-11-21 (PR "Let Claude merge all PRs, asking first for risky ones")_
 
 ## Live
 
@@ -415,7 +415,9 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   (PNG/WebP only, re-encoded without metadata, cropped and centred at
   512 px, served by a dedicated public view) – a narrow exception from ADR
   0009. The eight shipped images move into the upload. Implemented in two
-  PRs (#120), both with a migration, merged by the maintainer.
+  PRs (#120). (Since the merge rule of 2026-11-21: part 1 adds a field
+  and fills it – merged by Claude; part 2 removes the old field and needs
+  the maintainer's OK.)
 - Maintainer's rules 2026-11-21: never stack PRs (each from `main`, one
   after another); `git` output is not filtered either (CLAUDE.md,
   Workflow).
@@ -435,7 +437,7 @@ Overview: `gh issue list`. At the time of writing:
 | # | Topic | Who |
 |---|---|---|
 | 1 | Production server (UpCloud): set up, deployed, backups running, maintainer's admin account created (2026-11-20) – nothing left, can be closed | Maintainer |
-| 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, once the app is productive, migrations) are marked and merged by the maintainer. #42, #49 and #50 done | Claude Code |
+| 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs that need the maintainer's OK (CLAUDE.md, Workflow) are marked. #42, #49 and #50 done | Claude Code |
 
 ## Next steps
 
@@ -450,18 +452,23 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Working agreements (summary)
 
+- Merging (maintainer's rule, 2026-11-21): Claude merges every PR itself
+  once the checks are green. It asks in the chat first, and merges after
+  the OK, for migrations that delete data or fields or rework existing
+  data, for changes to the server, DNS, Caddy, secrets or
+  `scripts/deploy.sh`, and for CI changes that weaken or remove checks
+  (CLAUDE.md, Workflow). The earlier "maintainer merges migration and
+  server PRs" rule is replaced.
 - On the server Claude runs only read-only commands without the
   maintainer's explicit OK; executing or changing anything (also
   `scripts/deploy.sh`) needs the OK first, except the normal deployment
   after a merged PR (CLAUDE.md, Workflow; rule since 2026-11-21).
 - Conversation with the maintainer in German; docs and code in English; site
   content German (Swiss spelling). See CLAUDE.md.
-- Every change via branch + PR. Claude merges its own PRs with
-  `gh pr merge <N> --squash --auto` once the checks are green, verifies with
-  `gh pr view` and deploys. PRs with server/deployment changes are merged
-  by the maintainer; PRs with database migrations too, but only once the
-  maintainer has declared the app productive (until then Claude merges
-  them). Never pipe `gh` output.
+- Every change via branch + PR from `main` (never stacked). Claude merges
+  with `gh pr merge <N> --squash --auto` once the checks are green,
+  verifies with `gh pr view` and deploys (exceptions that need an OK:
+  above). Never pipe `gh` or `git` output.
 - Content on the live site lives only in the production database, not in
   git; local data is a playground.
 - Privacy principles (brief, section 4) are hard rules.

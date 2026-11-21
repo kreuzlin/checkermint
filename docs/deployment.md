@@ -368,6 +368,4 @@ issue are tracked there.
 **Switch to productive**
 
 - [ ] `docs/STATUS.md`: the app is productive (date).
-- [ ] `CLAUDE.md`, Workflow: migration PRs are merged by the maintainer
-  again (remove the "only once the app is productive" clause).
 - [ ] Participants get their accounts.

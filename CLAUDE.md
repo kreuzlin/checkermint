@@ -104,7 +104,9 @@ Rationale lives in `docs/decisions/`. To deviate, write a new ADR first.
     well.
   - Repository settings: **auto-merge is allowed** and **head branches are
     deleted automatically** after the merge.
-- **Merging – Claude merges its own PRs**, except in the cases below:
+- **Merging – Claude merges every PR itself** once the checks are green
+  (maintainer's rule, 2026-11-21; the maintainer no longer merges on
+  GitHub):
   1. `gh pr merge <N> --squash --auto`. With green checks GitHub merges
      right away; otherwise the PR is queued and merges once the checks pass.
   2. Check the result with
@@ -116,18 +118,22 @@ Rationale lives in `docs/decisions/`. To deviate, write a new ADR first.
      continues. Anything else means the merge did not happen – report it,
      do not deploy.
   3. Deploy (see below) and report the result.
-  - **Exceptions – the maintainer merges these PRs.** Open the PR, say in the
-    PR description and in the chat why it is an exception, and stop:
-    - the PR contains a **database migration** (any file in a `migrations/`
-      directory) – **only once the app is productive**: the server runs
-      since 2026-11-20, but until the maintainer declares the app productive
-      (real participants and data) Claude merges migration PRs itself
-      (maintainer's decision, 2026-11-20). Update this line when the
-      maintainer declares it productive. Or:
-    - the PR changes the **server or the deployment**: `compose.prod.yaml`,
-      `Dockerfile`, `deploy/`, `scripts/`, `.github/workflows/`, new or
-      changed variables in `.env.example`, or anything that needs manual
-      steps on the server (`.env`, cron, packages).
+  - **Ask first – then merge after the maintainer's OK.** For these PRs,
+    open the PR, explain in the chat what it changes and why it needs an
+    OK, and wait. After an explicit OK in the chat, Claude merges it
+    itself (an OK covers only that PR):
+    - **migrations that delete data or fields or rework existing data**
+      (e.g. `RemoveField`, `DeleteModel`, data migrations that change or
+      delete existing rows). Migrations that only add fields or tables, or
+      fill a new field without touching existing values, need no OK;
+    - changes to the **server, DNS, Caddy, secrets or `scripts/deploy.sh`**:
+      e.g. `compose.prod.yaml`, `deploy/` (Caddyfile), new or changed
+      secret variables in `.env.example`, anything that needs manual steps
+      on the server (`.env`, cron, packages);
+    - **CI changes that weaken or remove checks** (e.g. dropping a test or
+      lint step, removing a required job, `continue-on-error`). Other CI
+      changes need no OK.
+    - When in doubt whether a PR falls under these cases, ask.
   - If the PR is already merged, say so and skip the merge command.
 - **Deploying** (after Claude's own merge, if the PR changes the app):
   1. Wait until CI on `main` has pushed the image for the merge commit:
