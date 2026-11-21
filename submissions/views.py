@@ -23,7 +23,7 @@ from .forms import (
     SubmissionForm,
     stored_signature,
 )
-from .handlers import UploadHandler, handler_for
+from .handlers import PhotoHandler, UploadHandler, handler_for
 from .history import history_events
 from .models import Submission
 from .queue import SUBMISSION, queue_entries, submission_entries
@@ -112,9 +112,11 @@ class SubmissionView(LoginRequiredMixin, SeoMixin, TemplateView):
 
     def phone_upload(self, form):
         """QR code for the phone whenever the task asks for photos or files –
-        also before a draft exists; the first phone upload creates it (#130)."""
-        has_uploads = any(isinstance(row.handler, UploadHandler) for row in form.rows)
-        if not has_uploads:
+        also before a draft exists; the first phone upload creates it (#130).
+        Photos only: files such as code or 3D models come from the laptop
+        or a coach (brief 5.7, #134)."""
+        has_photos = any(isinstance(row.handler, PhotoHandler) for row in form.rows)
+        if not has_photos:
             return None
         url = upload_url(self.request, self.request.user, self.task)
         return {"url": url, "qr": qr_svg(url), "minutes": LIFETIME_MINUTES}
@@ -273,7 +275,11 @@ class PhoneUploadView(SeoMixin, TemplateView):
 
     def make_form(self, data=None, files=None):
         return PhoneUploadForm(
-            self.version.requirements.all(), self.stored, data=data, files=files
+            self.version.requirements.all(),
+            self.stored,
+            data=data,
+            files=files,
+            photos_only=True,
         )
 
     def get_context_data(self, **kwargs):

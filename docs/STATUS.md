@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Accept iPhone JPEGs with a second image")_
+_Last updated: 2026-11-21 (PR "Offer only photos on the phone upload page")_
 
 ## Live
 
@@ -456,6 +456,13 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   them as "MPO". Now accepted; only the photo itself is kept, re-encoded
   as JPEG without metadata. The maintainer's attempt also showed that the
   CSRF fix (#128) works (`Origin: https://checkermint.ch`, 200).
+
+- #134: the phone upload page ("Fotos hochladen") also showed file fields
+  (e.g. "3D-Modell (.stl)"); the maintainer picked a photo in the wrong
+  field. Now the phone page shows photo requirements only, and the QR code
+  appears only for tasks with photos (brief 5.7). The coach upload keeps
+  photos and files. Videos stay out of scope for version 1 (brief,
+  section 6). The maintainer's phone upload works (2026-11-21).
 
 ## Open issues
 
