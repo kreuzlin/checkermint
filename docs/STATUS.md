@@ -10,7 +10,7 @@ Next project, approved by the maintainer 2026-11-21:
 [`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md) (GearsBot simulator; see
 "GearsBot" below).
 
-_Last updated: 2026-11-21 (PR "Add the monthly GearsBot update workflow", #143)_
+_Last updated: 2026-11-21 (PR "Link task versions to the GearsBot simulator", #144)_
 
 ## Live
 
@@ -543,6 +543,19 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   requests" (maintainer); GitHub runs no checks on PRs opened by a
   workflow, so the PR is closed and reopened to start them. The "GearsBot"
   check is to be added to the ruleset by the maintainer.
+- 2026-11-21, maintainer: repository setting "Allow GitHub Actions to
+  create and approve pull requests" switched on, and "GearsBot" added as a
+  required check to the ruleset "protect main" (checked by Claude via the
+  API: three required checks).
+- #144: `SimulatorConfig` and `SimulatorFile` on task versions (migration
+  `tasks/0008` adds two tables; `tasks/0009` gives the coach group the 8 new
+  permissions – the live group matched the code list exactly before, so
+  nothing is removed). Admin inlines with JSON upload; files at
+  `/sim/<token>/<filename>` without login with CORS; references
+  `sim-file:<name>` resolved on serving (ADR 0021); button "Im Simulator
+  öffnen" on the task page and the admin preview. Checked locally end to
+  end: GearsBot (local `sim`) loads the maze-1 world from Checkermint, the
+  success check matches, German UI, filter applies.
 - Next: the issues in the brief's order (hosting
   and build, update workflow, simulator configuration, submissions and
   review, import command, coach guide), one PR each, never stacked.

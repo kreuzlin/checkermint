@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -10,14 +12,18 @@ from core.images import process_image
 from core.private_files import private_file_url
 
 from .models import (
+    SIMULATOR_FILE_MAX_BYTES,
     Hint,
     InstructionImage,
     LevelThreshold,
+    SimulatorConfig,
+    SimulatorFile,
     Task,
     TaskRequirement,
     TaskVersion,
     Topic,
 )
+from .simulator import launch_url
 
 
 @admin.register(Topic)
@@ -290,6 +296,69 @@ class HintInline(VersionChildInline):
     fields = [("key", "order"), "text"]
 
 
+class SimulatorConfigInline(VersionChildInline):
+    """GearsBot settings of a version (ADR 0021); at most one."""
+
+    model = SimulatorConfig
+    max_num = 1
+    can_delete = True
+    fields = ["world_scripts", "expected_code"]
+    verbose_name = "Simulator (GearsBot)"
+    verbose_name_plural = "Simulator (GearsBot)"
+
+
+class SimulatorFileForm(forms.ModelForm):
+    """Paste the JSON or upload the file GearsBot saved."""
+
+    upload = forms.FileField(
+        label="JSON-Datei hochladen",
+        required=False,
+        help_text="Ersetzt den Inhalt; ohne Dateiname wird der Name der Datei übernommen.",
+    )
+
+    class Meta:
+        model = SimulatorFile
+        fields = ["role", "filename", "upload", "content"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Filled from the upload when empty.
+        self.fields["content"].required = False
+        self.fields["filename"].required = False
+
+    def clean(self):
+        cleaned = super().clean()
+        upload = cleaned.get("upload")
+        if upload:
+            if upload.size > SIMULATOR_FILE_MAX_BYTES:
+                raise ValidationError(
+                    {"upload": "Die Datei ist zu gross (höchstens 2 MB)."}
+                )
+            try:
+                cleaned["content"] = json.loads(upload.read().decode("utf-8"))
+            except UnicodeDecodeError, json.JSONDecodeError:
+                raise ValidationError(
+                    {"upload": "Das ist keine gültige JSON-Datei."}
+                ) from None
+            self.instance.content = cleaned["content"]
+            if not cleaned.get("filename"):
+                cleaned["filename"] = upload.name
+                self.instance.filename = upload.name
+        if cleaned.get("content") in (None, ""):
+            raise ValidationError(
+                {"content": "Inhalt einfügen oder eine Datei hochladen."}
+            )
+        if not cleaned.get("filename"):
+            raise ValidationError({"filename": "Bitte einen Dateinamen angeben."})
+        return cleaned
+
+
+class SimulatorFileInline(VersionChildInline):
+    model = SimulatorFile
+    form = SimulatorFileForm
+    fields = [("role", "filename"), "upload", "content"]
+
+
 @admin.register(TaskVersion)
 class TaskVersionAdmin(admin.ModelAdmin):
     """Versions are opened from their task; published ones are read-only."""
@@ -297,7 +366,12 @@ class TaskVersionAdmin(admin.ModelAdmin):
     list_display = ["__str__", "task", "number", "status", "published_at"]
     list_filter = ["status"]
     actions = None  # no bulk delete
-    inlines = [RequirementInline, HintInline]
+    inlines = [
+        RequirementInline,
+        HintInline,
+        SimulatorConfigInline,
+        SimulatorFileInline,
+    ]
     readonly_fields = [
         "task_link",
         "number",
@@ -394,6 +468,7 @@ class TaskVersionAdmin(admin.ModelAdmin):
             "requirements": version.requirements.all(),
             "hints": version.hints.all(),
             "page_title": f"Vorschau: {version.title}",
+            "simulator_url": launch_url(request, version),
         }
         return TemplateResponse(request, "tasks/version_preview.html", context)
 

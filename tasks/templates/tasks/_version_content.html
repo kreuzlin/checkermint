@@ -5,6 +5,11 @@
 
 <div class="prose">{{ version.instructions|instructions_markdown:task }}</div>
 
+{% if simulator_url %}
+  <p><a class="button" href="{{ simulator_url }}" target="_blank" rel="noopener">Im Simulator öffnen</a>
+    <span class="help">GearsBot öffnet sich in einem neuen Tab.</span></p>
+{% endif %}
+
 <h2>Was du einreichst</h2>
 <ul>
   {% for requirement in requirements %}

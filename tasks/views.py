@@ -13,6 +13,7 @@ from submissions.switching import newer_version
 
 from .attempts import TaskNotStartable, start_attempt, visible_version
 from .catalogue import Status, catalogue, task_for
+from .simulator import launch_url
 
 
 class CatalogueView(LoginRequiredMixin, SeoMixin, TemplateView):
@@ -72,6 +73,7 @@ class TaskDetailView(LoginRequiredMixin, SeoMixin, TemplateView):
             hints=self.version.hints.all(),
             hint_state=hint_state(self.attempt, self.version) if participant else None,
             hint_form=HintRequestForm() if participant else None,
+            simulator_url=launch_url(self.request, self.version),
         )
         return context
 

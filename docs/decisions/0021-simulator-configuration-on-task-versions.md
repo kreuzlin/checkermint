@@ -47,10 +47,18 @@ Spike findings that shape this:
     small, task content only, need no access check, and are copied with the
     version in one transaction like requirements and hints.
 - `create_draft` (ADR 0010) copies the config and its files into the new
-  draft (new token). The version preview in the admin shows the
+  draft (new token). Both models share the immutability guard of
+  requirements and hints (abstract base `VersionBound`, #144).
+- **References between files** (decided in #144): a JSON string value
+  `"sim-file:<filename>"` stands for the absolute URL of that file of the
+  same version and is replaced when the file is served. Stored files
+  therefore contain no host name and no token: they work locally and live,
+  the import command needs no request, and copies need no rewriting. The version preview in the admin shows the
   "Im Simulator öffnen" button too.
-- Coaches edit a draft's config as an inline on the version admin: world
-  scripts, expected code, and a JSON upload per role (or paste). Published
+- Coaches edit a draft's config as inlines on the version admin
+  ("Simulator (GearsBot)" and "Simulator-Dateien"): world scripts, expected
+  code, and per file the role, the file name and a JSON upload or pasted
+  JSON (the upload fills an empty file name). Published
   versions are read-only as before.
 
 ### 2. Serving the files
@@ -81,9 +89,9 @@ only when `SIMULATOR_URL` is set: a button that opens a new tab
 with absolute, URL-encoded Checkermint URLs, only for the roles that exist.
 For an imported challenge the `world` file is the wrapper
 `{"worldName": "challenges_basic", "options": {"jsonFile": "<abs URL of the challenge_world file>", "useDefaultRobot": true}}`,
-written by the import with the version's own token (so it is generated when
-the version is created and copied with the new token on `create_draft`, by
-rewriting the `jsonFile` URL).
+stored as `{"worldName": "challenges_basic", "options": {"jsonFile":
+"sim-file:maze-1.json", "useDefaultRobot": true}}`; the view turns the
+reference into the absolute URL, which ends with the upstream file name.
 
 Shown to participants who may see the task (same rules as the task page),
 also before "Aufgabe starten".
