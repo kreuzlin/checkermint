@@ -31,7 +31,7 @@ font files are needed (no external requests). Commit the generated files.
 
 | File(s) | Source / author | Rights |
 |---|---|---|
-| `badges/*.png` (eight badges: Erste LED, Code-Starter, Greifarm, Sensor-Profi, Konstrukteur/in, Durchhalter/in, Linienfolger, Motor) | Delivered by the maintainer (kreuzlin) on 2026-11-21. Created by the maintainer with ChatGPT (image generation) from the prompts in [`badges/PROMPT.md`](badges/PROMPT.md) | Released by the maintainer for Checkermint; AI-made artwork allowed (maintainer's decision 2026-11-19, brief section 11) |
+| `badges/*.png` (15 badges: Erste LED, Code-Starter, Greifarm, Sensor-Profi, Konstrukteur/in, Durchhalter/in, Linienfolger, Motor; for GearsBot Erste Fahrt, Timing, Labyrinth, Verlies, Schleifen, Entscheidungen, Funktionen) | Delivered by the maintainer (kreuzlin) on 2026-11-21. Created by the maintainer with ChatGPT (image generation) from the prompts in [`badges/PROMPT.md`](badges/PROMPT.md) | Released by the maintainer for Checkermint; AI-made artwork allowed (maintainer's decision 2026-11-19, brief section 11) |
 | `logo/CHECKERMINT_*` (logo package: header, portrait logo dark/light/transparent, icon) | Delivered by the maintainer (kreuzlin) on 2026-11-19. Created by the maintainer with an AI image tool, then vectorised (see `logo/CHECKERMINT_README.txt`, which came with the package) | Released by the maintainer for Checkermint; the maintainer decided on 2026-11-19 that artwork made with AI tools may be used (brief, section 11) |
 
 Not in the repository: the RoboChallenge 2027 flyer that the maintainer gave
