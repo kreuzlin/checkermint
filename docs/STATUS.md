@@ -10,7 +10,7 @@ Next project, approved by the maintainer 2026-11-21:
 [`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md) (GearsBot simulator; see
 "GearsBot" below).
 
-_Last updated: 2026-11-21 (PR "Serve the GearsBot simulator on its own subdomain", #142)_
+_Last updated: 2026-11-21 (PR "Add the monthly GearsBot update workflow", #143)_
 
 ## Live
 
@@ -47,6 +47,7 @@ _Last updated: 2026-11-21 (PR "Serve the GearsBot simulator on its own subdomain
 | Cron | `deploy`'s crontab: `0 2 * * * cd /srv/checkermint && scripts/backup.sh` (switched from `backup-db.sh` after #107, 2026-11-20) |
 | Mail | Hostpoint SMTP `asmtp.mail.hostpoint.ch:465` (SSL), login and sender `mail@checkermint.ch` (mailbox created by the maintainer 2026-11-19). Outbound 465/587 not blocked by UpCloud. SPF `redirect=spf-permissive.mail.hostpoint.ch`, DKIM (three keys, selectors `20261121-{rsa1024,rsa2048,ed25519}-2051a403`) and DMARC `p=quarantine` enabled by the maintainer at Hostpoint 2026-11-21; sender policy "only with the mailbox's own user" fits (login, `DEFAULT_FROM_EMAIL` and `SERVER_EMAIL` are all `mail@checkermint.ch`) |
 | DNS | Hostpoint; only apex, `www` and `sim` of checkermint.ch are changed (#2, GearsBot brief). Both point to the server (A and AAAA) since 2026-11-20; `sim` (A and AAAA, GearsBot simulator) added by the maintainer 2026-11-21; MX records unchanged |
+| GearsBot | pinned upstream commit `c0549600a26f` (`sim/gears/UPSTREAM`), set 2026-11-21; monthly update PRs by the workflow "GearsBot update" (ADR 0020) |
 | CI | GitHub Actions: on pull requests lint + tests and, in parallel, an image build (no push); on `main` only the `linux/amd64` image build and push to `ghcr.io/kreuzlin/checkermint` (`latest`, `sha-<commit>`), no second test run (#118, #119); runs on `main` are queued, never cancelled |
 | GitHub | Squash merge only (PR title/body), auto-merge, head branches deleted; ruleset "protect main" active (PR, CI checks, branch up to date with `main` since #119, no force push/deletion); labels `ops`, `content`, `bug`, `enhancement` |
 
@@ -524,6 +525,24 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   `SIMULATOR_URL` is set ("Stand" 21 November 2026). DNS `sim` A and AAAA
   added by the maintainer 2026-11-21; the maintainer allowed Claude to set
   the `.env` values on the server.
+- 2026-11-21: #142 deployed (`75e5e97`): `.env` values `SIM_ADDRESS`,
+  `SIMULATOR_URL`, `SIM_IMAGE_TAG` added by Claude (maintainer's OK),
+  `scripts/deploy.sh` started `sim`; `https://sim.checkermint.ch` live with a
+  Let's Encrypt certificate (IPv4 and IPv6), headers checked; in Chrome the
+  live simulator starts in German and makes requests only to
+  `sim.checkermint.ch`.
+- #143: `sim/gears/check.py` parses the Basic Challenges (61, each with a
+  completion code, block limit and English mission text) and writes the
+  committed bundle `sim/gears/challenges_basic/` (`challenges.json` + world
+  files with mirror URLs, about 1 MB). CI job "GearsBot" on every PR: parser
+  tests and "bundle matches the pin" (fetches only the challenge files).
+  Workflow "GearsBot update" (monthly and manual): bumps the pin, mirrors
+  new third-party files, regenerates the bundle, opens or updates the PR
+  `chore/gearsbot-update` with commit log and change report. Needs the
+  repository setting "Allow GitHub Actions to create and approve pull
+  requests" (maintainer); GitHub runs no checks on PRs opened by a
+  workflow, so the PR is closed and reopened to start them. The "GearsBot"
+  check is to be added to the ruleset by the maintainer.
 - Next: the issues in the brief's order (hosting
   and build, update workflow, simulator configuration, submissions and
   review, import command, coach guide), one PR each, never stacked.

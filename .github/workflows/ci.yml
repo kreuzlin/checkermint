@@ -85,6 +85,33 @@ jobs:
       - name: Tests
         run: uv run python manage.py test
 
+  # GearsBot challenge bundle (ADR 0020): the committed bundle in
+  # sim/gears/challenges_basic/ must match the pinned upstream commit, and the
+  # parser's own tests must pass. Fetches only the challenge files (~2 MB).
+  gearsbot:
+    name: GearsBot
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Fetch the pinned challenge files
+        run: |
+          git init -q /tmp/gears
+          git -C /tmp/gears remote add origin https://github.com/QuirkyCort/gears.git
+          git -C /tmp/gears sparse-checkout set --no-cone \
+            /public/js/worlds/extra/challenges_basic.js /public/worlds/challenges_basic/
+          git -C /tmp/gears fetch -q --depth 1 --filter=blob:none origin "$(cat sim/gears/UPSTREAM)"
+          git -C /tmp/gears checkout -q FETCH_HEAD
+
+      - name: Parser tests
+        run: python3 -m unittest discover -s sim/gears/tests -v
+
+      - name: Bundle matches the pin
+        run: python3 sim/gears/check.py verify /tmp/gears
+
   # Runs at the same time as the tests (#118): on pull requests it only
   # checks that the image builds; both jobs are required checks. On main it
   # is the only job and pushes the image (#119).

@@ -61,17 +61,23 @@ plus `workflow_dispatch`:
    It updates `docs/STATUS.md` in the same PR ("GearsBot pin" line in the
    infrastructure table).
 - The workflow uses the default `GITHUB_TOKEN` with `contents: write` and
-  `pull-requests: write`. PRs opened with `GITHUB_TOKEN` do not trigger
-  other workflows, so the workflow then runs the CI by
-  `gh workflow run` on the branch, or the maintainer closes and reopens the
-  PR. Details are settled in the workflow's PR; if neither works, a
-  fine-grained token becomes a new secret (needs the maintainer).
+  `pull-requests: write`; the repository setting "Allow GitHub Actions to
+  create and approve pull requests" must be on. PRs opened with
+  `GITHUB_TOKEN` trigger no other workflows, so the checks start when the PR
+  is closed and reopened (by the maintainer, or by Claude with
+  `gh pr close N && gh pr reopen N`). No extra token or secret.
+- New third-party URLs are **mirrored by the workflow** (`check.py
+  mirror-add`: download, add to `mirror.json` with SHA-256) and listed in the
+  PR for review, instead of failing the run. If a step fails, the PR is
+  still opened and says what failed.
 
 ### 4. GearsBot checks in CI
 
-A Python script `sim/gears/check.py` (no Django, standard library only) runs
-in a CI job **"GearsBot"** on every PR that touches `sim/`, and inside the
-image build:
+Two scripts (no Django, standard library only): `sim/gears/build.py` runs
+inside the image build (workflow "Simulator", PRs that touch `sim/`) and
+`sim/gears/check.py` in the CI job **"GearsBot"** on **every** PR (so it can
+be a required check; it fetches only the challenge files, about 2 MB).
+Together they check:
 
 - `UPSTREAM` is a full SHA and the checked-out commit matches it;
 - all patches apply;
