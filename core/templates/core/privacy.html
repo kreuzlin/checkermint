@@ -32,6 +32,11 @@
   <h2>Keine Drittanbieter, keine Suchmaschinen</h2>
   <p>{{ site_short_name }} lädt nichts von anderen Anbietern: keine fremden Schriften, keine Statistik- oder Werbedienste. Suchmaschinen werden angewiesen, keine Seite aufzunehmen.</p>
 
+  {% if simulator_host %}
+  <h2>Simulator</h2>
+  <p>Für Programmieraufgaben gibt es den Roboter-Simulator GearsBot unter <strong>{{ simulator_host }}</strong>. Er läuft auf dem gleichen Server wie {{ site_short_name }} und lädt nichts von anderen Anbietern. Programme, die gewählte Sprache und Einstellungen speichert der Simulator nur im Browser des Geräts (lokaler Speicher), nicht auf dem Server. Zu {{ site_short_name }} kommt ein Programm nur, wenn es als Projektdatei bei einer Lösung hochgeladen wird. Wie bei {{ site_short_name }} hält der Server fest, wann der Simulator aufgerufen wurde (siehe Server-Protokolle).</p>
+  {% endif %}
+
   <h2>Wo liegen die Daten?</h2>
   <ul>
     <li><strong>Server:</strong> bei UpCloud, in einem Rechenzentrum in Deutschland.</li>

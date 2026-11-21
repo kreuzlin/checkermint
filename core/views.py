@@ -1,5 +1,6 @@
 import mimetypes
 from pathlib import PurePath
+from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.http import FileResponse, Http404, HttpResponse, JsonResponse
@@ -51,6 +52,7 @@ class PrivacyView(SeoMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["privacy_updated"] = PRIVACY_UPDATED
+        context["simulator_host"] = urlsplit(settings.SIMULATOR_URL).netloc
         return context
 
 
@@ -61,9 +63,14 @@ class ImprintView(SeoMixin, TemplateView):
     page_title = "Impressum"
     meta_description = "Wer Checkermint betreibt."
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["gearsbot_commit"] = settings.GEARSBOT_COMMIT
+        return context
+
 
 # Date of the last content change of the privacy page (shown as "Stand").
-PRIVACY_UPDATED = "19. November 2026"
+PRIVACY_UPDATED = "21. November 2026"
 
 
 def version(request):

@@ -12,7 +12,8 @@ examples: `<server-ip>`, `<domain>`.
   scripts; the app itself comes as an image from GHCR.
 - `.env` in `/srv/checkermint` holds all secrets (mode `600`, never
   committed).
-- Containers: `db` (PostgreSQL 18), `web` (Gunicorn), `caddy` (HTTPS).
+- Containers: `db` (PostgreSQL 18), `web` (Gunicorn), `caddy` (HTTPS),
+  `sim` (GearsBot simulator, static files, ADR 0019).
 
 ## 1. Server setup (once)
 
@@ -80,6 +81,11 @@ obtain the certificate once this record resolves. Watch out for wildcard
 records and existing `AAAA` records that point elsewhere – they make some
 clients reach the old host. Never touch `MX`, `SPF`, `DKIM` or `DMARC`
 records as part of the website.
+
+The GearsBot simulator (ADR 0019) needs its own `A` and `AAAA` record for
+`SIM_ADDRESS` (Checkermint: `sim.checkermint.ch`, added by the maintainer
+2026-11-21), pointing to the same server. Caddy gets its certificate on the
+first request after the deploy.
 
 Check the authoritative name servers directly (bypasses local caches):
 
@@ -201,6 +207,11 @@ curl -s https://checkermint.ch/version
 sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=latest|" .env
 scripts/deploy.sh
 ```
+
+The **simulator** has its own image and tag: `SIM_IMAGE_TAG=sha-<full
+commit>` in `.env` rolls back only GearsBot (ghcr.io/kreuzlin/checkermint-sim
+gets a new `sha-…` only for merges that change `sim/`). Alternatively pin the
+old commit in `sim/gears/UPSTREAM` in a PR (ADR 0020).
 
 Every merge to `main` has an image `sha-<full commit>` on GHCR (docs-only
 merges too). `scripts/deploy.sh` also pulls the repo, so scripts and

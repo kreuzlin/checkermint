@@ -49,6 +49,28 @@
 	}
 }
 
+# GearsBot simulator (ADR 0019) on its own origin, e.g. sim.example.ch. The
+# sim container sets the CSP, cache and robots headers itself. Without
+# SIM_ADDRESS, compose.prod.yaml sets a harmless placeholder.
+{$SIM_ADDRESS} {
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+
+	# The simulator only serves files; nothing is uploaded.
+	request_body {
+		max_size 1MB
+	}
+
+	reverse_proxy sim:8080
+
+	log {
+		output stdout
+		format console
+	}
+}
+
 # Other host names (e.g. www.example.ch) redirect permanently to the main
 # address, keeping the path. Caddy gets certificates for them too.
 # Without REDIRECT_ADDRESSES, compose.prod.yaml sets a harmless placeholder.

@@ -49,6 +49,8 @@ services:
       REDIRECT_ADDRESSES: ${REDIRECT_ADDRESSES:-http://localhost}
       # Upload limit per request in MB (deploy/Caddyfile); see .env.example.
       UPLOAD_MAX_REQUEST_MB: ${UPLOAD_MAX_REQUEST_MB:-100}
+      # GearsBot simulator host (ADR 0019). Default: a harmless placeholder.
+      SIM_ADDRESS: ${SIM_ADDRESS:-http://sim.localhost}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       # Optional server-specific snippets (e.g. Basic Auth), not in git.
@@ -57,6 +59,19 @@ services:
       - caddy_config:/config
     depends_on:
       - web
+      - sim
+
+  # GearsBot simulator (ADR 0019): static files with their own Caddy, built
+  # by .github/workflows/sim.yml. SIM_IMAGE_TAG pins a build for a rollback.
+  # No volumes, no secrets; only reachable through the main Caddy.
+  sim:
+    image: ghcr.io/kreuzlin/checkermint-sim:${SIM_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      # The only origin the simulator may fetch from (CSP connect-src).
+      CHECKERMINT_ORIGIN: https://${SITE_ADDRESS}
+    expose:
+      - "8080"
 
 volumes:
   postgres_data:

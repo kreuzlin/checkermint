@@ -309,9 +309,11 @@ Overview of how the project is built and run. Decisions and their rationale:
 
 ```
 Browser ──HTTPS──▶ caddy ──▶ web (Gunicorn + Django, WhiteNoise for /static/)
-                                    │
-                                    ├── media volume (private uploads)
-                                    └── db (PostgreSQL)
+   │                 │              │
+   │                 │              ├── media volume (private uploads)
+   │                 │              └── db (PostgreSQL)
+   │                 └──▶ sim (Caddy with the GearsBot files, sim.<domain>)
+   └── GearsBot in the browser fetches task world JSON from web (CORS)
 ```
 
 - **caddy**: TLS (Let's Encrypt), security headers (incl. a fixed
@@ -322,6 +324,12 @@ Browser ──HTTPS──▶ caddy ──▶ web (Gunicorn + Django, WhiteNoise 
   in the `media` volume, mounted only here, and are served by Django after
   an access check (ADR 0009) – never from a public `/media/` URL.
 - **db**: PostgreSQL 18, data in the `postgres_data` volume.
+- **sim**: the GearsBot simulator on its own origin `SIM_ADDRESS`
+  (ADR 0019): image `ghcr.io/kreuzlin/checkermint-sim` with the files of the
+  pinned upstream commit and its own Caddy (port 8080, Docker network only)
+  that sets caching, CSP and robots headers. The main Caddy terminates TLS
+  and proxies to it. No volumes, no secrets, no access to Checkermint data.
+  Built from `sim/gears/` (README there) by the workflow "Simulator".
 
 ## Delivery
 
