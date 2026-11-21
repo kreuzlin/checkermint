@@ -10,7 +10,7 @@ Next project, approved by the maintainer 2026-11-21:
 [`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md) (GearsBot simulator; see
 "GearsBot" below).
 
-_Last updated: 2026-11-21 (PR "Link task versions to the GearsBot simulator", #144)_
+_Last updated: 2026-11-21 (PR "Check GearsBot completion codes and project ZIPs", #145)_
 
 ## Live
 
@@ -556,6 +556,16 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   öffnen" on the task page and the admin preview. Checked locally end to
   end: GearsBot (local `sim`) loads the maze-1 world from Checkermint, the
   success check matches, German UI, filter applies.
+- 2026-11-21: #144 deployed (`468a2f2`), migrations `tasks/0008–0009`
+  applied; the coach group has 51 permissions (8 new).
+- #145: review page shows "✓ Code stimmt" or "✗ Code stimmt nicht –
+  erwartet: …" next to a `completion-code` text answer when the version
+  has an expected code (case and spaces ignored; coaches only, the coach
+  still decides). File requirements with `"gearsbot_project": true` check
+  the uploaded ZIP without extracting it (plain names only, allowed
+  GearsBot files and `*.py`, at most 50 entries, 1 MB each, 5 MB in total)
+  and show its Python files highlighted. Checked with two real projects
+  saved by the live simulator (block and Python mode). No migration.
 - Next: the issues in the brief's order (hosting
   and build, update workflow, simulator configuration, submissions and
   review, import command, coach guide), one PR each, never stacked.

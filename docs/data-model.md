@@ -308,7 +308,10 @@ shows submissions read-only to coaches.
 Per type: `text` and `code` use `text` (code from an uploaded file also
 keeps `original_filename`); `photo` uses `file` (re-encoded JPEG/PNG, at
 most 2000 px), `thumbnail` (at most 400 px) and `data` (`width`,
-`height`); `file` uses `file` as uploaded. Files are served at
+`height`); `file` uses `file` as uploaded – with the requirement option
+`gearsbot_project` the ZIP is checked (ADR 0021) and `data` holds
+`python_files` (`[{"name", "text"}]`, `main.py` first, at most 200 KB),
+shown highlighted. Files are served at
 `/dateien/einreichungsfoto/<id>/[vorschau/]` (inline) and
 `/dateien/einreichungsdatei/<id>/` (always a download), only to the
 participant who owns the submission and to coaches; everyone else gets

@@ -102,13 +102,14 @@ also before "Aufgabe starten".
   1. `completion-code` – type `text`, "Completion-Code", required, help text
      "Den Code zeigt GearsBot, wenn du die Challenge geschafft hast.";
   2. `projekt` – type `file`, "GearsBot-Projekt (.zip)", optional,
-     `options: {"extensions": [".zip"]}`.
+     `options: {"extensions": [".zip"], "gearsbot_project": true}`.
 - The review form shows next to the completion code answer **"Code stimmt"** (✓ and
   the word) or **"Code stimmt nicht"** (✗ and the word; not by colour
   alone) when the version's config has an `expected_code`. Comparison:
   both sides `casefold()`ed, inner whitespace collapsed, outer stripped.
   The coach still reviews and gives the stars; nothing is approved
-  automatically. Which requirement is checked: the `text` requirement with
+  automatically. On a wrong code the review shows the expected code
+  ("erwartet: …"). Which requirement is checked: the `text` requirement with
   key `completion-code`.
 - `expected_code` is never rendered for participants: not on the task page,
   not in the submission form, not in the history, not on public profiles,
@@ -117,8 +118,10 @@ also before "Aufgabe starten".
 
 ### 5. Project ZIP
 
-- A `file` requirement with `.zip` gets an extra validation step (a small
-  handler in `submissions`): at most `UPLOAD_MAX_FILE_MB`; opened with
+- A `file` requirement with the option `"gearsbot_project": true` gets an
+  extra validation step in `submissions.handlers` (decided in #145: only
+  with this option, so other tasks can still accept any ZIP, e.g. an
+  Arduino project): at most `UPLOAD_MAX_FILE_MB`; opened with
   `zipfile` without extracting; at most 50 entries, each at most 1 MB
   uncompressed and 5 MB in total (zip bombs); every name must be a plain
   file name (no `/`, `\`, `..`, absolute paths or drive letters) and one of
