@@ -12,6 +12,7 @@ without a handler is shown as "not possible yet" in the form; a version that
 requires one cannot be submitted.
 """
 
+import zipfile
 from pathlib import PurePath
 
 from django import forms
@@ -32,6 +33,14 @@ from .models import SubmissionItem
 MAX_TEXT_LENGTH = 10_000
 MAX_CODE_LENGTH = 100_000
 MAX_CODE_FILE_BYTES = 200 * 1024
+
+# GearsBot project ZIP (ADR 0021): what GearsBot's "Save" writes. In Python
+# mode the participant names the .py files.
+GEARSBOT_FILES = {"gearsBlocks.xml", "gearsRobot.json", "meta.json"}
+GEARSBOT_MAX_ENTRIES = 50
+GEARSBOT_MAX_ENTRY_BYTES = 1024 * 1024
+GEARSBOT_MAX_TOTAL_BYTES = 5 * 1024 * 1024
+GEARSBOT_MAX_PYTHON_BYTES = 200 * 1024
 
 
 def normalise_newlines(text: str) -> str:
@@ -190,6 +199,77 @@ class CodeHandler(RequirementHandler):
         return {"item": item, "highlighted": mark_safe(html)}
 
 
+def read_gearsbot_project(upload) -> list[dict]:
+    """Check a GearsBot project ZIP without extracting it; return its Python
+    files as [{"name", "text"}], main.py first.
+
+    Raises ValidationError with a German message. Sizes are checked while
+    reading, not trusted from the ZIP's headers (zip bombs).
+    """
+    upload.seek(0)
+    try:
+        archive = zipfile.ZipFile(upload)
+    except zipfile.BadZipFile, OSError:
+        raise ValidationError("Das ist keine ZIP-Datei.") from None
+    with archive:
+        entries = archive.infolist()
+        if len(entries) > GEARSBOT_MAX_ENTRIES:
+            raise ValidationError("Die ZIP-Datei enthält zu viele Dateien.")
+        python, total, names = [], 0, set()
+        python_bytes = 0
+        for entry in entries:
+            name = entry.filename
+            plain = (
+                name
+                and "/" not in name
+                and "\\" not in name
+                and ":" not in name
+                and name not in (".", "..")
+                and not entry.is_dir()
+            )
+            if not plain:
+                raise ValidationError(
+                    "Die ZIP-Datei darf keine Ordner enthalten (%(name)s).",
+                    params={"name": name[:80]},
+                )
+            if name not in GEARSBOT_FILES and not name.endswith(".py"):
+                raise ValidationError(
+                    "%(name)s gehört nicht in ein GearsBot-Projekt.",
+                    params={"name": name[:80]},
+                )
+            if name in names:
+                raise ValidationError(
+                    "Die ZIP-Datei enthält %(name)s doppelt.",
+                    params={"name": name[:80]},
+                )
+            names.add(name)
+            try:
+                with archive.open(entry) as member:
+                    data = member.read(GEARSBOT_MAX_ENTRY_BYTES + 1)
+            except zipfile.BadZipFile, RuntimeError, NotImplementedError, OSError:
+                raise ValidationError("Die ZIP-Datei ist beschädigt.") from None
+            if len(data) > GEARSBOT_MAX_ENTRY_BYTES:
+                raise ValidationError(
+                    "%(name)s ist zu gross.", params={"name": name[:80]}
+                )
+            total += len(data)
+            if total > GEARSBOT_MAX_TOTAL_BYTES:
+                raise ValidationError("Die ZIP-Datei ist entpackt zu gross.")
+            if name.endswith(".py"):
+                python_bytes += len(data)
+                if python_bytes <= GEARSBOT_MAX_PYTHON_BYTES:
+                    text = normalise_newlines(data.decode("utf-8", errors="replace"))
+                    python.append({"name": name, "text": text.rstrip()})
+    upload.seek(0)
+    if not python and "gearsBlocks.xml" not in names:
+        raise ValidationError(
+            "Das ist kein GearsBot-Projekt. Speichere es in GearsBot mit «Datei» "
+            "→ «Speichern» und lade die ZIP-Datei hoch."
+        )
+    python.sort(key=lambda f: (f["name"] != "main.py", f["name"]))
+    return python
+
+
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
@@ -333,7 +413,9 @@ class PhotoHandler(UploadHandler):
 
 class FileHandler(UploadHandler):
     """Any file (e.g. CAD), stored as uploaded and always offered as a
-    download. `options`: `extensions` (allowed endings, e.g. [".stl"])."""
+    download. `options`: `extensions` (allowed endings, e.g. [".stl"]);
+    `gearsbot_project`: true checks a GearsBot project ZIP and shows its
+    Python code (ADR 0021)."""
 
     type = TaskRequirement.Type.FILE
     display_template = "submissions/items/file.html"
@@ -367,7 +449,26 @@ class FileHandler(UploadHandler):
             )
         if not upload.size:
             raise ValidationError("Die Datei ist leer.")
-        return {"file": upload, "original_filename": name}
+        item = {"file": upload, "original_filename": name}
+        if requirement.options.get("gearsbot_project"):
+            item["data"] = {"python_files": read_gearsbot_project(upload)}
+        return item
+
+    def render(self, item):
+        context = super().render(item)
+        python = (item.data or {}).get("python_files") or []
+        lexer = get_lexer_by_name("python")
+        # Pygments escapes the code; the output contains only its own spans.
+        context["python_files"] = [
+            {
+                "name": f["name"],
+                "highlighted": mark_safe(
+                    highlight(f["text"], lexer, HtmlFormatter(wrapcode=True))
+                ),
+            }
+            for f in python
+        ]
+        return context
 
 
 HANDLERS: dict[str, RequirementHandler] = {

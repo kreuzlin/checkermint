@@ -3,6 +3,8 @@ from django.template.loader import render_to_string
 from django.utils.html import format_html
 
 from submissions.handlers import handler_for
+from tasks.models import SimulatorConfig, TaskRequirement
+from tasks.simulator import COMPLETION_CODE_KEY, codes_match
 
 register = template.Library()
 
@@ -28,3 +30,33 @@ def item_origin(item):
     if item.via_phone:
         return format_html('<span class="help">per Handy hochgeladen</span>')
     return ""
+
+
+@register.simple_tag(takes_context=True)
+def code_check(context, item):
+    """ "Code stimmt" / "Code stimmt nicht" next to a completion code, for
+    coaches on the review page only (ADR 0021). Shows the expected code,
+    which participants never see; the coach still decides."""
+    requirement = item.requirement
+    if not context.get("show_code_check"):
+        return ""
+    if (
+        requirement.key != COMPLETION_CODE_KEY
+        or requirement.type != TaskRequirement.Type.TEXT
+    ):
+        return ""
+    config = SimulatorConfig.objects.filter(
+        task_version_id=requirement.task_version_id
+    ).first()
+    if config is None or not config.expected_code:
+        return ""
+    if codes_match(item.text, config.expected_code):
+        return format_html(
+            '<p class="code-check code-check-ok"><span aria-hidden="true">✓</span> '
+            "Code stimmt</p>"
+        )
+    return format_html(
+        '<p class="code-check code-check-wrong"><span aria-hidden="true">✗</span> '
+        "<strong>Code stimmt nicht</strong> – erwartet: <code>{}</code></p>",
+        config.expected_code,
+    )

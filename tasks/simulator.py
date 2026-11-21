@@ -24,6 +24,20 @@ ROLE_PARAMETERS = {
 }
 
 
+# Key of the text requirement whose answer is compared with the expected
+# completion code (ADR 0021).
+COMPLETION_CODE_KEY = "completion-code"
+
+
+def normalise_code(code: str) -> str:
+    """Case and extra spaces do not matter: "salted  caramel" = "SALTED CARAMEL"."""
+    return " ".join(code.split()).casefold()
+
+
+def codes_match(given: str, expected: str) -> bool:
+    return normalise_code(given) == normalise_code(expected)
+
+
 def simulator_origin() -> str:
     """Scheme and host of SIMULATOR_URL, e.g. https://sim.checkermint.ch."""
     parts = urlsplit(settings.SIMULATOR_URL)

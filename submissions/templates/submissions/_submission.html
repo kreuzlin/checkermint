@@ -15,7 +15,7 @@
   {% for part in parts %}
     <section class="submission-item">
       <h4>{{ part.grouper.label }}</h4>
-      {% for item in part.list %}{% submission_item item %}{% item_origin item %}{% endfor %}
+      {% for item in part.list %}{% submission_item item %}{% item_origin item %}{% code_check item %}{% endfor %}
     </section>
   {% endfor %}
 </article>

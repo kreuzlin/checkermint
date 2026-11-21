@@ -1,1 +1,5 @@
 <a href="{{ url }}" download>{{ item.original_filename|default:"Datei" }}</a> <span class="help">({{ item.file.size|filesizeformat }})</span>
+{% for file in python_files %}
+  <p class="help">{{ file.name }} aus dem GearsBot-Projekt:</p>
+  <div class="code-block">{{ file.highlighted }}</div>
+{% endfor %}

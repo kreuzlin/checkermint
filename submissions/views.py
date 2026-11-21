@@ -539,6 +539,8 @@ class ReviewView(CoachRequiredMixin, SeoMixin, TemplateView):
         context.update(
             submission=submission,
             participant=submission.user,
+            # Completion code check next to the answer (ADR 0021).
+            show_code_check=True,
             earlier=submitted_submissions(submission.user, submission.task).exclude(
                 pk=submission.pk
             ),
