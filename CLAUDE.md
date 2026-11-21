@@ -129,6 +129,16 @@ Rationale lives in `docs/decisions/`. To deviate, write a new ADR first.
   - Docs- or CI-only changes need no deploy (the live commit then lags behind
     `main`). If CI or the deploy fails, report it and stop – no retries that
     change the server.
+- **Commands on the server** (maintainer's rule, 2026-11-21): without the
+  maintainer's explicit OK, Claude runs only **read-only** commands on the
+  server – e.g. checking `/version`, reading logs, `docker compose ps`,
+  `git log`, `df`, `crontab -l`, reading `.env` keys without values.
+  Everything that executes or changes something needs the OK first: also
+  `scripts/deploy.sh` (even "just to measure"), `scripts/backup.sh`,
+  `scripts/test-restore.sh`, `manage.py` commands that write, editing
+  `.env` or the crontab, installing packages, restarting containers.
+  Exception: the normal deployment after a merged PR (above). An OK covers
+  only the task it was given for.
 - **Do not pipe `gh` output** through `tail`, `head`, `grep` or similar, and
   do not hide its stderr: errors and hints from `gh` must stay visible.
 - **Small steps.** Commit after every working step (tests green, Ruff clean).

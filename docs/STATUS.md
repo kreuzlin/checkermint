@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Add badges for line follower and motor")_
+_Last updated: 2026-11-21 (PR "Allow only read-only server commands without OK")_
 
 ## Live
 
@@ -417,6 +417,10 @@ Overview: `gh issue list`. At the time of writing:
 
 ## Working agreements (summary)
 
+- On the server Claude runs only read-only commands without the
+  maintainer's explicit OK; executing or changing anything (also
+  `scripts/deploy.sh`) needs the OK first, except the normal deployment
+  after a merged PR (CLAUDE.md, Workflow; rule since 2026-11-21).
 - Conversation with the maintainer in German; docs and code in English; site
   content German (Swiss spelling). See CLAUDE.md.
 - Every change via branch + PR. Claude merges its own PRs with
