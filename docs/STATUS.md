@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Record mail authentication and first nightly backup")_
+_Last updated: 2026-11-21 (PR "Add badge artwork")_
 
 ## Live
 
@@ -366,6 +366,15 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
 - 2026-11-21: first nightly `scripts/backup.sh` by cron at 02:00 wrote
   the dump and `media.tar`. Disk 25 % used.
 
+- #4: badge artwork from the maintainer, made with ChatGPT (prompt and
+  file list in `design/badges/PROMPT.md`, rights in `design/README.md`):
+  six badges (Erste LED, Code-Starter, Greifarm, Sensor-Profi,
+  Konstrukteur/in, Durchhalter/in) as 1024 px originals in
+  `design/badges/`; `design/generate_assets.py` now also writes 160 px web
+  versions to `badges/static/badges/img/`, which the badge admin offers.
+  Checked at 40 px on the dark background. Coaches create the badges in
+  the admin and pick the image there.
+
 ## Open issues
 
 Overview: `gh issue list`. At the time of writing:
@@ -373,7 +382,6 @@ Overview: `gh issue list`. At the time of writing:
 | # | Topic | Who |
 |---|---|---|
 | 1 | Production server (UpCloud): set up, deployed, backups running, maintainer's admin account created (2026-11-20) – nothing left, can be closed | Maintainer |
-| 4 | Badge artwork (logo and colours delivered) | Maintainer |
 | 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, once the app is productive, migrations) are marked and merged by the maintainer. #42, #49 and #50 done | Claude Code |
 
 ## Next steps
