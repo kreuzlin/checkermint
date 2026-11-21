@@ -30,5 +30,15 @@ services:
       db:
         condition: service_healthy
 
+  # GearsBot simulator (ADR 0019), only with `--profile sim`: the first
+  # build downloads upstream GearsBot (about 215 MB).
+  sim:
+    build: sim/gears
+    profiles: [sim]
+    environment:
+      CHECKERMINT_ORIGIN: http://localhost:8000
+    ports:
+      - "8081:8080"
+
 volumes:
   postgres_data:

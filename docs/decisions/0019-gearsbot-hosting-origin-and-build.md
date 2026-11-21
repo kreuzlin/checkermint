@@ -84,10 +84,10 @@ data. The subdomain costs one DNS record and one CORS header.
   every update; the image is the unit we already deploy and roll back.
 - We serve upstream's `public/` as it is, including unused library
   versions. Removing files would be a change to maintain on every update;
-  disk space is not a problem (one image about 220 MB, old images are
+  disk space is not a problem (one image about 380 MB unpacked, old images are
   pruned by the deploy).
 - `scripts/deploy.sh` also pulls and restarts `sim`; it removes dangling
-  images afterwards (`docker image prune -f`), so old 220 MB images do not
+  images afterwards (`docker image prune -f`), so old images (about 380 MB) do not
   pile up.
 - Locally, `compose.yaml` gets the same `sim` service on
   `http://localhost:8081`; `SIMULATOR_URL` points there.
@@ -95,8 +95,8 @@ data. The subdomain costs one DNS record and one CORS header.
 ### 3. Mirrored assets
 
 - All 34 external files are stored **in our repository** under
-  `sim/gears/mirror/` with a manifest (`mirror.json`: source URL, local
-  name, SHA-256). The build does not download them, so it does not depend
+  `sim/gears/mirror/` with a manifest `sim/gears/mirror.json` (source URL,
+  local name, SHA-256; outside `mirror/`, so it is not served). The build does not download them, so it does not depend
   on that server.
 - The build rewrites `https://files.aposteriori.com.sg/get/<name>` and the
   one `raw.githubusercontent.com` URL in `public/` to root-relative
@@ -165,9 +165,11 @@ Cross-Origin-Opener-Policy: same-origin
   (`SIMULATOR_URL`'s counterpart, set from the environment at container
   start) for the task JSON.
 - `/robots.txt` disallows everything, no sitemap.
-- The exact list is checked in the hosting PR in Chrome, Firefox and Safari
-  (CSP violations in the console) and adjusted there; changes go into this
-  ADR.
+- Checked in the image PR (#141) with Chrome: a challenge deep link with
+  world and filter from another origin loads, the UI is German, the robot
+  comes from `/mirror/`, no CSP violations, no request leaves the two
+  origins. Firefox and Safari follow with the device test in the club;
+  changes go into this ADR.
 
 ### 7. Privacy page and logs
 
@@ -181,7 +183,7 @@ Cross-Origin-Opener-Policy: same-origin
 ## Consequences
 
 - One more container (a few MB of RAM) and one more image to build and
-  deploy. The deploy pulls about 220 MB when the pin changes, otherwise
+  deploy. The deploy pulls the new image (about 380 MB unpacked) when the pin changes, otherwise
   nothing new.
 - Needs the maintainer: the DNS record `sim`, the new `.env` values
   (`SIM_ADDRESS`, `SIMULATOR_URL`) on the server, and the OK for the

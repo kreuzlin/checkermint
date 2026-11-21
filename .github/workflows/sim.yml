@@ -1,0 +1,105 @@
+# GearsBot simulator image (ADR 0019, 0020): built for linux/amd64 when
+# anything under sim/ changes, smoke-tested, and pushed to GHCR from main as
+# ghcr.io/<owner>/checkermint-sim (sha-<commit>, latest). Other merges do not
+# touch it, so the deploy keeps the current `latest`.
+
+name: Simulator
+
+on:
+  pull_request:
+    paths:
+      - "sim/**"
+      - ".github/workflows/sim.yml"
+  push:
+    branches: [main]
+    paths:
+      - "sim/**"
+      - ".github/workflows/sim.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: sim-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}-sim
+
+jobs:
+  image:
+    name: Build sim image (linux/amd64)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      PUSH: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && !github.event.repository.is_template }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Image tags
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=sha,format=long
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      # Load into the runner's Docker for the smoke test; pushed below.
+      - name: Build
+        uses: docker/build-push-action@v7
+        with:
+          context: sim/gears
+          platforms: linux/amd64
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=sim
+          cache-to: type=gha,scope=sim,mode=max
+
+      - name: Smoke test
+        env:
+          TAG: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+        run: |
+          docker run -d --name sim -p 8081:8080 "$TAG"
+          sleep 2
+          version=$(docker exec sim cat /srv/VERSION)
+          test "$version" = "$(cut -c1-12 sim/gears/UPSTREAM)"
+          check() {
+            code=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8081$1")
+            echo "$1 -> $code"
+            test "$code" = "$2"
+          }
+          check / 200
+          check /start.js 200
+          check /robots.txt 200
+          check "/v/$version/index.html" 200
+          check "/v/$version/js/worlds/extra/challenges_basic.js" 200
+          check /mirror/ygcmWx4oSE.json 200
+          check /v/0000000/index.html 302
+          curl -sI http://localhost:8081/ | grep -i "^content-security-policy: .*connect-src 'self' https://checkermint.ch"
+          curl -sI http://localhost:8081/ | grep -i "^x-robots-tag: noindex, nofollow"
+          ! curl -s "http://localhost:8081/v/$version/js/worlds/extra/challenges_basic.js" | grep -q "aposteriori.com.sg"
+
+      - name: Log in to GHCR
+        if: env.PUSH == 'true'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push
+        if: env.PUSH == 'true'
+        env:
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          for tag in $TAGS; do docker push "$tag"; done
