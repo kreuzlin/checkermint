@@ -48,9 +48,12 @@ Kinder sehen sie erst, wenn ihr sie freischaltet.
 | Funktionen | 11 | 30 | 5 | + Variablen und Funktionen |
 
 Die Punkte und Level sind ein Vorschlag. Ihr könnt sie ändern. Die Mission
-jeder Challenge steht auf Englisch in der Anleitung, weil GearsBot sie nur
-englisch kennt. Die Kategorien «Movement» und «Conditions» heissen auch in
-der deutschen Oberfläche englisch.
+jeder Challenge steht auf Deutsch in der Anleitung (übersetzt von Claude,
+Tabelle in `tasks/gearsbot_missions.py`). Im Simulator selbst zeigt der
+Knopf «Mission» sie englisch, weil GearsBot nur den englischen Text kennt.
+Die Blockgrenze in der Anleitung ist die, die GearsBot wirklich prüft. Die
+Kategorien «Movement» und «Conditions» heissen auch in der deutschen
+Oberfläche englisch.
 
 ### Eine Challenge freischalten
 
@@ -175,6 +178,9 @@ nicht von selbst.
   prüft ihn und veröffentlicht ihn. Kinder, die schon angefangen haben,
   sehen dann den Hinweis auf die neuere Version, wie bei jeder anderen
   Aufgabe.
+- Bringt ein Update neue englische Missionstexte, schlägt ein Test im
+  Update-PR fehl. Claude ergänzt dann die Übersetzung. Ohne Übersetzung
+  bliebe der neue Satz englisch, es geht nichts verloren.
 - Eigene Welten (Abschnitt 3) sind in der Aufgabe gespeichert und ändern
   sich bei einem Update nicht. Läuft eine eigene Welt nach einem Update
   nicht mehr, braucht die Aufgabe eine neue Version.

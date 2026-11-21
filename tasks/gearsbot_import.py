@@ -12,6 +12,7 @@ from pathlib import Path
 from django.conf import settings
 from django.db import transaction
 
+from .gearsbot_missions import translate
 from .models import (
     SimulatorConfig,
     SimulatorFile,
@@ -86,9 +87,11 @@ FILTERS = {
 INSTRUCTIONS = """\
 Eine Challenge im Roboter-Simulator GearsBot: «{upstream_title}».
 
-**Mission** (von GearsBot, auf Englisch):
+**Mission:**
 
 {mission}
+
+Im Simulator zeigt der Knopf «Mission» denselben Auftrag auf Englisch.
 {limit}
 So gehst du vor:
 
@@ -133,7 +136,8 @@ def title_for(challenge) -> str:
 
 def instructions_for(challenge) -> str:
     mission = "\n".join(
-        f"> {line}" if line else ">" for line in challenge["mission"].splitlines()
+        f"> {line}" if line else ">"
+        for line in translate(challenge["mission"]).splitlines()
     )
     limit = ""
     if challenge["blocks_limit"]:

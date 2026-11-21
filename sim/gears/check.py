@@ -42,7 +42,9 @@ BUNDLE = HERE / "challenges_basic"
 OPTION = re.compile(
     r"\['([^']+)',\s*'worlds/challenges_basic/([\w-]+\.json)\?v=(\w+)'\]"
 )
-BRANCH = re.compile(r"jsonFile\.includes\('([\w-]+\.json)'\)\)\s*\{")
+# A branch tests a file name (`maze-1.json`) or a prefix (`conditions-`).
+BRANCH = re.compile(r"jsonFile\.includes\('([\w-]+(?:\.json)?)'\)\)\s*\{")
+FUNCTION = re.compile(r"\bthis\.\w+\s*=\s*function\b")
 
 
 class ParseError(Exception):
@@ -77,7 +79,10 @@ def branches(source, function):
     start = source.find(f"this.{function} = function")
     if start < 0:
         raise ParseError(f"this.{function} not found")
-    chain = source[start:]
+    # Only this function: the next `this.x = function` ends it, so a branch
+    # never runs into the chain of another function.
+    following = FUNCTION.search(source, start + 1)
+    chain = source[start : following.start() if following else len(source)]
     matches = list(BRANCH.finditer(chain))
     result = {}
     for match, following in zip(matches, [*matches[1:], None], strict=True):
@@ -128,7 +133,9 @@ def parse(checkout):
     if not options:
         raise ParseError("no challenge options found")
     render = branches(source, "render")
-    missions = dict(branches(source, "displayMission"))
+    missions = branches(source, "displayMission")
+    mission_names = [name for name, _ in missions]
+    missions = dict(missions)
     render_names = [name for name, _ in render]
     rules = dict(render)
     challenges = []
@@ -153,7 +160,9 @@ def parse(checkout):
                 "version": version,
                 "code": code,
                 "blocks_limit": limit,
-                "mission": mission_text(missions.get(file_name, "")),
+                "mission": mission_text(
+                    missions.get(first_match(file_name, mission_names), "")
+                ),
             }
         )
     orphans = set(rules) - seen
