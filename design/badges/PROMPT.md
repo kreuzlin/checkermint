@@ -1,8 +1,9 @@
 # How the badge images were made
 
-The six badge images in this folder were created by the maintainer
+The badge images in this folder were created by the maintainer
 (kreuzlin) with **ChatGPT** (image generation) and delivered on
-2026-11-21. Claude Code did not draw or edit them (brief, section 11); it
+2026-11-21: six in a first set, two more (07, 08) the same day for tasks
+that had no matching badge. Claude Code did not draw or edit them (brief, section 11); it
 only wrote the prompt below and generates the web versions with
 `design/generate_assets.py`.
 
@@ -14,12 +15,31 @@ only wrote the prompt below and generates the web versions with
 | `04_Sensor_Profi.png` | Sensor-Profi | `sensor-profi.png` |
 | `05_Konstrukteur.png` | Konstrukteur/in | `konstrukteur.png` |
 | `06_Durchhalter.png` | Durchhalter/in | `durchhalter.png` |
+| `07_Linienfolger.png` | Linienfolger | `linienfolger.png` |
+| `08_Motor.png` | Motor | `motor.png` |
 
-All originals: 1024 × 1024 px, PNG with a transparent background, no
-metadata. Checked at 40 px on the site's dark background (#020d16): every
-symbol stays recognisable.
+All originals: PNG with a transparent background, no metadata; 01–06 at
+1024 × 1024 px, 07–08 at 1254 × 1254 px with a larger motif.
+`design/generate_assets.py` crops every badge to its visible motif and
+centres it at the same size (85 % of the height), so all badges look
+equally large; the originals stay untouched. Checked at 40 and 48 px on
+the site's dark background (#020d16): every symbol stays recognisable.
 
-## Prompt
+## Prompt for badges 07 and 08
+
+Written by Claude Code on 2026-11-21 for the same ChatGPT conversation
+(so ChatGPT already knew the style):
+
+```text
+Bitte erstelle zwei weitere Badges für das gleiche Set, im exakt gleichen Stil wie die bisherigen sechs: gleiche Sechseck-Grundform, gleiche Strichstärke, gleiche Leuchtwirkung, gleiche Mint- und Petrol-Farben. Wieder 1024 × 1024 px, PNG mit echtem transparentem Hintergrund, kein Text im Bild, ein einziges gut erkennbares Symbol, das auch bei 40 × 40 px noch erkennbar ist.
+
+7. Linienfolger – ein kleiner Roboter auf Rädern, der einer geschwungenen dunklen Linie auf dem Boden folgt (die Linie gut sichtbar, z. B. mit hellem Rand)
+8. Motor – ein Elektromotor mit Welle und angedeuteter Drehbewegung (gebogener Pfeil)
+
+Liefere jedes Badge als einzelnes PNG.
+```
+
+## Prompt for badges 01–06
 
 Claude Code suggested this prompt (in German, as given to ChatGPT) on
 2026-11-21. The maintainer used it to create the set; ChatGPT was asked to

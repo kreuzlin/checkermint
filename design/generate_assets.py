@@ -13,6 +13,9 @@ Writes into core/static/core/brand/ (committed, collected into the image):
 
 and badge images from design/badges/ into badges/static/badges/img/
 (offered in the badge admin): PNGs resized to BADGE_SIZE px, SVGs cleaned.
+PNG badges are normalised first: the visible motif is cropped and centred
+so that it fills BADGE_FILL of the height, so badges delivered at different
+sizes or margins look the same size next to each other.
 The web name is the original's name without a leading number, in lower
 case with hyphens, e.g. "01_Erste_LED.png" -> "erste-led.png".
 
@@ -34,6 +37,10 @@ BADGE_SOURCE = ROOT / "design" / "badges"
 BADGE_TARGET = ROOT / "badges" / "static" / "badges" / "img"
 # Badges are shown at 40-48 px; 160 px stays sharp on 3x screens.
 BADGE_SIZE = 160
+# Share of the height the visible motif fills (as in the first badge set).
+BADGE_FILL = 0.85
+# Alpha above which a pixel counts as part of the motif (ignores faint glow).
+BADGE_ALPHA_THRESHOLD = 20
 
 SVG_NS = "http://www.w3.org/2000/svg"
 EDITOR_NAMESPACES = (
@@ -87,6 +94,27 @@ def badge_web_name(source):
     return f"{stem}{source.suffix.lower()}"
 
 
+def normalised_badge(source, size):
+    """Crop to the visible motif, centre it at BADGE_FILL, resize to size."""
+    with Image.open(source) as image:
+        image = image.convert("RGBA")
+    mask = image.getchannel("A").point(
+        lambda value: 255 if value > BADGE_ALPHA_THRESHOLD else 0
+    )
+    box = mask.getbbox()
+    if box is None:
+        raise ValueError(f"{source.name}: image is fully transparent")
+    motif = image.crop(box)
+    scale = BADGE_FILL * size / max(motif.width, motif.height)
+    motif = motif.resize(
+        (max(1, round(motif.width * scale)), max(1, round(motif.height * scale))),
+        Image.Resampling.LANCZOS,
+    )
+    canvas = Image.new("RGBA", (size, size))
+    canvas.paste(motif, ((size - motif.width) // 2, (size - motif.height) // 2))
+    return canvas
+
+
 def badge_images():
     """Write the web versions of the badge originals."""
     BADGE_TARGET.mkdir(parents=True, exist_ok=True)
@@ -96,7 +124,8 @@ def badge_images():
         if suffix == ".svg":
             clean_svg(source, target)
         elif suffix in {".png", ".webp"}:
-            resize_icon(source, target, BADGE_SIZE)
+            image = normalised_badge(source, BADGE_SIZE)
+            image.save(target, format="PNG", optimize=True)
         else:
             continue
         print(f"wrote {target}")
