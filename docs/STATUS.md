@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Record badges created on the server")_
+_Last updated: 2026-11-21 (PR "Add badges for line follower and motor")_
 
 ## Live
 
@@ -379,6 +379,21 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   attached to any task yet – there are only demo tasks so far. Real
   content, not demo data: `seed_demo --remove` does not touch them.
   Descriptions can be changed in the admin.
+- 2026-11-21, on the maintainer's request (to see the look and feel), on
+  the server: badges attached to the demo tasks (Blinklicht → Code-Starter,
+  Sensor auslesen → Sensor-Profi, LED-Schaltung → Erste LED, Greifarm →
+  Greifarm, Gehäuse → Konstrukteur/in; Linienfolger → Linienfolger and
+  Motor ansteuern → Motor after this PR). The two image-less demo badges
+  were revoked and deleted. For approved demo submissions the awards were
+  given afterwards with `award_for` (same rule as a review, dated with the
+  review) – normally badges are not retroactive. Tested locally that
+  `seed_demo --remove` then still removes all demo tasks and awards and
+  keeps the real badges. The attachments go with the demo tasks.
+- Two more badges from the maintainer (Linienfolger, Motor, made with
+  ChatGPT from a follow-up prompt in `design/badges/PROMPT.md`).
+  `design/generate_assets.py` now crops each badge to its motif and centres
+  it at 85 % of the height, because the new originals were larger with less
+  margin; all eight web versions are regenerated and look the same size.
 
 ## Open issues
 
