@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
-{% block extra_head %}<meta name="referrer" content="no-referrer">{% endblock %}
+{% comment %}strict-origin, not no-referrer (#128): referrers carry only the origin,
+never the token in the URL; with no-referrer browsers send "Origin: null" on
+the POST and Django's CSRF check rejects the upload.{% endcomment %}
+{% block extra_head %}<meta name="referrer" content="strict-origin">{% endblock %}
 
 {% block content %}
   <h1>Fotos hochladen</h1>

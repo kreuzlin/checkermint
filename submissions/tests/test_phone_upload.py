@@ -5,7 +5,7 @@ from unittest import mock
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, override_settings
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -62,6 +62,35 @@ class PhoneUploadTests(TestCase):
         self.client.post(url, {"aktion": "speichern", "erklaerung": "x"})
         self.assertNotContains(self.client.get(url), "Fotos mit dem Handy")
 
+    def test_upload_passes_the_real_csrf_check_with_an_origin(self):
+        """#128: browsers send the page's origin; the CSRF check must pass.
+
+        The default test client neither enforces CSRF nor sends an Origin
+        header, which is how "Origin: null" (from no-referrer) slipped
+        through.
+        """
+        draft = self.save_draft()
+        url = self.phone_url(draft)
+        phone = Client(enforce_csrf_checks=True)
+        page = phone.get(url)
+        token = page.context["csrf_token"]
+        response = phone.post(
+            url,
+            {"csrfmiddlewaretoken": str(token), "fotos": [jpeg("handy.jpg")]},
+            HTTP_ORIGIN="http://testserver",
+        )
+        self.assertRedirects(response, url, fetch_redirect_response=False)
+        self.assertEqual(draft.items.count(), 1)
+
+        # What no-referrer made the iPhone send: rejected, nothing stored.
+        response = phone.post(
+            url,
+            {"csrfmiddlewaretoken": str(token), "fotos": [jpeg("handy2.jpg")]},
+            HTTP_ORIGIN="null",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(draft.items.count(), 1)
+
     def test_phone_uploads_without_login_into_the_draft(self):
         draft = self.save_draft()
         url = self.phone_url(draft)
@@ -69,7 +98,8 @@ class PhoneUploadTests(TestCase):
         page = self.client.get(url)
         self.assertEqual(page.status_code, 200)
         self.assertContains(page, "«Brücke»")
-        self.assertContains(page, '<meta name="referrer" content="no-referrer">')
+        # Only the origin as referrer, never the token (#128).
+        self.assertContains(page, '<meta name="referrer" content="strict-origin">')
         # No personal data on a page without login.
         self.assertNotContains(page, "Anna")
 
