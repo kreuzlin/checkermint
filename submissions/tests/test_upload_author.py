@@ -40,7 +40,10 @@ class UploadAuthorTests(TestCase):
         self.client.post(self.edit, {"aktion": "speichern", "fotos": [jpeg("own.jpg")]})
         draft = Submission.objects.get()
         self.client.logout()
-        phone = reverse("submissions:phone_upload", kwargs={"token": make_token(draft)})
+        phone = reverse(
+            "submissions:phone_upload",
+            kwargs={"token": make_token(draft.user, draft.task)},
+        )
         self.client.post(phone, {"fotos": [jpeg("phone.jpg")]})
         self.client.force_login(self.coach)
         self.client.post(self.coach_url, {"fotos": [jpeg("coach.jpg")]})

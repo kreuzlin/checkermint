@@ -30,13 +30,20 @@ class LiveUpdateTests(TestCase):
         return Submission.objects.get()
 
     def phone_upload(self, draft, *names):
-        url = reverse("submissions:phone_upload", kwargs={"token": make_token(draft)})
+        url = reverse(
+            "submissions:phone_upload",
+            kwargs={"token": make_token(draft.user, draft.task)},
+        )
         self.client.post(url, {"fotos": [jpeg(name) for name in names]})
 
-    def test_form_polls_only_with_a_draft(self):
+    def test_form_polls_also_without_a_draft(self):
+        # #130: the QR code is there right away, so the form polls too and
+        # the stored-items view keeps polling (204) until the phone creates
+        # the draft.
         response = self.client.get(self.edit)
-        self.assertNotContains(response, "htmx-2.0.4.min.js")
-        self.assertNotContains(response, "hx-get")
+        self.assertContains(response, "/static/core/js/htmx-2.0.4.min.js")
+        self.assertContains(response, 'hx-trigger="every 5s"')
+        self.assertEqual(self.client.get(self.stored, {"stand": "0"}).status_code, 204)
         self.save_draft()
         response = self.client.get(self.edit)
         self.assertContains(response, "/static/core/js/htmx-2.0.4.min.js")
@@ -88,7 +95,10 @@ class LiveUpdateTests(TestCase):
         self.phone_upload(draft, "anna.jpg")
         ben = User.objects.create_user("ben", password="geheim123")
         self.client.force_login(ben)
-        self.assertEqual(self.client.get(self.stored).status_code, 286)
+        # Ben has no draft of his own: he keeps polling, sees nothing of Anna.
+        response = self.client.get(self.stored)
+        self.assertEqual(response.status_code, 204)
+        self.assertNotContains(response, "anna.jpg", status_code=204)
         coach = User.objects.create_user("coach", password="geheim123", is_staff=True)
         coach.groups.add(Group.objects.get(name=COACH_GROUP_NAME))
         self.client.force_login(coach)

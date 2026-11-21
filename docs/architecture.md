@@ -117,25 +117,32 @@ Overview of how the project is built and run. Decisions and their rationale:
   (`hints.services.plan_carry_over`, #38); an open hint request for a hint
   the new version no longer has blocks the switch until a coach decided
   it.
-- Phone upload (#28, brief 5.7): with a draft and photo or file
-  requirements, the form shows a QR code (`segno`, inline SVG, generated
-  locally) for `/hochladen/<token>/`. The token is signed with Django's
-  signing (`submissions.upload_links`, salt `submissions.upload-link`),
-  holds submission and user id, is valid 30 minutes and only while that
-  submission is still the participant's draft. The page needs no login,
+- Phone upload (#28, brief 5.7): for tasks with photo or file
+  requirements the form shows a QR code (`segno`, inline SVG, generated
+  locally) for `/hochladen/<token>/` right away, also before a draft
+  exists (#130). The token is signed with Django's signing
+  (`submissions.upload_links`, salt `submissions.upload-link`), holds task
+  and user id (links from before #130 held the draft id and still work
+  while that draft exists) and is valid 30 minutes, as long as the task is
+  visible and unlocked for the participant and no solution waits for a
+  coach. The first upload from the phone creates the draft
+  (`services.ensure_draft`, like a coach upload, starting from the last
+  submission's content); a GET creates nothing. The page needs no login,
   shows only the task title and requirement labels (no names, no
   thumbnails), sets the referrer policy `strict-origin` (referrers carry
   only the origin, never the token; `no-referrer` made browsers send
   `Origin: null` and broke the CSRF check, #128), and only adds photos/files (same
   handlers and image pipeline, `max_count` respected); invalid or expired
   links answer 410.
-- Live update (#29): with a draft, the form loads htmx (vendored, see
+- Live update (#29): whenever the QR code is shown, the form loads htmx (vendored, see
   [`vendored-assets.md`](vendored-assets.md)) and every stored-items block
   of a photo/file requirement polls
   `/aufgaben/<slug>/loesung/gespeichert/<key>/?stand=<ids>` every 5 s. The
   server answers 204 if the item ids are unchanged, the new block (keeping
-  ticked "Entfernen" boxes) if not, and 286 (htmx stops polling) when
-  there is no draft any more or the user may not see it.
+  ticked "Entfernen" boxes) if not, also 204 while there is no draft yet
+  (the phone may create it, #130), and 286 (htmx stops polling) when the
+  solution waits for a coach, the requirement is unknown or the user may
+  not see it.
 - Coach uploads (#30): the participant profile links coaches to
   `/teilnehmende/<nickname>/hochladen/` (tasks with photo/file
   requirements and the participant's status) and

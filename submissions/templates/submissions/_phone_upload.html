@@ -1,13 +1,11 @@
-{% comment %}QR code for uploading photos and files with a phone (brief 5.7).{% endcomment %}
+{% comment %}QR code for uploading photos and files with a phone (brief 5.7). Shown
+right away, also before a draft exists: the first upload from the phone
+creates it (#130).{% endcomment %}
 {% if phone_upload %}
   <aside class="phone-qr" aria-labelledby="handy-upload">
     <h2 id="handy-upload">Fotos mit dem Handy</h2>
-    {% if phone_upload.needs_draft %}
-      <p>Speichere zuerst einen Entwurf. Dann erscheint hier ein QR-Code, mit dem du Fotos direkt vom Handy hochladen kannst – auch mit dem Handy einer Kollegin oder eines Coaches.</p>
-    {% else %}
-      <div class="qr-code">{{ phone_upload.qr }}</div>
-      <p>Scanne den Code mit einem Handy und lade dort Fotos hoch. Danach diese Seite neu laden. Der Code gilt {{ phone_upload.minutes }} Minuten.</p>
-      <details><summary>Link statt QR-Code</summary><p class="qr-link"><code>{{ phone_upload.url }}</code></p></details>
-    {% endif %}
+    <div class="qr-code">{{ phone_upload.qr }}</div>
+    <p>Scanne den Code mit einem Handy und lade dort Fotos hoch – auch mit dem Handy einer Kollegin oder eines Coaches. Die Fotos erscheinen hier nach ein paar Sekunden. Der Code gilt {{ phone_upload.minutes }} Minuten.</p>
+    <details><summary>Link statt QR-Code</summary><p class="qr-link"><code>{{ phone_upload.url }}</code></p></details>
   </aside>
 {% endif %}

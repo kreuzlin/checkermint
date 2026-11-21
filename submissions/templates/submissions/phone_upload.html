@@ -7,7 +7,7 @@ the POST and Django's CSRF check rejects the upload.{% endcomment %}
 
 {% block content %}
   <h1>Fotos hochladen</h1>
-  <p>Für die Lösung zu «{{ draft.task_version.title }}». Was du hier hochlädst, landet direkt im Entwurf.</p>
+  <p>Für die Lösung zu «{{ version.title }}». Was du hier hochlädst, landet direkt im Entwurf.</p>
 
   <form method="post" enctype="multipart/form-data" class="form phone-upload" novalidate>
     {% csrf_token %}
