@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Add the time of day to database dump names")_
+_Last updated: 2026-11-21 (PR "Record the email tests")_
 
 ## Live
 
@@ -470,6 +470,14 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   by modification time.
 - The maintainer's phone upload works (2026-11-21, after #128–#134);
   checked off in the go-live checklist.
+
+- Email tests by the maintainer (2026-11-21): the coach notification on a
+  submission arrives in the inbox (sent to the superuser `linard`, the
+  only account with an address); the password reset works, but its email
+  lands in spam. Maintainer's decision: accepted, common for reset emails
+  (possible later: sender name "Checkermint", calmer wording). The email
+  to a participant after a review is still to be tried (needs an address
+  on a demo account).
 
 ## Open issues
 

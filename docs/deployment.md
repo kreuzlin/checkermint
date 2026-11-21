@@ -334,7 +334,10 @@ issue are tracked there.
   arrives; a password reset email arrives and its link works; a
   notification about a submission reaches a coach. Not in spam.
   (2026-11-21: SPF, DKIM and DMARC pass, the external test email arrived
-  in the inbox; password reset and notifications still to try.)
+  in the inbox; the coach notification on a submission arrived in the
+  inbox; the password reset works, its email landed in spam – accepted by
+  the maintainer, common for reset emails. Still to try: the email to a
+  participant after a review.)
 - [x] Backups: cron runs `scripts/backup.sh` at 02:00, UpCloud backup after
   it (02:15); `scripts/backup.sh && scripts/test-restore.sh` passes (#49).
   After the first night: today's files in `backups/` (2026-11-21 OK).
