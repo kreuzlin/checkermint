@@ -1,20 +1,13 @@
-"""Processing of badge images and the move of the shipped set (ADR 0018, #120)."""
+"""Processing of uploaded badge images (ADR 0018, #120)."""
 
-import importlib
 import io
-import shutil
-import tempfile
 
-from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase
 from PIL import Image
 
 from badges.images import SIZE, process_badge_image
-from badges.models import Badge
-
-move = importlib.import_module("badges.migrations.0005_move_shipped_images")
 
 
 def upload(
@@ -80,42 +73,3 @@ class ProcessBadgeImageTests(SimpleTestCase):
             process_badge_image(upload(size=(4097, 10), motif=(0, 0, 10, 10)))
         with self.assertRaisesMessage(ValidationError, "durchsichtig"):
             process_badge_image(upload(motif=(0, 0, 0, 0)))
-
-
-MEDIA_ROOT = tempfile.mkdtemp()
-
-
-@override_settings(MEDIA_ROOT=MEDIA_ROOT)
-class MoveShippedImagesTests(TestCase):
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        shutil.rmtree(MEDIA_ROOT, ignore_errors=True)
-
-    def test_shipped_images_are_moved_into_the_upload(self):
-        led = Badge.objects.create(name="Erste LED", image="erste-led.png")
-        placeholder = Badge.objects.create(name="Ohne Bild")
-        missing = Badge.objects.create(name="Fehlt", image="gibt-es-nicht.png")
-
-        move.move_shipped_images(apps, None)
-
-        led.refresh_from_db()
-        self.assertTrue(led.image_file.name.startswith("badges/"))
-        self.assertTrue(led.image_file.name.endswith(".png"))
-        with led.image_file.open("rb") as handle:
-            self.assertEqual(Image.open(handle).size, (SIZE, SIZE))
-        self.assertEqual(led.image, "erste-led.png")  # unchanged until #120 part 2
-        placeholder.refresh_from_db()
-        missing.refresh_from_db()
-        self.assertFalse(placeholder.image_file)
-        self.assertFalse(missing.image_file)
-
-        name = led.image_file.name
-        move.move_shipped_images(apps, None)  # idempotent
-        led.refresh_from_db()
-        self.assertEqual(led.image_file.name, name)
-
-        move.remove_uploaded_images(apps, None)
-        led.refresh_from_db()
-        self.assertFalse(led.image_file)
-        self.assertFalse(led.image_file.storage.exists(name))

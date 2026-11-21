@@ -2,21 +2,60 @@ from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Badge, UserBadge, available_images
+from accounts.roles import is_coach
+
+from .images import process_badge_image
+from .models import Badge, UserBadge
+
+# Required by the maintainer (ADR 0018): badge images are public.
+UPLOAD_NOTICE = (
+    "Keine Fotos von Personen hochladen – nur Grafiken. Das Bild ist "
+    "öffentlich sichtbar (öffentliche Profile). Erlaubt: PNG oder WebP, "
+    "höchstens 2 MB. Das Bild wird neu gespeichert, auf das Motiv "
+    "zugeschnitten und auf 512 × 512 Pixel zentriert."
+)
 
 
 class BadgeForm(forms.ModelForm):
+    upload = forms.FileField(
+        label="Bild hochladen",
+        required=False,
+        help_text=UPLOAD_NOTICE,
+        widget=forms.ClearableFileInput(attrs={"accept": "image/png,image/webp"}),
+    )
+    remove_image = forms.BooleanField(
+        label="Bild entfernen (Platzhalter zeigen)", required=False
+    )
+
     class Meta:
         model = Badge
-        fields = ["name", "description", "image"]
+        fields = ["name", "description"]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
-        choices = [("", "– Platzhalter –")] + [(n, n) for n in available_images()]
-        current = self.instance.image
-        if current and current not in available_images():
-            choices.append((current, f"{current} (fehlt)"))
-        self.fields["image"].widget = forms.Select(choices=choices)
+        # Only coaches and superusers upload (ADR 0018); the admin is staff
+        # only, but a staff user outside the coach group must not.
+        if user is None or not is_coach(user):
+            for name in ("upload", "remove_image"):
+                self.fields[name].disabled = True
+                self.fields[name].help_text = "Nur Coaches können Bilder ändern."
+        self._processed = None
+
+    def clean_upload(self):
+        upload = self.cleaned_data.get("upload")
+        if upload:
+            self._processed = process_badge_image(upload)
+        return upload
+
+    def save(self, commit=True):
+        badge = super().save(commit=False)
+        if self._processed is not None:
+            badge.set_image(self._processed)
+        elif self.cleaned_data.get("remove_image") and badge.image_file:
+            badge.remove_image()
+        if commit:
+            badge.save()
+        return badge
 
 
 @admin.register(Badge)
@@ -26,9 +65,18 @@ class BadgeAdmin(admin.ModelAdmin):
     list_display_links = ["preview", "name"]
     search_fields = ["name", "description"]
     readonly_fields = ["preview", "created_at"]
-    fields = ["name", "description", "image", "preview", "created_at"]
+    fields = ["name", "description", "preview", "upload", "remove_image", "created_at"]
 
-    @admin.display(description="Vorschau")
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+
+        class FormForUser(form):
+            def __init__(self, *args, **kw):
+                super().__init__(*args, user=request.user, **kw)
+
+        return FormForUser
+
+    @admin.display(description="Bild")
     def preview(self, obj):
         if obj and obj.image_url:
             return format_html(

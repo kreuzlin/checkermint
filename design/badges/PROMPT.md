@@ -19,10 +19,11 @@ only wrote the prompt below and generates the web versions with
 | `08_Motor.png` | Motor | `motor.png` |
 
 All originals: PNG with a transparent background, no metadata; 01–06 at
-1024 × 1024 px, 07–08 at 1254 × 1254 px with a larger motif.
-`design/generate_assets.py` crops every badge to its visible motif and
-centres it at the same size (85 % of the height), so all badges look
-equally large; the originals stay untouched. Checked at 40 and 48 px on
+1024 × 1024 px, 07–08 at 1254 × 1254 px with a larger motif. Since #120
+(ADR 0018) the images live as uploads in the badge admin (moved there by
+migration `badges/0005`); the upload crops every badge to its visible motif
+and centres it at the same size (85 % of the height), so all badges look
+equally large. This folder is the archive of the originals. Checked at 40 and 48 px on
 the site's dark background (#020d16): every symbol stays recognisable.
 
 ## Prompt for badges 07 and 08
@@ -48,8 +49,9 @@ corrections in the ChatGPT conversation are not recorded here.
 
 To add a badge in the same style, reuse the prompt with a new line in the
 list, or ask in the same ChatGPT conversation for one more badge "im exakt
-gleichen Stil". Then put the PNG here, run `design/generate_assets.py` and
-add a row to the table above.
+gleichen Stil". Then upload the PNG in the admin (Badges → Badge →
+"Bild hochladen"; PNG or WebP, at most 2 MB). Optionally keep the original
+here with a row in the table above.
 
 ```text
 Du gestaltest ein Set von Abzeichen (Badges) für «Checkermint», die Trainingsplattform eines Robotik-Clubs für Kinder von 7 bis 16 Jahren. Kinder bekommen einen Badge, wenn sie eine bestimmte Aufgabe gelöst haben.

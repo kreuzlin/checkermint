@@ -199,17 +199,17 @@ participants are pinned to each version.
 |---|---|---|
 | `name` | char 60, unique | |
 | `description` | char 200, optional | what the badge is for |
-| `image` | char 100, optional | file name in `badges/static/badges/img/`; empty = neutral placeholder. **Being replaced** by `image_file` (#120); removed in the second PR |
-| `image_file` | image, optional | uploaded badge image (ADR 0018): our own 512 px PNG from `badges.images.process_badge_image` (PNG/WebP only, no metadata, motif cropped and centred at 85 %), stored under a random name in `badges/` in the media volume (migrations `badges/0004–0005`) |
+| `image_file` | image, optional, not editable directly | uploaded badge image (ADR 0018): our own 512 px PNG from `badges.images.process_badge_image` (PNG/WebP only, no metadata, motif cropped and centred at 85 %), stored under a random name in `badges/` in the media volume; empty = neutral placeholder. Set in the admin by coaches and superusers only (`Badge.set_image`, `remove_image`); the old file is deleted after the commit, also when a badge is deleted |
 | `created_at` | datetime | automatic |
 
-Badge images are public (public profiles). Until #120 is complete they are
-static assets (`badges/static/badges/img/`, generated from `design/badges/`
-with their source and rights). ADR 0018 replaces this with uploads in the
-admin: migration `badges/0005` moves the shipped images into `image_file`;
-the second PR serves them through a dedicated public view and removes
-`image`. Artwork may be made by the maintainer with AI tools (brief,
-section 11); Claude Code never generates it.
+Badge images are public (public profiles): the only upload that is, as
+a deliberate exception from ADR 0009 (ADR 0018). `Badge.image_url` points to
+`badges:image` (`/badges/<id>/bild/<file name>.png`), which serves only the
+stored image of that badge. History: until #120 the images were static
+files (`badges/static/badges/img/`, field `image`); migration `badges/0005`
+moved them into `image_file`, `badges/0006` removed `image`. Originals and
+prompts stay in `design/badges/`. Artwork may be made by the maintainer with
+AI tools (brief, section 11); Claude Code never generates it.
 
 ### UserBadge
 

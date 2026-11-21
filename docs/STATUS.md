@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-21 (PR "Let Claude merge all PRs, asking first for risky ones")_
+_Last updated: 2026-11-21 (PR "Upload badge images in the admin")_
 
 ## Live
 
@@ -429,6 +429,15 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   into `image_file`; the shipped files are generated at 512 px for that
   (about 190 KB each, until part 2 removes them). No visible change yet;
   merged by the maintainer (migration).
+
+- #120, part 2: coaches (and superusers) upload badge images in the admin
+  ("Bild hochladen", notice "Keine Fotos von Personen hochladen – nur
+  Grafiken …", PNG/WebP only) or remove them; staff outside the coach group
+  cannot. Public view `/badges/<id>/bild/<file name>.png` (no login,
+  `nosniff`, inline, cached a year; the URL changes with every upload).
+  Migration `badges/0006` removes the old field `image`; the shipped images
+  and the badge part of `design/generate_assets.py` are gone. Merged after
+  the maintainer's OK (field removal).
 
 ## Open issues
 
