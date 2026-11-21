@@ -1,29 +1,20 @@
-from pathlib import Path
+from pathlib import PurePath
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.db import models
-from django.templatetags.static import static
+from django.db import models, transaction
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from django.urls import reverse
 from django.utils import timezone
 
 from core.private_files import RandomUploadPath
 
-# Badge artwork is a static asset, not an upload: it can appear on public
-# profiles, and uploads are always private (brief 4.2, ADR 0009). Original
-# files go to design/ (issue #4); the web versions live here.
-IMAGE_DIR = Path(__file__).resolve().parent / "static" / "badges" / "img"
-IMAGE_EXTENSIONS = {".svg", ".png", ".webp"}
 
-
-def available_images() -> list[str]:
-    """File names of the badge images that ship with the app."""
-    if not IMAGE_DIR.is_dir():
-        return []
-    return sorted(
-        path.name
-        for path in IMAGE_DIR.iterdir()
-        if path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS
-    )
+def _delete_after_commit(field_file):
+    """Remove a stored file once the database change is committed."""
+    if field_file:
+        storage, name = field_file.storage, field_file.name
+        transaction.on_commit(lambda: storage.delete(name))
 
 
 class Badge(models.Model):
@@ -36,22 +27,15 @@ class Badge(models.Model):
         blank=True,
         help_text="Wofür es den Badge gibt, in einem Satz.",
     )
-    image = models.CharField(
-        "Bild",
-        max_length=100,
-        blank=True,
-        help_text=(
-            "Eines der Badge-Bilder, die mit der Website ausgeliefert werden. "
-            "Leer: neutraler Platzhalter."
-        ),
-    )
-    # The uploaded badge image (ADR 0018): our own 512 px PNG, produced by
-    # badges.images.process_badge_image. Replaces `image` (#120); until the
-    # second PR switches over, the site still shows `image`.
+    # Uploaded by coaches in the admin (ADR 0018): always our own 512 px PNG
+    # from badges.images.process_badge_image, never the original upload.
+    # Public through badges:image (public profiles) – the only upload that
+    # is (ADR 0009 otherwise). Empty: neutral placeholder.
     image_file = models.ImageField(
-        "Bilddatei",
+        "Bild",
         upload_to=RandomUploadPath("badges"),
         blank=True,
+        editable=False,
     )
     created_at = models.DateTimeField("Erstellt", auto_now_add=True)
 
@@ -63,15 +47,28 @@ class Badge(models.Model):
     def __str__(self):
         return self.name
 
-    def clean(self):
-        if self.image and self.image not in available_images():
-            raise ValidationError({"image": "Dieses Bild gibt es nicht."})
+    def set_image(self, content) -> None:
+        """Store a processed image; the old file goes after the commit."""
+        # Captures the old name now, before save() replaces it.
+        _delete_after_commit(self.image_file)
+        self.image_file.save(content.name, content, save=False)
+
+    def remove_image(self) -> None:
+        _delete_after_commit(self.image_file)
+        self.image_file = ""
 
     @property
     def image_url(self) -> str | None:
-        if not self.image:
+        """Public URL; it changes with every new upload (random file name)."""
+        if not self.image_file:
             return None
-        return static(f"badges/img/{self.image}")
+        stem = PurePath(self.image_file.name).stem
+        return reverse("badges:image", args=[self.pk, stem])
+
+
+@receiver(post_delete, sender=Badge)
+def delete_badge_image(sender, instance, **kwargs):
+    _delete_after_commit(instance.image_file)
 
 
 class UserBadge(models.Model):

@@ -12,6 +12,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     # Feature apps go here, e.g. path("kontakt/", include("contact.urls")).
     path("aufgaben/", include("tasks.urls")),
+    path("", include("badges.urls")),
     path("", include("hints.urls")),
     path("", include("overviews.urls")),
     path("", include("submissions.urls")),
