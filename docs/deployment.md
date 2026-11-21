@@ -326,15 +326,17 @@ issue are tracked there.
 
 **Operations**
 
-- [ ] Server set up (section 1), domain switched (section 8), checks of
-  section 8 step 4 pass.
+- [x] Server set up (section 1), domain switched (section 8), checks of
+  section 8 step 4 pass (2026-11-20).
 - [ ] Email works (#3, #42): `sendtestemail` to an outside address
   arrives; a password reset email arrives and its link works; a
   notification about a submission reaches a coach. Not in spam.
-- [ ] Backups: cron runs `scripts/backup.sh` at 02:00, UpCloud backup after
+  (2026-11-21: SPF, DKIM and DMARC pass, the external test email arrived
+  in the inbox; password reset and notifications still to try.)
+- [x] Backups: cron runs `scripts/backup.sh` at 02:00, UpCloud backup after
   it (02:15); `scripts/backup.sh && scripts/test-restore.sh` passes (#49).
-  After the first night: today's files in `backups/`.
-- [ ] Rollback tested (section 4, #50).
+  After the first night: today's files in `backups/` (2026-11-21 OK).
+- [x] Rollback tested (section 4, #50, 2026-11-20).
 - [x] Container log retention matches the privacy page: 50 MB per
   container (`/etc/docker/daemon.json`, section 1; #97).
 - [ ] Disk: `df -h /` well below 80 %.
