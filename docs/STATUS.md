@@ -10,7 +10,7 @@ Next project, approved by the maintainer 2026-11-21:
 [`GEARSBOT_BRIEF.md`](GEARSBOT_BRIEF.md) (GearsBot simulator; see
 "GearsBot" below).
 
-_Last updated: 2026-11-21 (PR "Add the badge originals for the GearsBot groups")_
+_Last updated: 2026-11-21 (PR "Record the GearsBot badges on the server")_
 
 ## Live
 
@@ -608,8 +608,13 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   Verlies, Schleifen, Entscheidungen, Funktionen – one per group, awarded
   with its last challenge (maintainer's decision 2026-11-21: points reward
   every challenge, badges mark finishing a group). Originals in
-  `design/badges/` (09–15). Creating them on the server and attaching them
-  to the tasks needs the maintainer's OK.
+  `design/badges/` (09–15).
+- 2026-11-21, with the maintainer's OK: the seven badges created on the
+  server (name, one-sentence description, image through
+  `process_badge_image` as in the admin upload) and attached to Grundlagen 5,
+  Warten 2, Labyrinth 6, Verlies 6, Schleifen 7, Bedingungen 12 and
+  Funktionen 11 (tasks still unpublished). 15 badges in total; images
+  served (200). The eight earlier badges unchanged.
 - Needs the maintainer and coaches: testing the simulator on the club's
   devices, reviewing and publishing the challenges (guide, section 1),
   merging the GearsBot update PRs; after an update with changed challenges,
