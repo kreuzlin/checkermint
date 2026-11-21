@@ -7,7 +7,7 @@ live in the linked docs; open work lives in GitHub issues.
 Requirements and scope of version 1:
 [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md) (milestones in section 10).
 
-_Last updated: 2026-11-20 (PR "Record demo data on the server")_
+_Last updated: 2026-11-21 (PR "Record mail authentication and first nightly backup")_
 
 ## Live
 
@@ -40,9 +40,9 @@ _Last updated: 2026-11-20 (PR "Record demo data on the server")_
 | App | `/srv/checkermint` (git checkout), `compose.prod.yaml`: `db` (PostgreSQL 18), `web` (GHCR image, Gunicorn), `caddy` (HTTPS) |
 | Secrets | `/srv/checkermint/.env` on the server only |
 | Deploy | `scripts/deploy.sh` on the server after CI has pushed the image for the merged commit |
-| Backups | cron 02:00 `scripts/backup.sh`: database dump (14 days) and `media.tar` (latest only) in `backups/` (ADR 0017); restore test `scripts/test-restore.sh`; UpCloud backup daily at 02:15 (set by the maintainer 2026-11-20, after the dump); must include the `media` volume (ADR 0009) |
+| Backups | cron 02:00 `scripts/backup.sh`: database dump (14 days) and `media.tar` (latest only) in `backups/` (ADR 0017); restore test `scripts/test-restore.sh`; first nightly run 2026-11-21 02:00 OK (dump and `media.tar`); UpCloud backup daily at 02:15 (set by the maintainer 2026-11-20, after the dump); must include the `media` volume (ADR 0009) |
 | Cron | `deploy`'s crontab: `0 2 * * * cd /srv/checkermint && scripts/backup.sh` (switched from `backup-db.sh` after #107, 2026-11-20) |
-| Mail | Hostpoint SMTP `asmtp.mail.hostpoint.ch:465` (SSL), login and sender `mail@checkermint.ch` (mailbox created by the maintainer 2026-11-19). Outbound 465/587 not blocked by UpCloud. SPF: `redirect=spf-permissive.mail.hostpoint.ch`; DKIM not found; no DMARC record yet. First test email arrived in spam (#3) |
+| Mail | Hostpoint SMTP `asmtp.mail.hostpoint.ch:465` (SSL), login and sender `mail@checkermint.ch` (mailbox created by the maintainer 2026-11-19). Outbound 465/587 not blocked by UpCloud. SPF `redirect=spf-permissive.mail.hostpoint.ch`, DKIM (three keys, selectors `20261121-{rsa1024,rsa2048,ed25519}-2051a403`) and DMARC `p=quarantine` enabled by the maintainer at Hostpoint 2026-11-21; sender policy "only with the mailbox's own user" fits (login, `DEFAULT_FROM_EMAIL` and `SERVER_EMAIL` are all `mail@checkermint.ch`) |
 | DNS | Hostpoint; only apex and `www` of checkermint.ch are changed (#2). Both point to the server (A and AAAA) since 2026-11-20; MX records unchanged |
 | CI | GitHub Actions: lint + tests, `linux/amd64` image to `ghcr.io/kreuzlin/checkermint` (`latest`, `sha-<commit>`) on `main`; runs on `main` are queued, never cancelled |
 | GitHub | Squash merge only (PR title/body), auto-merge, head branches deleted; ruleset "protect main" active (PR, CI checks, no force push/deletion); labels `ops`, `content`, `bug`, `enhancement` |
@@ -355,25 +355,34 @@ Runbook: [`deployment.md`](deployment.md). Architecture:
   coach login, home, catalogue, queue, progress, ranking, directory and
   admin answer 200; 11 files in the media volume.
 
+- 2026-11-21 (#3): after the maintainer enabled DKIM and DMARC at
+  Hostpoint, a test email to `mail@checkermint.ch` showed `spf=pass`,
+  `dkim=pass` (all three signatures) and `dmarc=pass`, spam score −0.3
+  (limit 4.0), delivered to the inbox (headers read via IMAP, only that
+  message). The DKIM selectors from the signatures resolve at `ns` and
+  `ns2.hostpoint.ch`. A test email to the maintainer's external (iCloud)
+  address arrived in the inbox, not in spam. The first test on
+  2026-11-20, before DKIM/DMARC, had landed in spam.
+- 2026-11-21: first nightly `scripts/backup.sh` by cron at 02:00 wrote
+  the dump and `media.tar`. Disk 25 % used.
+
 ## Open issues
 
 Overview: `gh issue list`. At the time of writing:
 
 | # | Topic | Who |
 |---|---|---|
-| 1 | Production server (UpCloud): set up, deployed, backups scheduled; left: the maintainer's admin account (`createsuperuser`) | Maintainer |
-| 3 | Outgoing mail: the test email arrives but lands in spam – enable DKIM at Hostpoint, add a DMARC record (`p=none`), then test again and check the headers (SPF/DKIM `pass`) | Maintainer |
+| 1 | Production server (UpCloud): set up, deployed, backups running, maintainer's admin account created (2026-11-20) – nothing left, can be closed | Maintainer |
 | 4 | Badge artwork (logo and colours delivered) | Maintainer |
 | 42, 49, 50 | Version 1, one issue per PR, grouped in milestones M9–M11 (brief, section 10); PRs with server changes (and, once the app is productive, migrations) are marked and merged by the maintainer. #42, #49 and #50 done | Claude Code |
 
 ## Next steps
 
-1. Maintainer: #3 (DKIM, DMARC – the test email landed in spam).
-2. Then the go-live checklist (deployment.md, section 9) until the
+1. The go-live checklist (deployment.md, section 9) until the
    maintainer declares the app productive.
-3. Maintainer: manual test of phone upload and live update
+2. Maintainer: manual test of phone upload and live update
    ([`manual-testing.md`](manual-testing.md)).
-4. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
+3. Libraries agreed: `markdown` + `nh3` (sanitised Markdown), `segno` (QR
    codes, added with #28), htmx served as a local static file, `robohash` (avatars),
    `pygments` (code highlighting, added with #23), `pillow` +
    `pillow-heif` (image processing incl. HEIC, explicit since #24).
